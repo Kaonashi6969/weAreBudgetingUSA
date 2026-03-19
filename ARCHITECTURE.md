@@ -22,15 +22,21 @@ A layered architecture focused on domain isolation and testability:
   - modular `direct-store-scraper.js` that pulls configurations for multiple retailers (Walmart, Kroger).
 - **src/db/database.js**: SQLite connection management and schema initializations.
 
-### 🎨 Frontend (Angular 19)
+### 🎨 Frontend (Angular 21)
 
-Modern standalone component architecture using high-performance reactivity:
+Modern standalone component architecture using high-performance reactivity and strict clean code principles:
 
-- **src/app/components/**: Logic-heavy UI components (Basket, Products, Profile).
+- **src/app/components/**: A modular library of **8+ standalone components**:
+  - `IconComponent`: Root SVG handling with `:host` flexbox logic for perfect alignment.
+  - `ToastListComponent`: Global notification system driven by `UiStore`.
+  - `BasketComponent` / `ProfileComponent`: Feature-level logic orchestrators.
+  - `ProductResultCard` / `SavedListCard`: Reusable UI bricks for results and data visualization.
+- **src/app/models/types.ts**: Central **Source of Truth** for all data interfaces, eliminating `any` and ensuring 100% type safety.
 - **src/app/services/**:
-  - `ApiService`: Standard HTTP wrapper with JWT injection for authenticated requests.
-  - `UiStore`: **Signal-based** global state for notifications and loading indicators.
-- **src/app/app.routes.ts**: Lazy-loaded routes for optimized bundle sizes.
+  - `ApiService`: Standard HTTP wrapper with JWT injection for authenticated requests and typed Observables.
+  - `UiStore`: **Signal-based** global state for notifications, user session, and active region configuration.
+- **SCSS Styling**: Scoped styles using SCSS pre-processor for variables and logical nesting.
+- **Angular Control Flow**: Migrated to `@if` and `@for` (Angular 17+ Modern Control Flow) for faster rendering and cleaner templates.
 
 ---
 
@@ -54,7 +60,10 @@ The `BasketService.calculateCheapestBasket` logic is the primary differentiator 
 | Layer | Technology | Reason |
 | :--- | :--- | :--- |
 | **Language** | TypeScript (FE) / Node.js (BE) | Unified ecosystem and developer productivity. |
-| **Framework** | Angular 19 | Signals provide the most efficient change detection for dynamic basket lists. |
+| **Framework** | Angular 21 | Modern Control Flow and Signals provide the most efficient change detection. |
+| **State Management**| Signals | Granular reactivity without the overhead of Zone.js where possible. |
+| **Styling** | SCSS | Powerful variables and nesting for maintainable modular styling. |
+| **Linters** | ESLint / Stylelint | Enforces high code quality and strict standard compliance (TS, HTML, SCSS). |
 | **Database** | SQLite | Serverless, extremely fast for read-heavy retail data, and easy to backup. |
 | **Auth** | Passport.js + JWT | Industry standard for Google OAuth and stateless API security. |
 | **Scraping** | Playwright Stealth | Necessary to bypass Akamai/Cloudflare protections on modern supermarket sites. |

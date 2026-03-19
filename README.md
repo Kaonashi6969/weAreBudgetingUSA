@@ -10,7 +10,8 @@ A professional grocery search engine and price comparison tool for USA retailers
 - **NLP Matching**: Advanced scoring algorithm using `natural` (Jaro-Winkler + Exact Token Boost) that handles product names and category penalties (e.g., distinguishing between "Tomato" and "Tomato Sauce").
 - **Google OAuth 2.0**: Secure authentication for saving shopping lists and profiles.
 - **Profile & Lists**: Authenticated users can save, name, and retrieve their favorite shopping baskets.
-- **Modern Frontend**: Built with **Angular 19** using **Signals** for reactive state management.
+- **Modern Frontend**: Built with **Angular 21** (2026 Edition) using **Signals** for reactive state management and **Modern Control Flow** (`@if`, `@for`).
+- **Strict Quality Control**: Integrated **ESLint**, **Stylelint**, and **Prettier** for consistent code standards.
 
 ## 🏗️ Technical Architecture
 
@@ -21,9 +22,15 @@ The backend follows a **Layered/Clean Architecture**:
 - **Repositories** (backend/src/models/): Abstracted database access using the Repository Pattern.
 - **Scrapers** (backend/src/scrapers/): Playwright-based bots with modular store configurations.
 
-### Frontend (Angular 19)
-- **Standalone Components**: Clean, modern architecture.
-- **RxJS & Signals**: Efficient state management and change detection.
+### Frontend (Angular 21)
+- **Standalone Component Library**: Highly modular architecture with reusable components:
+  - `IconComponent`: Unified SVG renderer with flexbox centering.
+  - `StoreSelector` / `RegionSelector`: Modularized selection logic.
+  - `ProductResultCard`: Encapsulated matching and selection UI.
+  - `SavedListCard`: Reusable list preview for profile management.
+- **SCSS Styling**: Modern styling pipeline with component-scoped SCSS and global utility variables.
+- **RxJS & Signals**: Efficient state management and change detection using Granular Signals.
+- **Strict Typing**: Full TypeScript coverage with a central [types.ts](frontend/src/app/models/types.ts) library.
 - **Proxy Configuration**: Seamless development with proxy.conf.json for live-reloading.
 
 ## 🚀 Quick Start

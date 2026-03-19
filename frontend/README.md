@@ -1,59 +1,46 @@
-# BudgetFrontend
+# Budget Management - USA Edition (Frontend)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.2.
+This project is a high-performance **Angular 21** application using **Signals**, **Modern Control Flow**, and a **Standalone Component Architecture**.
 
-## Development server
+## 🚀 Development Server
 
-To start a local development server, run:
+To start a local development server with proxy support for the backend:
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Once the server is running, navigate to `http://localhost:4200/`.
 
-## Code scaffolding
+## 🛠️ Commands & Quality Control
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+We maintain high code standards with automated linting and formatting.
 
-```bash
-ng generate component component-name
-```
+| Command | Description |
+| :--- | :--- |
+| `npm run lint` | Runs **ESLint** for TypeScript and HTML logic checks. |
+| `npm run lint:scss` | Runs **Stylelint** to verify SCSS standard compliance. |
+| `npm run format` | Uses **Prettier** to auto-format every file in the project. |
+| `ng build` | Compiles the project into the `dist/` directory. |
+| `ng test` | Executes unit tests with **Vitest**. |
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 🏗️ Architecture Highlights
 
-```bash
-ng generate --help
-```
+### **1. Component Library**
+The UI is built with highly modular, standalone components found in `src/app/components/`:
+*   **Icon**: Centralized SVG handling.
+*   **Store/Region Selector**: Encapsulated list-filtering logic.
+*   **Product/Saved Card**: Reusable visual bricks for data representation.
 
-## Building
+### **2. State Management**
+*   **UiStore**: Global signal store for toasts, network status, and user session.
+*   **Signals & Computed**: Used extensively for granular reactivity without unnecessary change detection cycles.
 
-To build the project run:
+### **3. SCSS & Typography**
+*   Migration from CSS to **SCSS** complete.
+   *   Component-level scoped styles.
+   *   Prettier integrated for formatting CSS properties.
 
-```bash
-ng build
-```
+### **4. Strict Typing**
+All models are defined in [src/app/models/types.ts](src/app/models/types.ts). We maintain **zero** `any` types for maximum reliability.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
