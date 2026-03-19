@@ -1,0 +1,20 @@
+{
+  "pageTitle": "Access Denied",
+  "bodyText": "Access Denied\nYou don't have permission to access \"http://www.tesco.hu/groceries/hu-HU/search?\" on this server.\n\nReference #18.f4e1202.1773775258.ba41f75\n\nhttps://errors.edgesuite.net/18.f4e1202.1773775258.ba41f75",
+  "allClasses": [],
+  "allDataTestIds": [],
+  "productCandidates": [],
+  "pricePatterns": [],
+  "structure": {
+    "totalElements": 7,
+    "totalLinks": 0,
+    "totalButtons": 0,
+    "h1": 1,
+    "h2": 0,
+    "h3": 0,
+    "divs": 0,
+    "spans": 0,
+    "sections": 0,
+    "articles": 0
+  }
+}

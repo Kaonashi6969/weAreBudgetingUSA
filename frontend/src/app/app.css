@@ -1,0 +1,69 @@
+﻿.main { min-height: 100vh; background-color: #f0f2f5; font-family: system-ui, -apple-system, sans-serif; }
+
+.app-header {
+  background: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-content h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.profile-link {
+  text-decoration: none;
+  font-weight: 600;
+  color: #3182ce;
+  background: #ebf8ff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.profile-link:hover {
+  background: #bee3f8;
+  transform: translateY(-1px);
+}
+
+.badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.badge.pro {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.email {
+  font-size: 0.9rem;
+  color: #718096;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}

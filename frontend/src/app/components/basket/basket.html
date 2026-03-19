@@ -1,0 +1,129 @@
+<div class="basket-container">
+  <h2>Calculate Cheapest Basket</h2>
+
+  <!-- Global Toasts -->
+  <div class="toast-container">
+    <div *ngFor="let toast of ui.toasts()" class="toast" [ngClass]="'toast-' + toast.type">
+      {{ toast.message }}
+      <button (click)="ui.removeToast(toast.id)">×</button>
+    </div>
+  </div>
+
+  <div class="input-section">
+    <label for="items">Enter items (one per line):</label>
+    <textarea 
+      id="items" 
+      [ngModel]="itemsInput()" 
+      (ngModelChange)="itemsInput.set($event)"
+      rows="5" 
+      placeholder="e.g.&#10;Milk&#10;Bread&#10;Eggs">
+    </textarea>
+  </div>
+
+  <div class="store-selection">
+    <h3>Filter by Stores (Optional)</h3>
+    <div class="store-grid">
+      <div *ngFor="let store of stores()" class="store-checkbox">
+        <input 
+          type="checkbox" 
+          [id]="store.id" 
+          [checked]="selectedStores().includes(store.id)"
+          (change)="toggleStore(store.id)">
+        <label [for]="store.id">{{ store.name }}</label>
+      </div>
+    </div>
+  </div>
+
+  <button (click)="calculate()" [disabled]="isLoading() || !itemsInput().trim()" class="search-btn">
+    <span *ngIf="isLoading()" class="spinner"></span>
+    {{ isLoading() ? 'Searching Prices...' : '🛍️ Find Cheapest Basket' }}
+  </button>
+
+  <!-- Summary Section -->
+  <div *ngIf="results().length > 0" class="basket-summary">
+    <div class="summary-card">
+      <div class="summary-header">
+        <h3>Basket Overview</h3>
+        <span class="item-count">{{ totalItemsCount() }} / {{ results().length }} items matched</span>
+      </div>
+      <div class="total-price">
+        <span class="label">Total Estimated Price:</span>
+        <span class="amount">$ {{ totalPrice() | number:'1.2-2' }}</span>
+      </div>
+      
+      <!-- PRO Feature: Saving Basket -->
+      <div *ngIf="ui.user()?.tier === 'pro'; else upgradePrompt" class="pro-actions">
+        <button 
+          (click)="saveBasketToList()" 
+          [disabled]="totalItemsCount() === 0 || isSaving()" 
+          class="save-btn">
+          <span *ngIf="isSaving()" class="spinner-small"></span>
+          {{ isSaving() ? 'Saving list...' : '💾 Save as My Grocery List' }}
+        </button>
+      </div>
+
+      <ng-template #upgradePrompt>
+        <div class="upgrade-card">
+          <h4>🌟 Get PRO to save lists!</h4>
+          <p>Saving your grocery lists history is a PRO feature.</p>
+          <a href="/upgrade" class="upgrade-link">Upgrade Now</a>
+        </div>
+      </ng-template>
+
+      <div *ngIf="missingItemsCount() > 0" class="missing-warning">
+         ⚠️ {{ missingItemsCount() }} items currently have no matches in selected stores.
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="results().length > 0" class="results-section">
+    <div class="results-header">
+      <h3>Recommendations</h3>
+      <div class="user-tier-badge" [class.pro]="ui.user()?.tier === 'pro'">
+        {{ ui.user()?.tier === 'pro' ? '🚀 PRO: Live Scraping Enabled' : '📦 FREE: Searching Database Only' }}
+      </div>
+    </div>
+    
+    <div *ngFor="let item of results()" class="result-card" [class.is-fresh]="item.isFresh" [class.is-cached]="!item.isFresh">
+      <div class="status-indicator">
+        <span class="dot"></span>
+        {{ item.isFresh ? 'Live Refresh' : 'Cached Price' }}
+      </div>
+      
+      <h4>🛒 {{ item.userInput | titlecase }}</h4>
+      
+      <div *ngIf="!item.matches || item.matches.length === 0" class="no-match">
+          Could not find this item. Try a different term.
+      </div>
+
+      <div class="match-list">
+        <div *ngFor="let match of item.matches" 
+             class="match-item" 
+             [class.selected-match]="isSelected(item.userInput, match.id)"
+             (click)="selectMatch(item.userInput, match)">
+          
+          <div class="match-content">
+            <div class="match-image" *ngIf="match.image_url">
+              <img [src]="match.image_url" [alt]="match.name" />
+            </div>
+            <div class="match-details">
+              <div class="match-header">
+                <span class="store-badge" [ngClass]="match.store.toLowerCase()">{{ match.store }}</span>
+                <span class="price-text">$ {{ match.price | number:'1.2-2' }}</span>
+              </div>
+              <p class="product-name">{{ match.name }}</p>
+            </div>
+          </div>
+          
+          <div class="match-footer">
+            <span class="selection-indicator">
+              {{ isSelected(item.userInput, match.id) ? '✅ Selected' : '➕ Select this' }}
+            </span>
+            <a [href]="match.url" target="_blank" class="view-link" *ngIf="match.url" (click)="$event.stopPropagation()">View →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

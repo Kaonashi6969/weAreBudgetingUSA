@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cheapest Grocery Basket Finder</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-content">
+        <h1>🛒 Cheapest Grocery Basket</h1>
+        <p class="tagline">Tell me what to buy and I'll tell you where it's cheapest</p>
+      </div>
+    </header>
+
+    <main>
+      <!-- Input Section -->
+      <section class="input-section">
+        <div class="card">
+          <h2>Enter Your Grocery List</h2>
+          <p class="instructions">Enter grocery items one per line or comma-separated</p>
+          
+          <!-- Store Selection -->
+          <div class="store-selector-group">
+            <p class="label">Choose stores:</p>
+            <div id="storeCheckboxes" class="store-checkboxes">
+              <!-- Dynamically populated -->
+              <span class="text-muted">Loading stores...</span>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <textarea 
+              id="groceryInput" 
+              placeholder="chicken breast&#10;milk&#10;rice&#10;eggs&#10;bread"
+              rows="6"
+            ></textarea>
+            <button id="searchBtn" class="btn btn-primary">🔍 Find Cheapest</button>
+          </div>
+
+          <!-- Quick suggestions -->
+          <div class="suggestions">
+            <p class="label">Popular items:</p>
+            <div class="suggestion-buttons">
+              <button class="suggestion-btn" data-item="chicken breast">Chicken</button>
+              <button class="suggestion-btn" data-item="milk">Milk</button>
+              <button class="suggestion-btn" data-item="eggs">Eggs</button>
+              <button class="suggestion-btn" data-item="bread">Bread</button>
+              <button class="suggestion-btn" data-item="rice">Rice</button>
+              <button class="suggestion-btn" data-item="cheese">Cheese</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="hidden">
+        <div class="card">
+          <div class="spinner"></div>
+          <p>Searching for the best prices...</p>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <section id="resultsSection" class="results-section hidden">
+        <div class="card results-card">
+          <div class="results-header">
+            <h2>💰 Best Deal Found</h2>
+            <button id="resetBtn" class="btn btn-secondary">↻ New Search</button>
+          </div>
+
+          <!-- Summary -->
+          <div class="results-summary">
+            <div class="summary-item">
+              <label>Best Store</label>
+              <div id="bestStore" class="highlight-store">-</div>
+            </div>
+            <div class="summary-item">
+              <label>Total Price</label>
+              <div id="totalPrice" class="highlight-price">-</div>
+            </div>
+          </div>
+
+          <!-- Itemized Breakdown -->
+          <div class="itemized-section">
+            <h3>Itemized Breakdown</h3>
+            <div id="itemsList" class="items-list">
+              <!-- Items will be inserted here -->
+            </div>
+          </div>
+
+          <!-- Match Info -->
+          <div class="match-info">
+            <p id="matchInfo" class="text-muted"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Error Section -->
+      <section id="errorSection" class="error-section hidden">
+        <div class="card error-card">
+          <h3>⚠️ Unable to Process</h3>
+          <p id="errorMessage"></p>
+          <button id="errorDismissBtn" class="btn btn-secondary">Try Again</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Cheapest Grocery Basket Finder MVP • Budapest, Hungary</p>
+      <p class="footer-info">Comparing prices across: <span id="storeList">-</span></p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
