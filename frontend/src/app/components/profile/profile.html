@@ -1,12 +1,18 @@
 <div class="profile-container">
   <div class="profile-header">
-    <a routerLink="/" class="back-link">← {{ ui.translation()['find_deals'] }}</a>
+    <a routerLink="/" class="back-link">
+      <span class="material-icons">arrow_back</span>
+      <span>{{ ui.translation()['find_deals'] }}</span>
+    </a>
     <h2>{{ ui.translation()['dashboard_title'] }}</h2>
   </div>
 
   <!-- Region Preference -->
   <div class="profile-section region-section">
-    <h3>🌍 {{ ui.translation()['deployment_zone'] }}</h3>
+    <h3>
+      <span class="material-icons">public</span>
+      <span>{{ ui.translation()['deployment_zone'] }}</span>
+    </h3>
     <div class="region-selector">
       <label for="profileRegionSelect">{{ ui.translation()['active_region_label'] }}</label>
       <select id="profileRegionSelect"
@@ -18,14 +24,17 @@
   </div>
 
   <div class="profile-section">
-    <h3>🛋️ {{ ui.translation()['saved_inventories'] }}</h3>
+    <h3>
+      <span class="material-icons">inventory</span>
+      <span>{{ ui.translation()['saved_inventories'] }}</span>
+    </h3>
 
     <div *ngIf="isLoading()" class="loading">
       <p>{{ ui.translation()['loading_lists_label'] }}</p>
     </div>
 
     <div *ngIf="!isLoading() && savedLists().length === 0" class="empty-state">
-      <div class="basket-icon">🛒</div>
+      <div class="basket-icon"><span class="material-icons">shopping_cart</span></div>
       <p>{{ ui.translation()['no_saved_lists'] }}</p>
       <a routerLink="/" class="btn-primary">{{ ui.translation()['start_budgeting_btn'] }}</a>
     </div>
@@ -36,7 +45,7 @@
           <h3 class="list-title">{{ list.name || ui.translation()['untitled_list_fallback'] }}</h3>
           <span class="date">{{ formatDate(list.created_at) }}</span>
           <button class="btn-delete" (click)="deleteList(list.id)">
-            <span class="trash-icon">🗑️</span>
+            <span class="material-icons">delete</span>
           </button>
         </div>
 
@@ -52,7 +61,7 @@
               <div class="item-details">
                 <span class="item-price">{{ currencySymbol() }}{{ item.price | number:'1.2-2' }}</span>
                 <span class="store-tag">{{ item.store || ui.translation()['unknown_store_fallback'] }}</span>
-                <a *ngIf="item.url" [href]="item.url" target="_blank" class="item-link">{{ ui.translation()['open_link_btn'] }} 🔗</a>
+                <a *ngIf="item.url" [href]="item.url" target="_blank" class="item-link">{{ ui.translation()['open_link_btn'] }} <span class="material-icons">open_in_new</span></a>
               </div>
             </li>
           </ul>

@@ -1,5 +1,5 @@
 <div class="basket-container">
-  <h2>{{ ui.translation()['optimizer_title'] }}</h2>
+  <h2 class="centered">{{ ui.translation()['optimizer_title'] }}</h2>
 
   <!-- Global Toasts -->
   <div class="toast-container">
@@ -36,7 +36,8 @@
 
   <button (click)="calculate()" [disabled]="isLoading() || !itemsInput().trim()" class="search-btn">
     <span *ngIf="isLoading()" class="spinner"></span>
-    🛍️ {{ isLoading() ? ui.translation()['running_matchmaker'] : ui.translation()['find_deals'] }}
+    <span class="material-icons" *ngIf="!isLoading()">search</span> 
+    <span>{{ isLoading() ? ui.translation()['running_matchmaker'] : ui.translation()['find_deals'] }}</span>
   </button>
 
 
@@ -59,43 +60,35 @@
           [disabled]="totalItemsCount() === 0 || isSaving()" 
           class="save-btn">
           <span *ngIf="isSaving()" class="spinner-small"></span>
-          {{ isSaving() ? ui.translation()['saving_list'] : '💾 ' + ui.translation()['save_grocery_list'] }}
+          <span class="material-icons" *ngIf="!isSaving()">save</span> {{ isSaving() ? ui.translation()['saving_list'] : ui.translation()['save_grocery_list'] }}
         </button>
       </div>
 
       <ng-template #upgradePrompt>
         <div class="upgrade-card">
-          <h4>🌟 {{ ui.translation()['get_pro_title'] }}</h4>
+          <h4><span class="material-icons">stars</span> {{ ui.translation()['get_pro_title'] }}</h4>
           <p>{{ ui.translation()['get_pro_desc'] }}</p>
           <a href="/upgrade" class="upgrade-link">{{ ui.translation()['upgrade_now'] }}</a>
         </div>
       </ng-template>
 
       <div *ngIf="missingItemsCount() > 0" class="missing-warning">
-         ⚠️ {{ missingItemsCount() }} items currently have no matches in selected stores.
+         <span class="material-icons">warning</span> {{ missingItemsCount() }} {{ ui.translation()['items_matched'] }}
       </div>
     </div>
   </div>
 
-  <div *ngIf="results().length > 0" class="results-section">
-    <div class="results-header">
-      <h3>{{ ui.translation()['recommendations'] }}</h3>
-      <div class="user-tier-badge" [class.pro]="ui.user()?.tier === 'pro'">
-        {{ ui.user()?.tier === 'pro' ? '🚀 ' + ui.translation()['pro_scraping_enabled'] : '📦 ' + ui.translation()['free_db_only'] }}
-      </div>
-    </div>
-    
-    <div *ngFor="let item of results()" class="result-card" [class.is-fresh]="item.isFresh" [class.is-cached]="!item.isFresh">
-      <div class="status-indicator">
-        <span class="dot"></span>
-        {{ item.isFresh ? ui.translation()['live_refresh'] : ui.translation()['cached_price'] }}
-      </div>
-      
-      <h4>🛒 {{ item.userInput | titlecase }}</h4>
-      
-      <div *ngIf="!item.matches || item.matches.length === 0" class="no-match">
+    <div *ngIf="!isLoading() && results().length > 0" class="results-grid">
+      <div *ngFor="let item of results()" class="result-card">
+        <div class="card-header">
+          <span class="material-icons">shopping_bag</span>
+          <h4>{{ item.userInput | titlecase }}</h4>
+        </div>
+        
+        <div *ngIf="item.matches?.length === 0" class="no-match">
+          <span class="material-icons">sentiment_dissatisfied</span>
           {{ ui.translation()['could_not_find_item'] }}
-      </div>
+        </div>
 
       <div class="match-list">
         <div *ngFor="let match of item.matches" 
@@ -118,9 +111,10 @@
           
           <div class="match-footer">
             <span class="selection-indicator">
-              {{ isSelected(item.userInput, match.id) ? '✅ ' + ui.translation()['selected'] : '➕ ' + ui.translation()['select_this'] }}
+              <span class="material-icons">{{ isSelected(item.userInput, match.id) ? 'check_circle' : 'add_circle' }}</span>
+              {{ isSelected(item.userInput, match.id) ? ui.translation()['selected'] : ui.translation()['select_this'] }}
             </span>
-            <a [href]="match.url" target="_blank" class="view-link" *ngIf="match.url" (click)="$event.stopPropagation()">View →</a>
+            <a [href]="match.url" target="_blank" class="view-link" *ngIf="match.url" (click)="$event.stopPropagation()">View <span class="material-icons">open_in_new</span></a>
           </div>
         </div>
       </div>
