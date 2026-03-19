@@ -1,0 +1,31 @@
+<div class="search-section">
+  <div class="input-section">
+    <label for="items">{{ translations['shopping_list_label'] }}</label>
+    <textarea
+      id="items"
+      [ngModel]="itemsInput"
+      (ngModelChange)="onItemsInputChange($event)"
+      rows="5"
+      [placeholder]="translations['placeholder']"
+    >
+    </textarea>
+  </div>
+
+  <app-store-selector
+    [stores]="stores"
+    [selected]="selectedStores"
+    [label]="translations['filter_sources']"
+    (toggled)="onStoreToggled($event)"
+  />
+
+  <button (click)="onSearch()" [disabled]="isLoading || !itemsInput.trim()" class="search-btn">
+    @if (isLoading) {
+      <span class="spinner"></span>
+    } @else {
+      <app-icon name="search" />
+    }
+    <span>{{
+      isLoading ? translations['running_matchmaker'] : translations['find_deals']
+    }}</span>
+  </button>
+</div>

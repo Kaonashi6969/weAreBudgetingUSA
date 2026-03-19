@@ -3,9 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
 import { UIStore, NetworkStatus } from '../../services/ui-store';
-import { IconComponent } from '../icon/icon';
 import { ToastListComponent } from '../toast-list/toast-list';
-import { StoreSelectorComponent } from '../store-selector/store-selector';
+import { BasketSearchComponent } from './basket-search';
 import { ProductResultCardComponent } from '../product-result-card/product-result-card';
 import { BasketOverviewComponent } from '../basket-overview/basket-overview';
 import { Store, Region, BasketResult, ProductMatch } from '../../models/types';
@@ -16,9 +15,8 @@ import { Store, Region, BasketResult, ProductMatch } from '../../models/types';
   imports: [
     CommonModule,
     FormsModule,
-    IconComponent,
     ToastListComponent,
-    StoreSelectorComponent,
+    BasketSearchComponent,
     ProductResultCardComponent,
     BasketOverviewComponent,
   ],

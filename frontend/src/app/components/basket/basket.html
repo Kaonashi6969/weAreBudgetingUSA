@@ -3,35 +3,16 @@
 
   <app-toast-list />
 
-  <div class="input-section">
-    <label for="items">{{ ui.translation()['shopping_list_label'] }}</label>
-    <textarea
-      id="items"
-      [ngModel]="itemsInput()"
-      (ngModelChange)="itemsInput.set($event)"
-      rows="5"
-      [placeholder]="ui.translation()['placeholder']"
-    >
-    </textarea>
-  </div>
-
-  <app-store-selector
+  <app-basket-search
+    [itemsInput]="itemsInput()"
     [stores]="stores()"
-    [selected]="selectedStores()"
-    [label]="ui.translation()['filter_sources']"
-    (toggled)="toggleStore($event)"
+    [selectedStores]="selectedStores()"
+    [isLoading]="isLoading()"
+    [translations]="ui.translation()"
+    (itemsInputChange)="itemsInput.set($event)"
+    (storeToggled)="toggleStore($event)"
+    (searchRequested)="calculate()"
   />
-
-  <button (click)="calculate()" [disabled]="isLoading() || !itemsInput().trim()" class="search-btn">
-    @if (isLoading()) {
-      <span class="spinner"></span>
-    } @else {
-      <app-icon name="search" />
-    }
-    <span>{{
-      isLoading() ? ui.translation()['running_matchmaker'] : ui.translation()['find_deals']
-    }}</span>
-  </button>
 
   @if (results().length > 0) {
     <app-basket-overview
