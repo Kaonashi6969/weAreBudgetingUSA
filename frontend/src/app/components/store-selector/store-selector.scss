@@ -1,39 +1,120 @@
-.store-selection {
-  margin-bottom: 30px;
-  padding: 20px;
-  background-color: #f8fafc;
-  border-radius: 8px;
+﻿.store-selection {
+  margin-bottom: 24px;
 }
 
-.store-selection h3 {
-  font-size: 1.1rem;
-  margin-top: 0;
-  margin-bottom: 15px;
-  color: #4a5568;
+.section-label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 500;
+  color: #475569;
+  font-size: 0.95rem;
 }
 
 .store-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
 }
 
-.store-checkbox {
+.store-card {
+  flex: 0 1 auto;
+  min-width: 80px;
+  max-width: 110px;
+  padding: 10px;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    border-color: #94a3b8;
+    background-color: #f8fafc;
+    transform: translateY(-1px);
+  }
+
+  &.active {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+
+    .store-name {
+      color: #1e40af;
+      font-weight: 500;
+    }
+
+    .check-badge {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+.logo-container {
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 8px 12px;
+  justify-content: center;
   background: white;
   border-radius: 6px;
-  border: 1px solid #edf2f7;
+  padding: 2px;
+
+  .store-logo {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: grayscale(0.2);
+    transition: filter 0.2s;
+  }
+}
+
+.active .store-logo {
+  filter: grayscale(0);
+}
+
+.store-name {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.check-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 14px;
+  height: 14px;
+  background-color: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.5);
   transition: all 0.2s;
+
+  .check-icon {
+    width: 6px;
+    height: 3px;
+    border-left: 1.5px solid white;
+    border-bottom: 1.5px solid white;
+    transform: rotate(-45deg);
+    margin-top: -1px;
+  }
 }
 
-.store-checkbox:hover {
-  border-color: #cbd5e0;
-}
-
-.store-checkbox input {
-  cursor: pointer;
+@media (max-width: 480px) {
+  .store-grid {
+    justify-content: space-between;
+  }
+  .store-card {
+    min-width: calc(33% - 8px);
+    max-width: none;
+  }
 }
