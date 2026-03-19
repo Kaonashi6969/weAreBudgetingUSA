@@ -82,16 +82,15 @@ class BasketService {
 
             // Category Penalty: If name implies it's a processed/liquid version
             const processedWords = [
-              "szosz", "le", "ital", "passzirozott", "keverek", "pesto", 
-              "suritmeny", "suritmény", "sűritmeny", "sűrítmény", "konzerv", "ketchup", "mustar", "mustár"
+              "sauce", "juice", "drink", "pureed", "mix", "pesto", 
+              "concentrate", "canned", "ketchup", "mustard"
             ];
             
-            // Clean both for comparison to avoid hungarian character misses in keys
-            const cleanPNom = cleanPName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            // Clean both for comparison
+            const cleanPNom = cleanPName.toLowerCase();
             const isProcessed = processedWords.some(pw => {
-               const cleanPW = pw.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-               return pTokens.some(pt => pt.normalize("NFD").replace(/[\u0300-\u036f]/g, "") === cleanPW) || 
-                      cleanPNom.includes(cleanPW);
+               return pTokens.some(pt => pt.toLowerCase() === pw) || 
+                      cleanPNom.includes(pw);
             });
             const userAskedForProcessed = iTokens.some(it => processedWords.includes(it));
 
@@ -99,14 +98,14 @@ class BasketService {
               score -= 3.5; // CRITICAL penalty: Makes sauces have negative or near-zero scores
             }
 
-            // Snack/Pastry Penalty (Vajas croissant, Sajt snack problem)
-            const snackWords = ["snack", "pogacsa", "croissant", "kalacs", "parna", "stangli", "burek"];
+            // Snack/Pastry Penalty
+            const snackWords = ["snack", "cookie", "croissant", "pastry", "roll", "bun"];
             const isSnack = snackWords.some(sw => pTokens.includes(sw) || cleanPName.includes(sw));
             if (isSnack) {
               score -= 1.8;
             }
 
-            // Length Bonus: Favor shorter, pure names ("Paradicsom" vs "Zöldséges paradicsom szósz")
+            // Length Bonus: Favor shorter, pure names ("Tomato" vs "Vegetable tomato sauce")
             const lengthRatio = normalizedInput.length / cleanPName.length;
             score += lengthRatio * 0.6;
         } else {

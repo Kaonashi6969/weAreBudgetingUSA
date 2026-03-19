@@ -25,7 +25,7 @@ class PriceUpdateScheduler {
         const scraper = new DirectStoreScraper();
         
         // Default search terms if not provided
-        const terms = searchTerms || ['csirkemell', 'tej', 'tojás', 'rizs', 'fehér kenyér'];
+        const terms = searchTerms || ['chicken breast', 'milk', 'eggs', 'rice', 'white bread'];
         
         await scraper.launch();
         for (const term of terms) {

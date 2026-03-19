@@ -1,13 +1,13 @@
-﻿# 🛒 Cheapest Grocery Basket Finder
+﻿# 🛒 Cheapest Grocery Basket Finder - USA Edition
 
-A professional grocery search engine and price comparison tool for Hungarian retailers (Tesco, Auchan, etc.). Built with a modern **Angular frontend** and a scalable **layered Node.js backend**.
+A professional grocery search engine and price comparison tool for USA retailers (Walmart, Kroger, etc.). Built with a modern **Angular frontend** and a scalable **layered Node.js backend**.
 
 ## ✨ Features
 
-- **Store Filtering**: Select specific retailers (Tesco, Auchan, Lidl, Aldi) to search in.
+- **Store Filtering**: Select specific retailers (Walmart, Kroger, etc.) to search in.
 - **Top 5 Offers**: See the best 5 prices for every product, ranked by relevance and value.
 - **Just-In-Time Scraper**: Automatically fetches fresh prices using Playwright if data is missing or older than 24h.
-- **NLP Matching**: Advanced scoring algorithm using `natural` (Jaro-Winkler + Exact Token Boost) that handles Hungarian special characters and category penalties (e.g., distinguishing between "Paradicsom" and "Paradicsom szósz").
+- **NLP Matching**: Advanced scoring algorithm using `natural` (Jaro-Winkler + Exact Token Boost) that handles product names and category penalties (e.g., distinguishing between "Tomato" and "Tomato Sauce").
 - **Google OAuth 2.0**: Secure authentication for saving shopping lists and profiles.
 - **Profile & Lists**: Authenticated users can save, name, and retrieve their favorite shopping baskets.
 - **Modern Frontend**: Built with **Angular 19** using **Signals** for reactive state management.

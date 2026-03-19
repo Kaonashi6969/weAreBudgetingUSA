@@ -5,7 +5,6 @@ const PriceRepository = require('../models/PriceRepository');
 const StoreRepository = require('../models/StoreRepository');
 const ProductRepository = require('../models/ProductRepository');
 const STORES = require('./config');
-const tescoApiScraper = require('./tesco-api-scraper');
 const krogerApiFetcher = require('./kroger-api-fetcher');
 const walmartApiFetcher = require('./walmart-api-fetcher');
 const instacartApiFetcher = require('./instacart-api-fetcher');
@@ -79,91 +78,11 @@ class DirectStoreScraper {
       userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
     });
 
-    // Check if we have an API scraper for this store
-    if (store.id === 'tesco') {
-      try {
-        // 1. Quick initial navigation to get current session context
-        await page.goto(store.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-        
-        // 2. Perform the GraphQL search INSIDE the browser context to bypass Akamai/TLS fingerprinting
-        const results = await page.evaluate(async ({ query, apiUrl, apiKey }) => {
-          const graphqlQuery = `query Search($query: String!, $page: Int = 1, $count: Int = 24, $sortBy: String = "relevance", $filterCriteria: [filterCriteria], $showDepositReturnCharge: Boolean = true) {
-            search(query: $query, page: $page, count: $count, sortBy: $sortBy, filterCriteria: $filterCriteria) {
-              results {
-                node {
-                  ... on ProductType { id title defaultImageUrl sellers(type: TOP, limit: 1) { results { price { actual } } } }
-                  ... on MPProduct { id title defaultImageUrl sellers(type: TOP, limit: 1) { results { price { actual } } } }
-                }
-              }
-            }
-          }`;
-
-          try {
-            const response = await fetch(apiUrl, {
-              method: 'POST',
-              headers: {
-                'content-type': 'application/json',
-                'x-apikey': apiKey
-              },
-              body: JSON.stringify({
-                operationName: "Search",
-                variables: {
-                  query: query,
-                  page: 1,
-                  count: 24,
-                  sortBy: "relevance",
-                  filterCriteria: [{ name: "inputType", values: ["free text"] }],
-                  showDepositReturnCharge: true
-                },
-                query: graphqlQuery
-              })
-            });
-
-            const text = await response.text();
-            if (!response.ok) {
-              console.error(`Tesco API error: ${response.status} ${text}`);
-              return null;
-            }
-            
-            const data = JSON.parse(text);
-            if (!data || !data.data || !data.data.search) return null;
-
-            return data.data.search.results.map(item => {
-              const node = item.node;
-              return {
-                id: node.id,
-                name: node.title,
-                price: node.sellers?.results[0]?.price?.actual,
-                image_url: node.defaultImageUrl,
-                store: 'Tesco',
-                url: `https://bevasarlas.tesco.hu/groceries/hu-HU/products/${node.id}`
-              };
-            }).filter(i => i.price !== undefined);
-          } catch (e) {
-            return null;
-          }
-        }, { 
-          query: termStr, 
-          apiUrl: 'https://xapi.tesco.com/', 
-          apiKey: 'SPr9p907l7z1G98T16as4L5PAn759C4X' 
-        });
-
-        if (results && results.length > 0) {
-          console.log(`✅ [${store.name}] API (In-Browser) returned ${results.length} results!`);
-          await page.close();
-          return results;
-        }
-        console.log(`⚠️ [${store.name}] API returned no results, falling back to browser scraping.`);
-      } catch (err) {
-        console.error(`❌ [${store.name}] API error (In-Browser), falling back to browser: ${err.message}`);
-      }
-    }
-
     console.log(`🔍 [${store.name}] Searching (Browser DOM): ${termStr}`);
     
     try {
       await page.setExtraHTTPHeaders({
-        'Accept-Language': 'hu-HU,hu;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Accept-Language': 'en-US,en;q=0.9',
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache'
       });
@@ -184,7 +103,7 @@ class DirectStoreScraper {
       // Quick cookie accept
       try {
         await page.waitForTimeout(1000);
-        const cookieButtons = ["button:has-text('Összes elfogadása')", "button:has-text('Elfogad')", "button#accept-all"];
+        const cookieButtons = ["button:has-text('Accept All')", "button:has-text('Accept')", "button#accept-all"];
         for (const selector of cookieButtons) {
           const btn = await page.$(selector);
           if (btn && await btn.isVisible()) {

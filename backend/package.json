@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "scrape": "node src/scrapers/tesco-scraper.js",
+    "scrape:walmart": "node src/scrapers/direct-store-scraper.js --store walmart",
     "seed-test-user": "node seed-users.js"
   },
   "dependencies": {
