@@ -1,32 +1,32 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { IconComponent } from '../icon/icon';
+import { SavedList, SavedListItem } from '../../models/types';
 
 @Component({
   selector: 'app-saved-list-card',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, DecimalPipe, IconComponent],
   templateUrl: './saved-list-card.html',
-  styleUrl: './saved-list-card.scss'
+  styleUrl: './saved-list-card.scss',
 })
 export class SavedListCardComponent {
-  @Input({ required: true }) list: any;
-  @Input({ required: true }) currencySymbol = '$';
+  @Input({ required: true }) list!: SavedList;
+  @Input() currencySymbol = '$';
   @Input() untitledText = 'Untitled List';
   @Input() itemsText = 'Items';
-  @Input() unknownStoreText = 'Unknown';
+  @Input() unknownStoreText = 'Unknown Store';
   @Input() openLinkText = 'Open';
   @Input() refreshText = 'Refresh';
+
   @Output() delete = new EventEmitter<number>();
   @Output() refresh = new EventEmitter<void>();
 
-  formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric', month: 'short', day: 'numeric'
-    });
+  calculateTotal(items: SavedListItem[]): number {
+    return items.reduce((acc, item) => acc + item.price, 0);
   }
 
-  calculateTotal(items: any[]): number {
-    return items.reduce((sum, item) => sum + (item.price || 0), 0);
+  formatDate(dateStr: string): string {
+    return new Date(dateStr).toLocaleDateString();
   }
 }

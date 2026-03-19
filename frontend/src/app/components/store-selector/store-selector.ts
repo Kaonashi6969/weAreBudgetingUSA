@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Store } from '../../models/types';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -6,10 +7,10 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './store-selector.html',
-  styleUrl: './store-selector.scss'
+  styleUrl: './store-selector.scss',
 })
 export class StoreSelectorComponent {
-  @Input({ required: true }) stores: any[] = [];
+  @Input({ required: true }) stores: Store[] = [];
   @Input({ required: true }) selected: string[] = [];
   @Input() label = '';
   @Output() toggled = new EventEmitter<string>();

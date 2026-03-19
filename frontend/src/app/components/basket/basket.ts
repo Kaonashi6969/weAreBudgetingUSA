@@ -6,20 +6,24 @@ import { UIStore, NetworkStatus } from '../../services/ui-store';
 import { IconComponent } from '../icon/icon';
 import { ToastListComponent } from '../toast-list/toast-list';
 import { StoreSelectorComponent } from '../store-selector/store-selector';
-import { RegionSelectorComponent } from '../region-selector/region-selector';
 import { UpgradeBannerComponent } from '../upgrade-banner/upgrade-banner';
 import { ProductResultCardComponent } from '../product-result-card/product-result-card';
+import { Store, Region, BasketResult, ProductMatch } from '../../models/types';
 
 @Component({
   selector: 'app-basket',
   standalone: true,
   imports: [
-    CommonModule, FormsModule,
-    IconComponent, ToastListComponent, StoreSelectorComponent,
-    UpgradeBannerComponent, ProductResultCardComponent
+    CommonModule,
+    FormsModule,
+    IconComponent,
+    ToastListComponent,
+    StoreSelectorComponent,
+    UpgradeBannerComponent,
+    ProductResultCardComponent,
   ],
   templateUrl: './basket.html',
-  styleUrl: './basket.scss'
+  styleUrl: './basket.scss',
 })
 export class BasketComponent {
   public ui = inject(UIStore);
@@ -29,15 +33,15 @@ export class BasketComponent {
   // Use Signals for performance and reactivity
   itemsInput = signal('');
   selectedStores = signal<string[]>([]);
-  stores = signal<any[]>([]);
-  regions = signal<any[]>([]);
-  results = signal<any[]>([]);
+  stores = signal<Store[]>([]);
+  regions = signal<Region[]>([]);
+  results = signal<BasketResult[]>([]);
 
   // Map: userInput -> selected match
-  selectedItems = signal<Record<string, any>>({});
+  selectedItems = signal<Record<string, ProductMatch>>({});
 
   totalPrice = computed(() =>
-    Object.values(this.selectedItems()).reduce((acc, item) => acc + (item.price || 0), 0.0)
+    Object.values(this.selectedItems()).reduce((acc, item) => acc + (item.price || 0), 0.0),
   );
 
   isSaving = signal(false);
@@ -64,7 +68,7 @@ export class BasketComponent {
         this.regions.set(regions);
         // Set the active region from the API data to ensure consistency
         const current = this.ui.activeRegion();
-        const matched = regions.find((r: any) => r.id === current.id);
+        const matched = regions.find((r: Region) => r.id === current.id);
         if (matched) this.ui.setRegion(matched);
         this.loadStores();
         this.cdr.detectChanges();
@@ -72,12 +76,12 @@ export class BasketComponent {
       error: () => {
         // Silently fall back — the default 'us' region is already set in ui-store
         this.loadStores();
-      }
+      },
     });
   }
 
   changeRegion(regionId: string) {
-    const region = this.regions().find((r: any) => r.id === regionId);
+    const region = this.regions().find((r: Region) => r.id === regionId);
     if (!region) return;
     this.ui.setRegion(region);
     this.selectedStores.set([]);
@@ -87,7 +91,7 @@ export class BasketComponent {
 
     // Persist the chosen region to the user’s profile
     this.api.updateUserRegion(regionId).subscribe({
-      error: (err) => console.warn('Could not save region preference:', err.message)
+      error: (err) => console.warn('Could not save region preference:', err.message),
     });
 
     this.cdr.detectChanges();
@@ -102,14 +106,14 @@ export class BasketComponent {
         this.stores.set(stores);
         this.cdr.detectChanges();
       },
-      error: () => this.ui.showToast('Failed to load stores', 'error')
+      error: () => this.ui.showToast('Failed to load stores', 'error'),
     });
   }
 
   toggleStore(storeId: string) {
-    this.selectedStores.update(current => {
+    this.selectedStores.update((current) => {
       const idx = current.indexOf(storeId);
-      if (idx > -1) return current.filter(id => id !== storeId);
+      if (idx > -1) return current.filter((id) => id !== storeId);
       return [...current, storeId];
     });
     this.cdr.detectChanges();
@@ -118,7 +122,9 @@ export class BasketComponent {
   // ── Basket Calculation ───────────────────────────────────────────────────────
 
   calculate() {
-    const items = this.itemsInput().split('\n').filter(i => i.trim());
+    const items = this.itemsInput()
+      .split('\n')
+      .filter((i) => i.trim());
 
     if (items.length === 0) {
       this.ui.showToast('Please enter at least one product name', 'warning');
@@ -135,8 +141,8 @@ export class BasketComponent {
       next: (res) => {
         this.results.set(res);
         // Auto-select the best match (sorted by score/price in the backend)
-        const bestChoices: Record<string, any> = {};
-        res.forEach((item: any) => {
+        const bestChoices: Record<string, ProductMatch> = {};
+        res.forEach((item: BasketResult) => {
           if (item.matches?.length > 0) {
             bestChoices[item.userInput] = item.matches[0];
           }
@@ -151,12 +157,12 @@ export class BasketComponent {
         this.ui.setStatus(NetworkStatus.ERROR);
         this.ui.showToast('Failed to calculate basket. Please try again.', 'error');
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
-  selectMatch(userInput: string, match: any) {
-    this.selectedItems.update(current => ({ ...current, [userInput]: match }));
+  selectMatch(userInput: string, match: ProductMatch) {
+    this.selectedItems.update((current) => ({ ...current, [userInput]: match }));
     this.cdr.detectChanges();
   }
 
@@ -168,7 +174,10 @@ export class BasketComponent {
 
   saveBasketToList() {
     if (!this.listName().trim()) {
-      const name = prompt('Give a name to your grocery list:', `My List ${new Date().toLocaleDateString()}`);
+      const name = prompt(
+        'Give a name to your grocery list:',
+        `My List ${new Date().toLocaleDateString()}`,
+      );
       if (!name) return;
       this.listName.set(name);
     }
@@ -179,7 +188,7 @@ export class BasketComponent {
       price: match.price,
       store: match.store_name || match.store,
       url: match.url,
-      id: match.id
+      id: match.id,
     }));
 
     if (selected.length === 0) {
@@ -199,8 +208,7 @@ export class BasketComponent {
         this.ui.showToast('Please login to save lists', 'error');
         this.isSaving.set(false);
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 }
-

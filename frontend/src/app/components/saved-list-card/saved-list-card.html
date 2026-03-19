@@ -9,8 +9,10 @@
 
   <div class="card-body">
     <div class="summary">
-      <strong>{{ itemsText }}:</strong> {{ list.items.length }}
-      &mdash; <span class="total-price">{{ currencySymbol }}{{ calculateTotal(list.items) | number:'1.2-2' }}</span>
+      <strong>{{ itemsText }}:</strong> {{ list.items.length }} &mdash;
+      <span class="total-price"
+        >{{ currencySymbol }}{{ calculateTotal(list.items) | number: '1.2-2' }}</span
+      >
     </div>
 
     <ul class="items-list">
@@ -18,7 +20,7 @@
         <li>
           <div class="item-name">{{ item.productName }}</div>
           <div class="item-details">
-            <span class="item-price">{{ currencySymbol }}{{ item.price | number:'1.2-2' }}</span>
+            <span class="item-price">{{ currencySymbol }}{{ item.price | number: '1.2-2' }}</span>
             <span class="store-tag">{{ item.store || unknownStoreText }}</span>
             @if (item.url) {
               <a [href]="item.url" target="_blank" class="item-link">

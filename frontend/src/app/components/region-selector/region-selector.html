@@ -4,8 +4,12 @@
     <span>{{ sectionLabel }}</span>
   </h3>
   <div class="region-selector">
-    <label>{{ selectLabel }}</label>
-    <select [ngModel]="activeRegionId" (ngModelChange)="regionChanged.emit($event)">
+    <label for="region-select">{{ selectLabel }}</label>
+    <select
+      id="region-select"
+      [ngModel]="activeRegionId"
+      (ngModelChange)="regionChanged.emit($event)"
+    >
       @for (r of regions; track r.id) {
         <option [value]="r.id">{{ r.name }} ({{ r.currency.code }})</option>
       }

@@ -1,25 +1,10 @@
 import { signal, computed, inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { TranslocoService, Translation } from '@ngneat/transloco';
+import { TranslocoService } from '@ngneat/transloco';
+import { NetworkStatus, ToastMessage, Region, User } from '../models/types';
 
-export enum NetworkStatus {
-  IDLE = 'idle',
-  LOADING = 'loading',
-  ERROR = 'error',
-  SUCCESS = 'success'
-}
-
-export interface ToastMessage {
-  id: number;
-  message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-}
-
-export interface Region {
-  id: string;
-  name: string;
-  currency: { code: string; symbol: string };
-}
+export type { ToastMessage, Region, User };
+export { NetworkStatus };
 
 /**
  * Global UI state: loading, toasts, current user, and active region.
@@ -35,7 +20,7 @@ export class UIStore {
   readonly isLoading = computed(() => this._status() === NetworkStatus.LOADING);
 
   // Global user state
-  readonly user = signal<any>(null);
+  readonly user = signal<User | null>(null);
 
   // Translation signal from Transloco
   private _t = toSignal(this.transloco.selectTranslation());
@@ -53,7 +38,7 @@ export class UIStore {
   readonly activeRegion = signal<Region>({
     id: 'us',
     name: 'United States',
-    currency: { code: 'USD', symbol: '$' }
+    currency: { code: 'USD', symbol: '$' },
   });
 
   // Notifications
@@ -71,7 +56,7 @@ export class UIStore {
 
   showToast(message: string, type: ToastMessage['type'] = 'info') {
     const id = Date.now();
-    this._toasts.update(t => [...t, { id, message, type }]);
+    this._toasts.update((t) => [...t, { id, message, type }]);
 
     // Auto-remove after 4 seconds
     setTimeout(() => {
@@ -80,7 +65,6 @@ export class UIStore {
   }
 
   removeToast(id: number) {
-    this._toasts.update(t => t.filter(toast => toast.id !== id));
+    this._toasts.update((t) => t.filter((toast) => toast.id !== id));
   }
 }
-

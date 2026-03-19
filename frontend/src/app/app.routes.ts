@@ -4,5 +4,5 @@ import { ProfileComponent } from './components/profile/profile';
 
 export const routes: Routes = [
   { path: '', component: BasketComponent },
-  { path: 'profile', component: ProfileComponent }
+  { path: 'profile', component: ProfileComponent },
 ];

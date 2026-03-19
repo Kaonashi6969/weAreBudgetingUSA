@@ -6,7 +6,7 @@ import { IconComponent } from '../icon/icon';
   standalone: true,
   imports: [IconComponent],
   templateUrl: './upgrade-banner.html',
-  styleUrl: './upgrade-banner.scss'
+  styleUrl: './upgrade-banner.scss',
 })
 export class UpgradeBannerComponent {
   @Input({ required: true }) title = '';

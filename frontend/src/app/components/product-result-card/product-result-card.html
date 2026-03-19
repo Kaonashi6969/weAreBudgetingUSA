@@ -14,10 +14,13 @@
   <div class="match-list">
     @for (match of item.matches; track match.id) {
       <div
-           class="match-item"
-           [class.selected-match]="isSelected(match.id)"
-           (click)="select(match)">
-
+        class="match-item"
+        tabindex="0"
+        (keydown.enter)="select(match)"
+        (keydown.space)="select(match)"
+        [class.selected-match]="isSelected(match.id)"
+        (click)="select(match)"
+      >
         <div class="match-content">
           @if (match.image_url) {
             <div class="match-image">
@@ -26,8 +29,12 @@
           }
           <div class="match-details">
             <div class="match-header">
-              <span class="store-badge" [ngClass]="match.store.toLowerCase()">{{ match.store }}</span>
-              <span class="price-text">{{ currencySymbol }}{{ match.price | number:'1.2-2' }}</span>
+              <span class="store-badge" [ngClass]="match.store.toLowerCase()">{{
+                match.store
+              }}</span>
+              <span class="price-text"
+                >{{ currencySymbol }}{{ match.price | number: '1.2-2' }}</span
+              >
             </div>
             <p class="product-name">{{ match.name }}</p>
           </div>
@@ -39,8 +46,12 @@
             {{ isSelected(match.id) ? selectedText : selectThisText }}
           </span>
           @if (match.url) {
-            <a [href]="match.url" target="_blank" class="view-link"
-               (click)="$event.stopPropagation()">
+            <a
+              [href]="match.url"
+              target="_blank"
+              class="view-link"
+              (click)="$event.stopPropagation()"
+            >
               View <app-icon name="open_in_new" />
             </a>
           }

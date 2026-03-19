@@ -7,7 +7,7 @@ import { UIStore } from '../../services/ui-store';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './toast-list.html',
-  styleUrl: './toast-list.scss'
+  styleUrl: './toast-list.scss',
 })
 export class ToastListComponent {
   ui = inject(UIStore);

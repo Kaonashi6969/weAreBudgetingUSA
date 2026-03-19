@@ -7,7 +7,8 @@
           type="checkbox"
           [id]="store.id"
           [checked]="selected.includes(store.id)"
-          (change)="toggled.emit(store.id)">
+          (change)="toggled.emit(store.id)"
+        />
         <label [for]="store.id">{{ store.name }}</label>
       </div>
     }

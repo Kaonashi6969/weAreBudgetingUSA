@@ -12,7 +12,8 @@
     [activeRegionId]="ui.activeRegion().id"
     [sectionLabel]="ui.translation()['deployment_zone']"
     [selectLabel]="ui.translation()['active_region_label']"
-    (regionChanged)="changeRegion($event)" />
+    (regionChanged)="changeRegion($event)"
+  />
 
   <div class="profile-section">
     <h3>
@@ -46,7 +47,8 @@
             [openLinkText]="ui.translation()['open_link_btn']"
             [refreshText]="ui.translation()['refresh_btn']"
             (delete)="deleteList($event)"
-            (refresh)="loadLists()" />
+            (refresh)="loadLists()"
+          />
         }
       </div>
     }

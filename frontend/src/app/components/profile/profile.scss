@@ -40,7 +40,7 @@
   background: white;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -207,7 +207,7 @@
   background: white;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 7%);
   padding: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -252,5 +252,5 @@
 .region-selector select:focus {
   outline: none;
   border-color: #3182ce;
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+  box-shadow: 0 0 0 3px rgb(49 130 206 / 15%);
 }
