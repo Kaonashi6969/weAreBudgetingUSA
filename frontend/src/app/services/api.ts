@@ -14,12 +14,19 @@ export class ApiService {
     return this.http.get<any[]>(`${this.apiUrl}/products`);
   }
 
-  getStores(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/stores`);
+  /** Returns stores available for the given region (defaults to 'us'). */
+  getStores(region = 'us'): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/stores`, { params: { region } });
   }
 
-  calculateBasket(items: string[], selectedStores: string[]): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/basket`, { items, selectedStores });
+  /** Returns all supported regions for the region selector. */
+  getRegions(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/regions`);
+  }
+
+  /** Calculates the cheapest basket, scoped to the user’s current region. */
+  calculateBasket(items: string[], selectedStores: string[], region = 'us'): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/basket`, { items, selectedStores, region });
   }
 
   saveList(items: any[], name: string): Observable<any> {
@@ -36,5 +43,10 @@ export class ApiService {
 
   deleteList(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/lists/${id}`);
+  }
+
+  /** Persists the user’s preferred region on the server. */
+  updateUserRegion(regionId: string): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/auth/region`, { region: regionId });
   }
 }

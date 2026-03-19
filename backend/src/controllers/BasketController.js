@@ -5,7 +5,7 @@ const scraper = new DirectStoreScraper();
 class BasketController {
   async processBasket(req, res) {
     try {
-      const { items, selectedStores } = req.body;
+      const { items, selectedStores, region = 'us' } = req.body;
 
       if (!items) {
         return res.status(400).json({
@@ -16,29 +16,27 @@ class BasketController {
       }
 
       const storeList = Array.isArray(selectedStores) ? selectedStores : (selectedStores ? selectedStores.split(',') : []);
-
       const itemsStr = Array.isArray(items) ? items.join('\n') : items;
       const isPro = req.user?.tier === 'pro';
 
-      // JIT Scraping - Restricted to PRO users
+      // JIT Scraping — restricted to PRO users
       const staleTerms = await BasketService.getStaleTerms(itemsStr, storeList);
       let scrapedTerms = [];
-      
+
       if (staleTerms.length > 0) {
         if (isPro) {
           console.log(`🕒 PRO User: Found ${staleTerms.length} stale/missing terms. Updating cache...`);
           for (const term of staleTerms) {
-            await scraper.scrapeOnDemand(term, storeList);
+            await scraper.scrapeOnDemand(term, storeList, region);
             scrapedTerms.push(term.toLowerCase());
           }
         } else {
-          console.log(`ℹ️ FREE User: Found ${staleTerms.length} stale terms, but user is not PRO. Skipping JIT scraping.`);
+          console.log(`ℹ️ FREE User: ${staleTerms.length} stale terms found, skipping JIT scraping.`);
         }
       }
 
-      const results = await BasketService.calculateCheapestBasket(itemsStr, storeList);
-      
-      // Mark results as fresh or cached
+      const results = await BasketService.calculateCheapestBasket(itemsStr, storeList, region);
+
       const finalResults = results.map(item => ({
         ...item,
         isFresh: scrapedTerms.includes(item.userInput.toLowerCase())

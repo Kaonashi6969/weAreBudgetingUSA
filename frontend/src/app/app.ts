@@ -22,6 +22,16 @@ export class App implements OnInit {
       next: (userData) => {
         this.ui.user.set(userData);
         console.log('✅ Logged in as:', userData.email);
+
+        // Restore the user’s saved region preference, then load the regions list
+        if (userData.region) {
+          this.api.getRegions().subscribe({
+            next: (regions) => {
+              const saved = regions.find((r: any) => r.id === userData.region);
+              if (saved) this.ui.setRegion(saved);
+            }
+          });
+        }
       },
       error: (err) => {
         console.error('❌ Error fetching user profile:', err);

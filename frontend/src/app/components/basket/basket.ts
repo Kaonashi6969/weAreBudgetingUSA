@@ -19,17 +19,18 @@ export class BasketComponent {
   itemsInput = signal('');
   selectedStores = signal<string[]>([]);
   stores = signal<any[]>([]);
+  regions = signal<any[]>([]);
   results = signal<any[]>([]);
-  
-  // Calculate final totals and selected items logic
-  selectedItems = signal<Record<string, any>>({}); // Map: userInput -> selected match
 
-  totalPrice = computed(() => {
-    return Object.values(this.selectedItems()).reduce((acc, item) => acc + (item.price || 0), 0.0);
-  });
+  // Map: userInput -> selected match
+  selectedItems = signal<Record<string, any>>({});
+
+  totalPrice = computed(() =>
+    Object.values(this.selectedItems()).reduce((acc, item) => acc + (item.price || 0), 0.0)
+  );
 
   isSaving = signal(false);
-  listName = signal(''); // Store the custom name for saving
+  listName = signal('');
 
   totalItemsCount = computed(() => Object.keys(this.selectedItems()).length);
   missingItemsCount = computed(() => this.results().length - this.totalItemsCount());
@@ -38,24 +39,55 @@ export class BasketComponent {
   ui = uiStore;
   isLoading = computed(() => this.ui.isLoading());
 
+  /** Currency symbol derived from the active region (e.g. '$', '£', '€'). */
+  currencySymbol = computed(() => this.ui.activeRegion()?.currency?.symbol ?? '$');
+
   constructor() {
-    this.loadStores();
+    this.loadRegions();
   }
 
-  selectMatch(userInput: string, match: any) {
-    this.selectedItems.update(current => ({
-      ...current,
-      [userInput]: match
-    }));
+  // ── Region ──────────────────────────────────────────────────────────────────
+
+  loadRegions() {
+    this.api.getRegions().subscribe({
+      next: (regions) => {
+        this.regions.set(regions);
+        // Set the active region from the API data to ensure consistency
+        const current = this.ui.activeRegion();
+        const matched = regions.find((r: any) => r.id === current.id);
+        if (matched) this.ui.setRegion(matched);
+        this.loadStores();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        // Silently fall back — the default 'us' region is already set in ui-store
+        this.loadStores();
+      }
+    });
+  }
+
+  changeRegion(regionId: string) {
+    const region = this.regions().find((r: any) => r.id === regionId);
+    if (!region) return;
+    this.ui.setRegion(region);
+    this.selectedStores.set([]);
+    this.results.set([]);
+    this.selectedItems.set({});
+    this.loadStores();
+
+    // Persist the chosen region to the user’s profile
+    this.api.updateUserRegion(regionId).subscribe({
+      error: (err) => console.warn('Could not save region preference:', err.message)
+    });
+
     this.cdr.detectChanges();
   }
 
-  isSelected(userInput: string, matchId: string): boolean {
-    return this.selectedItems()[userInput]?.id === matchId;
-  }
+  // ── Stores ──────────────────────────────────────────────────────────────────
 
   loadStores() {
-    this.api.getStores().subscribe({
+    const regionId = this.ui.activeRegion().id;
+    this.api.getStores(regionId).subscribe({
       next: (stores) => {
         this.stores.set(stores);
         this.cdr.detectChanges();
@@ -73,9 +105,11 @@ export class BasketComponent {
     this.cdr.detectChanges();
   }
 
+  // ── Basket Calculation ───────────────────────────────────────────────────────
+
   calculate() {
     const items = this.itemsInput().split('\n').filter(i => i.trim());
-    
+
     if (items.length === 0) {
       this.ui.showToast('Please enter at least one product name', 'warning');
       return;
@@ -85,19 +119,19 @@ export class BasketComponent {
     this.results.set([]);
     this.cdr.detectChanges();
 
-    this.api.calculateBasket(items, this.selectedStores()).subscribe({
+    const regionId = this.ui.activeRegion().id;
+
+    this.api.calculateBasket(items, this.selectedStores(), regionId).subscribe({
       next: (res) => {
         this.results.set(res);
-        // Automatically select the cheapest match for each item
+        // Auto-select the best match (sorted by score/price in the backend)
         const bestChoices: Record<string, any> = {};
         res.forEach((item: any) => {
-          if (item.matches && item.matches.length > 0) {
-            // They are already sorted by score/price by backend, so [0] is often best
+          if (item.matches?.length > 0) {
             bestChoices[item.userInput] = item.matches[0];
           }
         });
         this.selectedItems.set(bestChoices);
-
         this.ui.setStatus(NetworkStatus.SUCCESS);
         this.ui.showToast(`Found ${res.length} items for your basket!`, 'success');
         this.cdr.detectChanges();
@@ -111,11 +145,21 @@ export class BasketComponent {
     });
   }
 
+  selectMatch(userInput: string, match: any) {
+    this.selectedItems.update(current => ({ ...current, [userInput]: match }));
+    this.cdr.detectChanges();
+  }
+
+  isSelected(userInput: string, matchId: string): boolean {
+    return this.selectedItems()[userInput]?.id === matchId;
+  }
+
+  // ── List Saving (PRO) ────────────────────────────────────────────────────────
+
   saveBasketToList() {
-    // If list name is empty, prompt user or use default
     if (!this.listName().trim()) {
       const name = prompt('Give a name to your grocery list:', `My List ${new Date().toLocaleDateString()}`);
-      if (!name) return; // User cancelled
+      if (!name) return;
       this.listName.set(name);
     }
 
@@ -134,12 +178,11 @@ export class BasketComponent {
     }
 
     this.isSaving.set(true);
-    // Send both name and items to backend
     this.api.saveList(selected, this.listName()).subscribe({
       next: () => {
         this.ui.showToast(`'${this.listName()}' saved to your profile!`, 'success');
         this.isSaving.set(false);
-        this.listName.set(''); // Reset name after saving
+        this.listName.set('');
         this.cdr.detectChanges();
       },
       error: () => {

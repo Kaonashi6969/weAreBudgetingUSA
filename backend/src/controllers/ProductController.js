@@ -1,6 +1,6 @@
 const ProductRepository = require('../models/ProductRepository');
-const StoreRepository = require('../models/StoreRepository');
-const STORES_CONFIG = require('../scrapers/config');
+const { getStoresForRegion } = require('../config/stores');
+const { getAllRegions } = require('../config/regions');
 
 class ProductController {
   async getProducts(req, res) {
@@ -12,15 +12,26 @@ class ProductController {
     }
   }
 
+  /**
+   * Returns the stores available for a given region.
+   * Always sourced from config so the list is accurate even if the DB is empty.
+   */
   async getStores(req, res) {
     try {
-      // Map from hardcoded config to ensure stores are always available for filtering
-      // even if the database is empty.
-      const stores = STORES_CONFIG.map(s => ({
-        id: s.id,
-        name: s.name
-      }));
+      const regionId = req.query.region || 'us';
+      const stores = getStoresForRegion(regionId).map(s => ({ id: s.id, name: s.name }));
       res.json(stores);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  /**
+   * Returns the list of supported regions for the frontend region selector.
+   */
+  async getRegions(req, res) {
+    try {
+      res.json(getAllRegions());
     } catch (err) {
       res.status(500).json({ error: err.message });
     }

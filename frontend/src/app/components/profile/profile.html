@@ -1,49 +1,67 @@
 <div class="profile-container">
   <div class="profile-header">
     <a routerLink="/" class="back-link">← Back to Shopping</a>
-    <h2>My Saved Grocery Lists</h2>
+    <h2>My Profile</h2>
   </div>
 
-  <div *ngIf="isLoading()" class="loading">
-    <p>Loading your lists...</p>
+  <!-- Region Preference -->
+  <div class="profile-section region-section">
+    <h3>🌍 Region Preference</h3>
+    <p class="section-desc">Your saved region determines which stores and currency are shown.</p>
+    <div class="region-selector">
+      <label for="profileRegionSelect">Active region:</label>
+      <select id="profileRegionSelect"
+              [ngModel]="ui.activeRegion().id"
+              (ngModelChange)="changeRegion($event)">
+        <option *ngFor="let r of regions()" [value]="r.id">{{ r.name }} ({{ r.currency.code }})</option>
+      </select>
+    </div>
   </div>
 
-  <div *ngIf="!isLoading() && savedLists().length === 0" class="empty-state">
-    <div class="basket-icon">🛒</div>
-    <p>You haven't saved any lists yet.</p>
-    <a routerLink="/" class="btn-primary">Start Budgeting</a>
-  </div>
+  <div class="profile-section">
+    <h3>🛋️ My Saved Grocery Lists</h3>
 
-  <div class="list-grid" *ngIf="savedLists().length > 0">
-    <div *ngFor="let list of savedLists()" class="list-card">
-      <div class="card-header">
-        <h3 class="list-title">{{ list.name || 'Untitled List' }}</h3>
-        <span class="date">{{ formatDate(list.created_at) }}</span>
-        <button class="btn-delete" (click)="deleteList(list.id)">
-          <span class="trash-icon">🗑️</span>
-        </button>
-      </div>
+    <div *ngIf="isLoading()" class="loading">
+      <p>Loading your lists...</p>
+    </div>
 
-      <div class="card-body">
-        <div class="summary">
-          <strong>Items:</strong> {{ list.items.length }} 
-          — <span class="total-price">{{ calculateTotal(list.items) | number:'1.0-0' }} HUF</span>
+    <div *ngIf="!isLoading() && savedLists().length === 0" class="empty-state">
+      <div class="basket-icon">🛒</div>
+      <p>You haven't saved any lists yet.</p>
+      <a routerLink="/" class="btn-primary">Start Budgeting</a>
+    </div>
+
+    <div class="list-grid" *ngIf="savedLists().length > 0">
+      <div *ngFor="let list of savedLists()" class="list-card">
+        <div class="card-header">
+          <h3 class="list-title">{{ list.name || 'Untitled List' }}</h3>
+          <span class="date">{{ formatDate(list.created_at) }}</span>
+          <button class="btn-delete" (click)="deleteList(list.id)">
+            <span class="trash-icon">🗑️</span>
+          </button>
         </div>
-        
-        <ul class="items-list">
-          <li *ngFor="let item of list.items">
-            <div class="item-name">{{ item.productName }}</div>
-            <div class="item-details">
-              <span class="item-price">{{ item.price | number:'1.0-0' }} Ft</span>
-              <span class="store-tag">{{ item.store || 'Unknown' }}</span>
-              <a *ngIf="item.url" [href]="item.url" target="_blank" class="item-link">Open 🔗</a>
-            </div>
-          </li>
-        </ul>
-      </div>
 
-      <div class="card-footer">
-        <button class="btn-secondary" (click)="loadLists()">Refresh</button>
+        <div class="card-body">
+          <div class="summary">
+            <strong>Items:</strong> {{ list.items.length }}
+            &mdash; <span class="total-price">{{ currencySymbol() }}{{ calculateTotal(list.items) | number:'1.2-2' }}</span>
+          </div>
+
+          <ul class="items-list">
+            <li *ngFor="let item of list.items">
+              <div class="item-name">{{ item.productName }}</div>
+              <div class="item-details">
+                <span class="item-price">{{ currencySymbol() }}{{ item.price | number:'1.2-2' }}</span>
+                <span class="store-tag">{{ item.store || 'Unknown' }}</span>
+                <a *ngIf="item.url" [href]="item.url" target="_blank" class="item-link">Open 🔗</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-footer">
+          <button class="btn-secondary" (click)="loadLists()">Refresh</button>
+        </div>
       </div>
     </div>
   </div>

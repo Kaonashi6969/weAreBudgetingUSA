@@ -1,6 +1,8 @@
 const ProductRepository = require('../models/ProductRepository');
 const PriceRepository = require('../models/PriceRepository');
 const natural = require('natural');
+const { getRegion } = require('../config/regions');
+const { getStoresByIds } = require('../config/stores');
 
 const tokenizer = new natural.WordTokenizer();
 const metaphone = natural.Metaphone;
@@ -11,6 +13,16 @@ class BasketService {
     const inputs = typeof itemsStr === 'string' 
       ? itemsStr.split(/[\r\n,]+/).map(i => i.trim().toLowerCase()).filter(i => i.length > 0)
       : [];
+
+    // If every selected store is API-based (noCache:true), skip the TTL check entirely
+    // and treat all terms as stale so fresh data is always fetched from the API.
+    const selectedStores = getStoresByIds(selectedStoreIds);
+    const allNoCache = selectedStores.length > 0 && selectedStores.every(s => s.noCache === true);
+    if (allNoCache) {
+      console.log(`[Cache] All selected stores are API-based. Bypassing TTL — treating all ${inputs.length} term(s) as stale.`);
+      return inputs;
+    }
+
     const staleItems = [];
 
     for (const input of inputs) {
@@ -37,8 +49,11 @@ class BasketService {
     return staleItems;
   }
 
-  async calculateCheapestBasket(userInput, selectedStoreIds = []) {
-    console.log(`Calculate: "${userInput}", Stores: ${selectedStoreIds}`);
+  async calculateCheapestBasket(userInput, selectedStoreIds = [], regionId = 'us') {
+    const region = getRegion(regionId);
+    const { processedWordPenalty, snackWordPenalty } = region.nlp;
+
+    console.log(`Calculate: "${userInput}", Stores: ${selectedStoreIds}, Region: ${regionId}`);
     const inputs = typeof userInput === 'string' 
       ? userInput.split(/[\r\n,]+/).map(item => item.trim().toLowerCase()).filter(item => item.length > 0)
       : [];
@@ -78,34 +93,26 @@ class BasketService {
 
         if (hasExactToken) {
             // HUGE boost for finding the actual root word
-            score += 3.0; // Higher boost to pull true word matches way above the 0.8 filter
+            score += 3.0;
 
-            // Category Penalty: If name implies it's a processed/liquid version
-            const processedWords = [
-              "sauce", "juice", "drink", "pureed", "mix", "pesto", 
-              "concentrate", "canned", "ketchup", "mustard"
-            ];
-            
-            // Clean both for comparison
+            // Category Penalty: penalise processed/liquid versions the user didn’t ask for
             const cleanPNom = cleanPName.toLowerCase();
-            const isProcessed = processedWords.some(pw => {
-               return pTokens.some(pt => pt.toLowerCase() === pw) || 
-                      cleanPNom.includes(pw);
-            });
-            const userAskedForProcessed = iTokens.some(it => processedWords.includes(it));
+            const isProcessed = processedWordPenalty.some(pw =>
+              pTokens.some(pt => pt.toLowerCase() === pw) || cleanPNom.includes(pw)
+            );
+            const userAskedForProcessed = iTokens.some(it => processedWordPenalty.includes(it));
 
             if (isProcessed && !userAskedForProcessed) {
-              score -= 3.5; // CRITICAL penalty: Makes sauces have negative or near-zero scores
+              score -= 3.5;
             }
 
             // Snack/Pastry Penalty
-            const snackWords = ["snack", "cookie", "croissant", "pastry", "roll", "bun"];
-            const isSnack = snackWords.some(sw => pTokens.includes(sw) || cleanPName.includes(sw));
+            const isSnack = snackWordPenalty.some(sw => pTokens.includes(sw) || cleanPName.includes(sw));
             if (isSnack) {
               score -= 1.8;
             }
 
-            // Length Bonus: Favor shorter, pure names ("Tomato" vs "Vegetable tomato sauce")
+            // Length Bonus: favour shorter, purer names
             const lengthRatio = normalizedInput.length / cleanPName.length;
             score += lengthRatio * 0.6;
         } else {

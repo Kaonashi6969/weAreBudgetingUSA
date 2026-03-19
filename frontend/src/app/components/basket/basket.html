@@ -48,7 +48,7 @@
       </div>
       <div class="total-price">
         <span class="label">Total Estimated Price:</span>
-        <span class="amount">$ {{ totalPrice() | number:'1.2-2' }}</span>
+        <span class="amount">{{ currencySymbol() }}{{ totalPrice() | number:'1.2-2' }}</span>
       </div>
       
       <!-- PRO Feature: Saving Basket -->
@@ -109,7 +109,7 @@
             <div class="match-details">
               <div class="match-header">
                 <span class="store-badge" [ngClass]="match.store.toLowerCase()">{{ match.store }}</span>
-                <span class="price-text">$ {{ match.price | number:'1.2-2' }}</span>
+                <span class="price-text">{{ currencySymbol() }}{{ match.price | number:'1.2-2' }}</span>
               </div>
               <p class="product-name">{{ match.name }}</p>
             </div>

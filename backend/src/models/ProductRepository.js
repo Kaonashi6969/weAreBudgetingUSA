@@ -31,24 +31,33 @@ class ProductRepository extends BaseRepository {
     });
   }
 
-  async getWithPrices(selectedStoreIds = []) {
+  async getWithPrices(selectedStoreIds = [], regionId = null) {
     let query = `
       SELECT p.id, p.name, p.image_url, pr.price, s.name as store, pr.url, pr.updated_at, s.id as store_id
       FROM products p 
       JOIN prices pr ON p.id = pr.product_id
       JOIN stores s ON pr.store_id = s.id
     `;
-    
+    const conditions = [];
+    const params = [];
+
     if (selectedStoreIds && selectedStoreIds.length > 0) {
       const placeholders = selectedStoreIds.map(() => '?').join(',');
-      const formattedIds = selectedStoreIds.map(id => String(id).toLowerCase());
-      query += ` WHERE LOWER(s.id) IN (${placeholders})`;
-      console.log(`[DB Exec] ${query} | Params: ${JSON.stringify(formattedIds)}`);
-      return await database.all(query, formattedIds);
+      conditions.push(`LOWER(s.id) IN (${placeholders})`);
+      selectedStoreIds.forEach(id => params.push(String(id).toLowerCase()));
     }
 
-    console.log(`[DB Exec] ${query} | No filter`);
-    return await database.all(query);
+    if (regionId) {
+      conditions.push('s.region = ?');
+      params.push(regionId);
+    }
+
+    if (conditions.length > 0) {
+      query += ` WHERE ${conditions.join(' AND ')}`;
+    }
+
+    console.log(`[DB Exec] ${query} | Params: ${JSON.stringify(params)}`);
+    return await database.all(query, params);
   }
 }
 

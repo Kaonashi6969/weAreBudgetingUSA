@@ -2,12 +2,22 @@ require("dotenv").config();
 const { chromium } = require("playwright");
 const database = require("../db/database");
 const PriceRepository = require('../models/PriceRepository');
-const StoreRepository = require('../models/StoreRepository');
 const ProductRepository = require('../models/ProductRepository');
-const STORES = require('./config');
+const { getStoresForRegion, getAllActiveStores } = require('../config/stores');
 const krogerApiFetcher = require('./kroger-api-fetcher');
 const walmartApiFetcher = require('./walmart-api-fetcher');
 const instacartApiFetcher = require('./instacart-api-fetcher');
+
+/**
+ * Dispatch map: scraperType → fetcher function.
+ * To support a new store, register its scraperType here and create its fetcher.
+ * Browser DOM scraping is used automatically for any store without an entry here.
+ */
+const API_FETCHERS = {
+  'kroger-api':    (store, term) => krogerApiFetcher.searchProducts(term, store.zipCode),
+  'walmart-api':   (store, term) => walmartApiFetcher.searchProducts(term),
+  'instacart-api': (store, term) => instacartApiFetcher.searchProducts(term, store.zipCode)
+};
 
 class DirectStoreScraper {
   constructor() {
@@ -30,50 +40,32 @@ class DirectStoreScraper {
   }
 
   async scrapeStore(store, termStr) {
-    // Kroger API Fetching (USA)
-    if (store.id === 'kroger') {
-      console.log(`[DirectStoreScraper] Handling Kroger API for: ${termStr}`);
+    // API-based fetcher (preferred, no browser needed)
+    const apiFetcher = API_FETCHERS[store.scraperType];
+    if (apiFetcher) {
+      console.log(`[DirectStoreScraper] Using ${store.scraperType} for: ${termStr}`);
       try {
-        const results = await krogerApiFetcher.searchProducts(termStr, store.zipCode || "45202");
-        console.log(`[DirectStoreScraper] Kroger API returned raw results: ${results?.length || 0}`);
-        
+        const results = await apiFetcher(store, termStr);
         if (results && results.length > 0) {
-          console.log(`✅ [${store.name}] API returned ${results.length} results!`);
-          
+          console.log(`✅ [${store.name}] API returned ${results.length} results`);
           for (const item of results) {
-              console.log(`[DirectStoreScraper] Upserting product: ${item.name}`);
-              await ProductRepository.upsertWithPrice(item, store.id);
-          }
-
-          return results;
-        }
-      } catch (err) {
-        console.error(`❌ [${store.name}] API error: ${err.message}`);
-      }
-      return []; // Kroger is API only, no fallback needed for now
-    }
-
-    // Instacart Scraper (USA)
-    if (store.id === 'instacart') {
-      console.log(`[DirectStoreScraper] Handling Instacart API for: ${termStr}`);
-      try {
-        const results = await instacartApiFetcher.searchProducts(termStr, store.zipCode || "90210");
-        
-        if (results && results.length > 0) {
-          console.log(`✅ [${store.name}] API returned ${results.length} results!`);
-          for (const item of results) {
-              await ProductRepository.upsertWithPrice(item, store.id);
+            await ProductRepository.upsertWithPrice(item, store.id);
           }
           return results;
         }
       } catch (err) {
         console.error(`❌ [${store.name}] API error: ${err.message}`);
       }
-      return [];
+      return []; // API-only stores do not fall back to browser
     }
 
+    // Browser DOM scraper — used for stores without a registered API fetcher
+    return this._browserScrape(store, termStr);
+  }
+
+  async _browserScrape(store, termStr) {
     await this.launch();
-    
+
     const page = await this.browser.newPage({
       userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
     });
@@ -201,63 +193,63 @@ class DirectStoreScraper {
     }
   }
 
-  async savePrice(productName, storeName, price, url, image_url = "", category = "Requested") {
+async savePrice(productName, storeName, price, url, image_url = "", category = "Requested", regionId = "us") {
     try {
       const storeId = storeName.toLowerCase().replace(/\s+/g, "_");
       const productId = productName.toLowerCase().replace(/\s+/g, "_").substring(0, 150);
 
-      // Using repositories for database operations
-      await database.run("INSERT OR IGNORE INTO stores (id, name) VALUES (?, ?)", [storeId, storeName]);
+      await database.run("INSERT OR IGNORE INTO stores (id, name, region) VALUES (?, ?, ?)", [storeId, storeName, regionId]);
       await database.run("INSERT OR IGNORE INTO products (id, name, category, image_url) VALUES (?, ?, ?, ?)", [productId, productName, category, image_url]);
-      
+
       // Update image_url if it was ignored during INSERT IGNORE
       if (image_url) {
         await database.run("UPDATE products SET image_url = ? WHERE id = ? AND (image_url IS NULL OR image_url = '')", [image_url, productId]);
       }
       
-      await PriceRepository.upsert(productId, storeId, { price, unit: 'db', url });
+      await PriceRepository.upsert(productId, storeId, { price, unit: 'pcs', url });
     } catch (e) {
       console.error("Save error:", e.message);
     }
   }
 
-  async scrapeOnDemand(term, selectedStoreIds = []) {
-    console.log(`🚀 Triggering on-demand scrape for: "${term}" ${selectedStoreIds.length > 0 ? `(Stores: ${selectedStoreIds.join(', ')})` : '(All stores)'}`);
+  /**
+   * Scrape a search term across all (or selected) stores for a given region.
+   * @param {string}   term              - The product to search for.
+   * @param {string[]} selectedStoreIds  - Optional subset of store IDs to target.
+   * @param {string}   regionId          - Region context (default: 'us').
+   */
+  async scrapeOnDemand(term, selectedStoreIds = [], regionId = 'us') {
+    const storeScope = selectedStoreIds.length > 0 ? `Stores: ${selectedStoreIds.join(', ')}` : `All ${regionId.toUpperCase()} stores`;
+    console.log(`🚀 On-demand scrape: "${term}" | ${storeScope}`);
     try {
       await this.launch();
-      // database.initialize() is called in server.js, but keeping it for standalone runs
+      // database.initialize() is called in server.js, but kept here for standalone use.
       await database.initialize();
 
+      const regionStores = getStoresForRegion(regionId);
       const storesToScrape = selectedStoreIds.length > 0
-        ? STORES.filter(s => selectedStoreIds.includes(s.name.toLowerCase()) || selectedStoreIds.includes(s.id))
-        : STORES;
+        ? regionStores.filter(s => selectedStoreIds.includes(s.name.toLowerCase()) || selectedStoreIds.includes(s.id))
+        : regionStores;
 
-      const scrapePromises = storesToScrape.map(async (store) => {
+      const counts = await Promise.all(storesToScrape.map(async (store) => {
         try {
           const items = await this.scrapeStore(store, term);
           for (const item of items) {
-            await this.savePrice(item.name, store.name, item.price, item.url, item.image_url);
+            await this.savePrice(item.name, store.name, item.price, item.url, item.image_url, "Requested", regionId);
           }
           return items.length;
         } catch (err) {
           console.error(`Error scraping ${store.name}:`, err);
           return 0;
         }
-      });
+      }));
 
-      const counts = await Promise.all(scrapePromises);
       const total = counts.reduce((a, b) => a + b, 0);
-      console.log(`✅ On-demand scrape completed. Total items cached: ${total}`);
+      console.log(`✅ Scrape complete. Items cached: ${total}`);
     } catch (err) {
       console.error(`Error in scrapeOnDemand for "${term}":`, err);
-      // Don't crash the whole request if scraping fails, just log it
+      // Non-fatal: don't crash the request if scraping fails
     }
-  }
-
-  async run() {
-    // Legacy support for manual runs
-    await this.scrapeOnDemand("rizs");
-    if (this.browser) await this.browser.close();
   }
 }
 

@@ -91,9 +91,21 @@ class Database {
         CREATE TABLE IF NOT EXISTS stores (
           id TEXT PRIMARY KEY,
           name TEXT NOT NULL UNIQUE,
+          region TEXT NOT NULL DEFAULT 'us',
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
       `);
+
+      // Migration: add region column to existing stores tables
+      try {
+        const storeCols = await this.all("PRAGMA table_info(stores)");
+        if (!storeCols.some(col => col.name === 'region')) {
+          await this.run("ALTER TABLE stores ADD COLUMN region TEXT NOT NULL DEFAULT 'us'");
+          console.log('Migration: added region column to stores table');
+        }
+      } catch (err) {
+        console.error('Error migrating stores table:', err);
+      }
 
       // Create Prices table
       await this.run(`
@@ -120,9 +132,21 @@ class Database {
           display_name TEXT,
           profile_pic TEXT,
           tier TEXT DEFAULT 'free', -- 'free', 'pro'
+          region TEXT DEFAULT 'us',
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
       `);
+
+      // Migration: add region column to existing users tables
+      try {
+        const userCols = await this.all("PRAGMA table_info(users)");
+        if (!userCols.some(col => col.name === 'region')) {
+          await this.run("ALTER TABLE users ADD COLUMN region TEXT NOT NULL DEFAULT 'us'");
+          console.log('Migration: added region column to users table');
+        }
+      } catch (err) {
+        console.error('Error migrating users table:', err);
+      }
 
       // Create User Lists table
       await this.run(`

@@ -91,14 +91,29 @@ The app supports a dual-tier model (**Free** vs **Pro**):
 
 ## 🔗 API Reference
 
+### GET /api/regions
+Returns all supported regions with their currency info.
+
+**Response:**
+```json
+[
+  { "id": "us", "name": "United States", "currency": { "code": "USD", "symbol": "$" } },
+  { "id": "uk", "name": "United Kingdom", "currency": { "code": "GBP", "symbol": "£" } }
+]
+```
+
+### GET /api/stores?region=us
+Returns the list of supported retailers for a given region.
+
 ### POST /api/basket
-Calculate the cheapest basket for a list of items.
+Calculate the cheapest basket for a list of items in a region.
 
 **Request Body:**
 ```json
 {
-  "items": ["tej", "rizs"],
-  "selectedStores": ["tesco", "auchan"]
+  "items": ["chicken breast", "milk"],
+  "selectedStores": ["walmart", "kroger"],
+  "region": "us"
 }
 ```
 
@@ -106,12 +121,13 @@ Calculate the cheapest basket for a list of items.
 ```json
 [
   {
-    "userInput": "tej",
+    "userInput": "milk",
+    "isFresh": false,
     "matches": [
       {
-        "name": "Magyar Tej 1.5%",
-        "price": 279,
-        "store": "Tesco",
+        "name": "Great Value Whole Milk 1 Gallon",
+        "price": 3.98,
+        "store": "Walmart",
         "url": "..."
       }
     ]
@@ -119,11 +135,8 @@ Calculate the cheapest basket for a list of items.
 ]
 ```
 
-### GET /api/products 
+### GET /api/products
 Returns all items currently in the local database.
-
-### GET /api/stores
-Returns list of supported retailers.
 
 ---
 

@@ -24,9 +24,12 @@ router.use(async (req, res, next) => {
   next();
 });
 
+// Region discovery (used by frontend region selector)
+router.get('/regions', ProductController.getRegions);
+
 // Product and Store routes
 router.get('/products', ProductController.getProducts);
-router.get('/stores', ProductController.getStores);
+router.get('/stores', ProductController.getStores);   // supports ?region=us
 
 // Basket logic routes
 router.post('/basket', BasketController.processBasket);
