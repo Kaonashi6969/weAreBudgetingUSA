@@ -37,17 +37,27 @@ export class BasketComponent {
   regions = signal<Region[]>([]);
   results = signal<BasketResult[]>([]);
 
-  // Map: userInput -> selected match
-  selectedItems = signal<Record<string, ProductMatch>>({});
+  // Map: userInput -> selected matches (array for multiple selection)
+  selectedItems = signal<Record<string, ProductMatch[]>>({});
+
+  // Pagination state
+  displayLimit = signal(3);
+  canLoadMore = computed(() => this.results().some((res) => res.matches.length > this.displayLimit()));
+  visibleResults = computed(() => this.results().slice(0, this.displayLimit()));
 
   totalPrice = computed(() =>
-    Object.values(this.selectedItems()).reduce((acc, item) => acc + (item.price || 0), 0.0),
+    Object.values(this.selectedItems()).reduce(
+      (acc, matches) => acc + matches.reduce((sum, m) => sum + (m.price || 0) * (m.quantity || 1), 0),
+      0.0,
+    ),
   );
 
   isSaving = signal(false);
   listName = signal('');
 
-  totalItemsCount = computed(() => Object.keys(this.selectedItems()).length);
+  totalItemsCount = computed(() => 
+    Object.values(this.selectedItems()).reduce((acc, matches) => acc + matches.reduce((sum, m) => sum + (m.quantity || 1), 0), 0)
+  );
   missingItemsCount = computed(() => this.results().length - this.totalItemsCount());
 
   // Expose UI states
@@ -140,14 +150,15 @@ export class BasketComponent {
     this.api.calculateBasket(items, this.selectedStores(), regionId).subscribe({
       next: (res) => {
         this.results.set(res);
-        // Auto-select the best match (sorted by score/price in the backend)
-        const bestChoices: Record<string, ProductMatch> = {};
+        // Auto-select the best match per row
+        const initialSelections: Record<string, ProductMatch[]> = {};
         res.forEach((item: BasketResult) => {
           if (item.matches?.length > 0) {
-            bestChoices[item.userInput] = item.matches[0];
+            initialSelections[item.userInput] = [item.matches[0]];
           }
         });
-        this.selectedItems.set(bestChoices);
+        this.selectedItems.set(initialSelections);
+        this.displayLimit.set(3);
         this.ui.setStatus(NetworkStatus.SUCCESS);
         this.ui.showToast(`Found ${res.length} items for your basket!`, 'success');
         this.cdr.detectChanges();
@@ -161,13 +172,55 @@ export class BasketComponent {
     });
   }
 
+  loadMore() {
+    this.displayLimit.update((n) => n + 10);
+    this.cdr.detectChanges();
+  }
+
   selectMatch(userInput: string, match: ProductMatch) {
-    this.selectedItems.update((current) => ({ ...current, [userInput]: match }));
+    this.selectedItems.update((current) => {
+      const selections = current[userInput] || [];
+      const index = selections.findIndex((m) => m.id === match.id);
+
+      if (index > -1) {
+        // Increment quantity if already selected
+        const updatedSelections = [...selections];
+        updatedSelections[index] = {
+          ...updatedSelections[index],
+          quantity: (updatedSelections[index].quantity || 1) + 1,
+        };
+        return { ...current, [userInput]: updatedSelections };
+      } else {
+        // Add new selection
+        return {
+          ...current,
+          [userInput]: [...selections, { ...match, quantity: 1 }],
+        };
+      }
+    });
+    this.cdr.detectChanges();
+  }
+
+  updateQuantity(userInput: string, matchId: string, delta: number) {
+    this.selectedItems.update((current) => {
+      const selections = current[userInput] || [];
+      const updated = selections
+        .map((m) => {
+          if (m.id === matchId) {
+            const newQty = (m.quantity || 1) + delta;
+            return newQty > 0 ? { ...m, quantity: newQty } : null;
+          }
+          return m;
+        })
+        .filter((m): m is ProductMatch => m !== null);
+
+      return { ...current, [userInput]: updated };
+    });
     this.cdr.detectChanges();
   }
 
   isSelected(userInput: string, matchId: string): boolean {
-    return this.selectedItems()[userInput]?.id === matchId;
+    return (this.selectedItems()[userInput] || []).some((m) => m.id === matchId);
   }
 
   // ── List Saving (PRO) ────────────────────────────────────────────────────────
@@ -182,14 +235,16 @@ export class BasketComponent {
       this.listName.set(name);
     }
 
-    const selected = Object.entries(this.selectedItems()).map(([userInput, match]) => ({
-      userInput,
-      productName: match.name,
-      price: match.price,
-      store: match.store_name || match.store,
-      url: match.url,
-      id: match.id,
-    }));
+    const selected = Object.entries(this.selectedItems()).flatMap(([userInput, matches]) => 
+      matches.map(match => ({
+        userInput,
+        productName: match.name,
+        price: match.price,
+        store: match.store_name || match.store,
+        url: match.url,
+        id: match.id,
+      }))
+    );
 
     if (selected.length === 0) {
       this.ui.showToast('Please select items first', 'warning');

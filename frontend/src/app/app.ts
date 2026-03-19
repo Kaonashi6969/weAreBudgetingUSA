@@ -1,13 +1,15 @@
-import { User } from './models/types';
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { ApiService } from './services/api';
 import { UIStore } from './services/ui-store';
+import { User } from './models/types';
+import { HeaderComponent } from './components/header/header';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule, HeaderComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

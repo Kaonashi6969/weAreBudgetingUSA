@@ -1,0 +1,100 @@
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  padding: 0.75rem 0;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: #2d3748;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.025em;
+
+  .logo-icon {
+    font-size: 2rem;
+    color: #48bb78;
+  }
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-weight: 500;
+  color: #4a5568;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background-color: #f7fafc;
+    color: #2d3748;
+  }
+
+  &.active {
+    background-color: #ebf8ff;
+    color: #3182ce;
+  }
+
+  app-icon {
+    font-size: 1.25rem;
+  }
+}
+
+.profile-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pro-badge {
+  font-size: 0.65rem;
+  font-weight: bold;
+  background-color: #fbbf24;
+  color: #92400e;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+}
+
+.username {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .app-name, .nav-link span {
+    display: none;
+  }
+  
+  .header-container {
+    padding: 0 1rem;
+  }
+}

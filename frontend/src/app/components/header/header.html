@@ -1,0 +1,22 @@
+<header class="main-header">
+  <div class="header-container">
+    <a routerLink="/" class="logo-area">
+      <app-icon name="payments" class="logo-icon" />
+      <span class="app-name">{{ appName }}</span>
+    </a>
+
+    <nav class="main-nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+        <app-icon name="shopping_cart" />
+        <span>{{ ui.translation()['optimizer_title'] }}</span>
+      </a>
+      <a routerLink="/profile" routerLinkActive="active" class="nav-link profile-link">
+        @if (ui.user()?.tier === 'pro') {
+          <span class="pro-badge">PRO</span>
+        }
+        <app-icon name="account_circle" />
+        <span class="username">{{ ui.user()?.username || 'Profile' }}</span>
+      </a>
+    </nav>
+  </div>
+</header>

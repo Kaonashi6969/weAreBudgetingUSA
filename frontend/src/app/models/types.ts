@@ -39,6 +39,7 @@ export interface ProductMatch {
   url: string;
   image_url?: string;
   score?: number;
+  quantity?: number;
 }
 
 export interface BasketResult {

@@ -93,7 +93,9 @@
           [noMatchText]="ui.translation()['could_not_find_item']"
           [selectedText]="ui.translation()['selected']"
           [selectThisText]="ui.translation()['select_this']"
+          [initialDisplayLimit]="3"
           (matchSelected)="selectMatch($event.userInput, $event.match)"
+          (quantityChanged)="updateQuantity($event.userInput, $event.matchId, $event.delta)"
         />
       }
     </div>

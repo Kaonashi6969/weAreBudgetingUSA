@@ -1,61 +1,126 @@
-<div class="result-card">
-  <div class="card-header">
+<div class="result-card" [class.collapsed]="isCollapsed()">
+  <div class="card-header" (click)="toggleCollapse()">
     <app-icon name="shopping_bag" />
     <h4>{{ item.userInput | titlecase }}</h4>
+
+    @if (hasSelections()) {
+      <div class="selected-summary-group">
+        @for (match of getSelectedMatches(); track match.id; let first = $first) {
+          @if (first) {
+            <div class="selected-summary">
+              <app-store-logo [storeId]="match.store" />
+              <span class="price-mini">{{ currencySymbol }}{{ match.price | number: '1.2-2' }}</span>
+            </div>
+          } @else if ($index < 2) {
+            <div class="summary-extra">
+              +{{ getSelectedMatches().length - 1 }} more
+            </div>
+          }
+        }
+      </div>
+    }
+
+    <button class="collapse-toggle">
+      <app-icon [name]="isCollapsed() ? 'expand_more' : 'expand_less'" />
+    </button>
   </div>
 
-  @if (!item.matches || item.matches.length === 0) {
-    <div class="no-match">
-      <app-icon name="sentiment_dissatisfied" />
-      {{ noMatchText }}
-    </div>
-  }
+  <div class="collapsible-content">
+    @if (!item.matches || item.matches.length === 0) {
+      <div class="no-match">
+        <app-icon name="sentiment_dissatisfied" />
+        {{ noMatchText }}
+      </div>
+    }
 
-  <div class="match-list">
-    @for (match of item.matches; track match.id) {
-      <div
-        class="match-item"
-        tabindex="0"
-        (keydown.enter)="select(match)"
-        (keydown.space)="select(match)"
-        [class.selected-match]="isSelected(match.id)"
-        (click)="select(match)"
-      >
-        <div class="match-content">
-          @if (match.image_url) {
-            <div class="match-image">
-              <img [src]="match.image_url" [alt]="match.name" />
+    <div class="match-list">
+      @for (match of item.matches; track match.id; let i = $index) {
+        @if (i < displayLimit()) {
+          @if (i === 3) {
+            <div class="similar-items-divider">
+              <span>Similar Items</span>
             </div>
           }
-          <div class="match-details">
-            <div class="match-header">
-              <span class="store-badge" [ngClass]="match.store.toLowerCase()">{{
-                match.store
-              }}</span>
-              <span class="price-text"
-                >{{ currencySymbol }}{{ match.price | number: '1.2-2' }}</span
-              >
+          <div
+            class="match-item"
+            tabindex="0"
+            (keydown.enter)="select(match)"
+            (keydown.space)="select(match)"
+            [class.selected-match]="isSelected(match.id)"
+            (click)="select(match)"
+            [style.animation-delay]="(i * 0.05) + 's'"
+          >
+            <div class="match-content">
+              @if (match.image_url) {
+                <div class="match-image">
+                  <img [src]="match.image_url" [alt]="match.name" />
+                </div>
+              }
+              <div class="match-details">
+                <div class="match-header">
+                  <app-store-logo [storeId]="match.store" />
+                  <span class="store-name">{{ match.store }}</span>
+                  @if (match.score && match.score >= 90) {
+                    <span class="exact-badge" title="Highly Relevant Match">
+                      <app-icon name="verified" /> Exact Match
+                    </span>
+                  }
+                  <span class="price-text"
+                    >{{ currencySymbol }}{{ match.price | number: '1.2-2' }}</span
+                  >
+                </div>
+                <p class="product-name">{{ match.name }}</p>
+              </div>
             </div>
-            <p class="product-name">{{ match.name }}</p>
+
+            <div class="match-footer">
+              <div class="selection-actions">
+                @if (isSelected(match.id)) {
+                  <div class="quantity-controls">
+                    <button class="qty-btn" (click)="changeQuantity($event, match.id, -1)">
+                      <app-icon name="remove" />
+                    </button>
+                    <span class="qty-text">{{ getQuantity(match.id) }}</span>
+                    <button class="qty-btn" (click)="changeQuantity($event, match.id, 1)">
+                      <app-icon name="add" />
+                    </button>
+                  </div>
+                } @else {
+                  <span class="selection-indicator">
+                    <app-icon name="add_circle" />
+                    {{ selectThisText }}
+                  </span>
+                }
+              </div>
+              @if (match.url) {
+                <a
+                  [href]="match.url"
+                  target="_blank"
+                  class="view-link"
+                  (click)="$event.stopPropagation()"
+                >
+                  View <app-icon name="open_in_new" />
+                </a>
+              }
+            </div>
           </div>
-        </div>
+        }
+      }
+    </div>
 
-        <div class="match-footer">
-          <span class="selection-indicator">
-            <app-icon [name]="isSelected(match.id) ? 'check_circle' : 'add_circle'" />
-            {{ isSelected(match.id) ? selectedText : selectThisText }}
-          </span>
-          @if (match.url) {
-            <a
-              [href]="match.url"
-              target="_blank"
-              class="view-link"
-              (click)="$event.stopPropagation()"
-            >
-              View <app-icon name="open_in_new" />
-            </a>
-          }
-        </div>
+    @if (!isCollapsed() && canLoadMore()) {
+      <div class="load-more-container">
+        <button class="load-more-button" (click)="loadMore($event)">
+          Load more items <app-icon name="expand_more" />
+        </button>
+      </div>
+    }
+
+    @if (item.matches && item.matches.length > 0) {
+      <div class="footer-actions" [class.hidden]="isCollapsed()">
+        <button class="done-button" (click)="markAsDone($event)">
+          <app-icon name="check" /> Done with this item
+        </button>
       </div>
     }
   </div>
