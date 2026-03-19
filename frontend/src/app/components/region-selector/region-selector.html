@@ -1,0 +1,14 @@
+<div class="profile-section region-section">
+  <h3>
+    <app-icon name="public" />
+    <span>{{ sectionLabel }}</span>
+  </h3>
+  <div class="region-selector">
+    <label>{{ selectLabel }}</label>
+    <select [ngModel]="activeRegionId" (ngModelChange)="regionChanged.emit($event)">
+      @for (r of regions; track r.id) {
+        <option [value]="r.id">{{ r.name }} ({{ r.currency.code }})</option>
+      }
+    </select>
+  </div>
+</div>

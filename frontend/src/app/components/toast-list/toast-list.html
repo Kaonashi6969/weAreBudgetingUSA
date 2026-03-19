@@ -1,0 +1,8 @@
+<div class="toast-container">
+  @for (toast of ui.toasts(); track toast.id) {
+    <div class="toast" [ngClass]="'toast-' + toast.type">
+      {{ toast.message }}
+      <button (click)="ui.removeToast(toast.id)">×</button>
+    </div>
+  }
+</div>

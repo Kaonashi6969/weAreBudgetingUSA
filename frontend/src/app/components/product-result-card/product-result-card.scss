@@ -1,0 +1,135 @@
+.result-card {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.card-header h4 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.no-match {
+  padding: 1rem;
+  background: #fff5f5;
+  color: #c53030;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.match-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.match-item {
+  border: 2px solid #edf2f7;
+  border-radius: 10px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.match-item:hover {
+  border-color: #cbd5e0;
+  transform: translateY(-2px);
+}
+
+.selected-match {
+  border-color: #3182ce;
+  background-color: #ebf8ff;
+}
+
+.match-content {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex: 1;
+}
+
+.match-image img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.match-details {
+  flex: 1;
+}
+
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.25rem;
+}
+
+.store-badge {
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.price-text {
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.product-name {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #4a5568;
+}
+
+.match-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid #edf2f7;
+}
+
+.selection-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.selected-match .selection-indicator {
+  color: #3182ce;
+}
+
+.view-link {
+  font-size: 0.85rem;
+  color: #3182ce;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.view-link:hover {
+  text-decoration: underline;
+}

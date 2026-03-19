@@ -1,0 +1,51 @@
+<div class="result-card">
+  <div class="card-header">
+    <app-icon name="shopping_bag" />
+    <h4>{{ item.userInput | titlecase }}</h4>
+  </div>
+
+  @if (!item.matches || item.matches.length === 0) {
+    <div class="no-match">
+      <app-icon name="sentiment_dissatisfied" />
+      {{ noMatchText }}
+    </div>
+  }
+
+  <div class="match-list">
+    @for (match of item.matches; track match.id) {
+      <div
+           class="match-item"
+           [class.selected-match]="isSelected(match.id)"
+           (click)="select(match)">
+
+        <div class="match-content">
+          @if (match.image_url) {
+            <div class="match-image">
+              <img [src]="match.image_url" [alt]="match.name" />
+            </div>
+          }
+          <div class="match-details">
+            <div class="match-header">
+              <span class="store-badge" [ngClass]="match.store.toLowerCase()">{{ match.store }}</span>
+              <span class="price-text">{{ currencySymbol }}{{ match.price | number:'1.2-2' }}</span>
+            </div>
+            <p class="product-name">{{ match.name }}</p>
+          </div>
+        </div>
+
+        <div class="match-footer">
+          <span class="selection-indicator">
+            <app-icon [name]="isSelected(match.id) ? 'check_circle' : 'add_circle'" />
+            {{ isSelected(match.id) ? selectedText : selectThisText }}
+          </span>
+          @if (match.url) {
+            <a [href]="match.url" target="_blank" class="view-link"
+               (click)="$event.stopPropagation()">
+              View <app-icon name="open_in_new" />
+            </a>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

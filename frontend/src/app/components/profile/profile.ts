@@ -4,13 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
 import { RouterLink } from '@angular/router';
 import { UIStore } from '../../services/ui-store';
+import { IconComponent } from '../icon/icon';
+import { RegionSelectorComponent } from '../region-selector/region-selector';
+import { SavedListCardComponent } from '../saved-list-card/saved-list-card';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, IconComponent, RegionSelectorComponent, SavedListCardComponent],
   templateUrl: './profile.html',
-  styleUrl: './profile.css'
+  styleUrl: './profile.scss'
 })
 export class ProfileComponent implements OnInit {
   public readonly ui = inject(UIStore);
@@ -61,17 +64,5 @@ export class ProfileComponent implements OnInit {
         this.loadLists();
       });
     }
-  }
-
-  formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
-
-  calculateTotal(items: any[]) {
-    return items.reduce((sum, item) => sum + (item.price || 0), 0);
   }
 }

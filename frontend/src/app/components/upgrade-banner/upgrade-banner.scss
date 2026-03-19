@@ -1,0 +1,37 @@
+.upgrade-card {
+  padding: 20px;
+  background-color: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  color: #92400e;
+}
+
+.upgrade-card h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.upgrade-card p {
+  margin: 0 0 16px 0;
+  font-size: 0.95rem;
+}
+
+.upgrade-link {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #d97706;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.upgrade-link:hover {
+  background-color: #b45309;
+}

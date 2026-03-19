@@ -3,13 +3,23 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
 import { UIStore, NetworkStatus } from '../../services/ui-store';
+import { IconComponent } from '../icon/icon';
+import { ToastListComponent } from '../toast-list/toast-list';
+import { StoreSelectorComponent } from '../store-selector/store-selector';
+import { RegionSelectorComponent } from '../region-selector/region-selector';
+import { UpgradeBannerComponent } from '../upgrade-banner/upgrade-banner';
+import { ProductResultCardComponent } from '../product-result-card/product-result-card';
 
 @Component({
   selector: 'app-basket',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule, FormsModule,
+    IconComponent, ToastListComponent, StoreSelectorComponent,
+    UpgradeBannerComponent, ProductResultCardComponent
+  ],
   templateUrl: './basket.html',
-  styleUrl: './basket.css'
+  styleUrl: './basket.scss'
 })
 export class BasketComponent {
   public ui = inject(UIStore);

@@ -1,0 +1,37 @@
+<div class="list-card">
+  <div class="card-header">
+    <h3 class="list-title">{{ list.name || untitledText }}</h3>
+    <span class="date">{{ formatDate(list.created_at) }}</span>
+    <button class="btn-delete" (click)="delete.emit(list.id)">
+      <app-icon name="delete" />
+    </button>
+  </div>
+
+  <div class="card-body">
+    <div class="summary">
+      <strong>{{ itemsText }}:</strong> {{ list.items.length }}
+      &mdash; <span class="total-price">{{ currencySymbol }}{{ calculateTotal(list.items) | number:'1.2-2' }}</span>
+    </div>
+
+    <ul class="items-list">
+      @for (item of list.items; track item.id) {
+        <li>
+          <div class="item-name">{{ item.productName }}</div>
+          <div class="item-details">
+            <span class="item-price">{{ currencySymbol }}{{ item.price | number:'1.2-2' }}</span>
+            <span class="store-tag">{{ item.store || unknownStoreText }}</span>
+            @if (item.url) {
+              <a [href]="item.url" target="_blank" class="item-link">
+                {{ openLinkText }} <app-icon name="open_in_new" />
+              </a>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+
+  <div class="card-footer">
+    <button class="btn-secondary" (click)="refresh.emit()">{{ refreshText }}</button>
+  </div>
+</div>

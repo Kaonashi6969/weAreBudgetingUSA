@@ -1,0 +1,15 @@
+<div class="store-selection">
+  <h3>{{ label }}</h3>
+  <div class="store-grid">
+    @for (store of stores; track store.id) {
+      <div class="store-checkbox">
+        <input
+          type="checkbox"
+          [id]="store.id"
+          [checked]="selected.includes(store.id)"
+          (change)="toggled.emit(store.id)">
+        <label [for]="store.id">{{ store.name }}</label>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,39 @@
+.store-selection {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+}
+
+.store-selection h3 {
+  font-size: 1.1rem;
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #4a5568;
+}
+
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.store-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #edf2f7;
+  transition: all 0.2s;
+}
+
+.store-checkbox:hover {
+  border-color: #cbd5e0;
+}
+
+.store-checkbox input {
+  cursor: pointer;
+}

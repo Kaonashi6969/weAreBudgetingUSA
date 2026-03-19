@@ -3,13 +3,14 @@ import { RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiService } from './services/api';
 import { UIStore } from './services/ui-store';
+import { IconComponent } from './components/icon/icon';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, CommonModule],
+  imports: [RouterOutlet, RouterLink, CommonModule, IconComponent],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.scss'
 })
 export class App implements OnInit {
   public readonly title = signal('Budget Scraper');

@@ -1,0 +1,30 @@
+/* Toasts should be managed globally or in their own specific style file if needed */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.toast {
+  padding: 12px 24px;
+  margin-top: 10px;
+  border-radius: 8px;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toast-success { background-color: #48bb78; }
+.toast-error { background-color: #f56565; }
+.toast-warning { background-color: #ed8936; }
+
+button {
+  background: transparent;
+  border: none;
+  color: white;
+  margin-left: 10px;
+  cursor: pointer;
+}

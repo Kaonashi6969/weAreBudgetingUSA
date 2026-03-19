@@ -1,0 +1,107 @@
+.list-card {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.card-header {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #edf2f7;
+  padding-bottom: 0.75rem;
+}
+
+.list-title {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #2d3748;
+}
+
+.date {
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.btn-delete {
+  padding: 0.4rem;
+  background: #fff5f5;
+  color: #e53e3e;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: auto;
+  transition: all 0.2s;
+}
+
+.btn-delete:hover {
+  background: #feb2b2;
+}
+
+.summary {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  color: #4a5568;
+}
+
+.total-price {
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+}
+
+.items-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px dotted #e2e8f0;
+}
+
+.item-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.item-details {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.store-tag {
+  background: #f7fafc;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.item-link {
+  color: #3182ce;
+  text-decoration: none;
+  font-weight: 600;
+  display: flex !important;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.item-link:hover {
+  text-decoration: underline;
+}
+
+.card-footer {
+  display: flex !important;
+  justify-content: flex-end;
+}
+
+.btn-secondary {
+  width: auto;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
