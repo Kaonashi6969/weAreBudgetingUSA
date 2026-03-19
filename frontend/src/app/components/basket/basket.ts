@@ -6,8 +6,8 @@ import { UIStore, NetworkStatus } from '../../services/ui-store';
 import { IconComponent } from '../icon/icon';
 import { ToastListComponent } from '../toast-list/toast-list';
 import { StoreSelectorComponent } from '../store-selector/store-selector';
-import { UpgradeBannerComponent } from '../upgrade-banner/upgrade-banner';
 import { ProductResultCardComponent } from '../product-result-card/product-result-card';
+import { BasketOverviewComponent } from '../basket-overview/basket-overview';
 import { Store, Region, BasketResult, ProductMatch } from '../../models/types';
 
 @Component({
@@ -19,8 +19,8 @@ import { Store, Region, BasketResult, ProductMatch } from '../../models/types';
     IconComponent,
     ToastListComponent,
     StoreSelectorComponent,
-    UpgradeBannerComponent,
     ProductResultCardComponent,
+    BasketOverviewComponent,
   ],
   templateUrl: './basket.html',
   styleUrl: './basket.scss',

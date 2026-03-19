@@ -1,0 +1,66 @@
+<div class="basket-summary">
+  <div class="summary-card">
+    <div class="summary-header">
+      <div class="list-title-input">
+        <app-icon name="edit" />
+        <input
+          type="text"
+          [ngModel]="listName"
+          (ngModelChange)="onTitleChange($event)"
+          [placeholder]="translations['list_name_placeholder'] || 'Name your grocery list...'"
+          class="list-name-control"
+        />
+      </div>
+      <span class="item-count">
+        <app-icon name="shopping_cart" />
+        {{ totalItemsCount }} {{ translations['items_in_cart'] || 'items' }}
+      </span>
+    </div>
+
+    <div class="total-price">
+      <span class="label">{{ translations['total_estimated_price'] }}:</span>
+      <span class="amount">{{ currencySymbol }}{{ totalPrice | number: '1.2-2' }}</span>
+    </div>
+
+    @if (userTier === 'pro') {
+      <div class="pro-actions">
+        <button
+          (click)="onSave()"
+          [disabled]="totalItemsCount === 0 || isSaving"
+          class="save-btn"
+        >
+          @if (isSaving) {
+            <span class="spinner-small"></span>
+          } @else {
+            <app-icon name="cloud_upload" />
+          }
+          {{
+            isSaving ? translations['saving_list'] : translations['save_grocery_list']
+          }}
+        </button>
+      </div>
+    } @else {
+      <app-upgrade-banner
+        [title]="translations['get_pro_title']"
+        [description]="translations['get_pro_desc']"
+        [ctaLabel]="translations['upgrade_now']"
+      />
+    }
+
+    <div class="summary-footer">
+      @if (missingItemsCount > 0) {
+        <div class="missing-warning">
+          <app-icon name="error_outline" />
+          <span>
+            {{ missingItemsCount }} {{ translations['unmatched_rows'] || 'rows without selections' }}
+          </span>
+        </div>
+      } @else {
+        <div class="all-matched">
+          <app-icon name="check_circle" />
+          <span>{{ translations['all_items_ready'] || 'All items optimized!' }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>

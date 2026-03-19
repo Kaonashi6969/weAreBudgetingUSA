@@ -34,53 +34,19 @@
   </button>
 
   @if (results().length > 0) {
-    <div class="basket-summary">
-      <div class="summary-card">
-        <div class="summary-header">
-          <h3>{{ ui.translation()['basket_overview'] }}</h3>
-          <span class="item-count"
-            >{{ totalItemsCount() }} / {{ results().length }}
-            {{ ui.translation()['items_matched'] }}</span
-          >
-        </div>
-        <div class="total-price">
-          <span class="label">{{ ui.translation()['total_estimated_price'] }}:</span>
-          <span class="amount">{{ currencySymbol() }}{{ totalPrice() | number: '1.2-2' }}</span>
-        </div>
-
-        @if (ui.user()?.tier === 'pro') {
-          <div class="pro-actions">
-            <button
-              (click)="saveBasketToList()"
-              [disabled]="totalItemsCount() === 0 || isSaving()"
-              class="save-btn"
-            >
-              @if (isSaving()) {
-                <span class="spinner-small"></span>
-              } @else {
-                <app-icon name="save" />
-              }
-              {{
-                isSaving() ? ui.translation()['saving_list'] : ui.translation()['save_grocery_list']
-              }}
-            </button>
-          </div>
-        } @else {
-          <app-upgrade-banner
-            [title]="ui.translation()['get_pro_title']"
-            [description]="ui.translation()['get_pro_desc']"
-            [ctaLabel]="ui.translation()['upgrade_now']"
-          />
-        }
-
-        @if (missingItemsCount() > 0) {
-          <div class="missing-warning">
-            <app-icon name="warning" /> {{ missingItemsCount() }}
-            {{ ui.translation()['items_matched'] }}
-          </div>
-        }
-      </div>
-    </div>
+    <app-basket-overview
+      [listName]="listName()"
+      [totalItemsCount]="totalItemsCount()"
+      [resultsLength]="results().length"
+      [totalPrice]="totalPrice()"
+      [currencySymbol]="currencySymbol()"
+      [missingItemsCount]="missingItemsCount()"
+      [userTier]="ui.user()?.tier || 'free'"
+      [isSaving]="isSaving()"
+      [translations]="ui.translation()"
+      (listNameChange)="listName.set($event)"
+      (saveRequested)="saveBasketToList()"
+    />
   }
 
   @if (!isLoading() && results().length > 0) {
