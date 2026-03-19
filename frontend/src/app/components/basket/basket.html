@@ -1,5 +1,5 @@
 <div class="basket-container">
-  <h2>Calculate Cheapest Basket</h2>
+  <h2>{{ ui.translation()['optimizer_title'] }}</h2>
 
   <!-- Global Toasts -->
   <div class="toast-container">
@@ -10,18 +10,18 @@
   </div>
 
   <div class="input-section">
-    <label for="items">Enter items (one per line):</label>
+    <label for="items">{{ ui.translation()['shopping_list_label'] }}</label>
     <textarea 
       id="items" 
       [ngModel]="itemsInput()" 
       (ngModelChange)="itemsInput.set($event)"
       rows="5" 
-      placeholder="e.g.&#10;Milk&#10;Bread&#10;Eggs">
+      [placeholder]="ui.translation()['placeholder']">
     </textarea>
   </div>
 
   <div class="store-selection">
-    <h3>Filter by Stores (Optional)</h3>
+    <h3>{{ ui.translation()['filter_sources'] }}</h3>
     <div class="store-grid">
       <div *ngFor="let store of stores()" class="store-checkbox">
         <input 
@@ -36,18 +36,19 @@
 
   <button (click)="calculate()" [disabled]="isLoading() || !itemsInput().trim()" class="search-btn">
     <span *ngIf="isLoading()" class="spinner"></span>
-    {{ isLoading() ? 'Searching Prices...' : '🛍️ Find Cheapest Basket' }}
+    🛍️ {{ isLoading() ? ui.translation()['running_matchmaker'] : ui.translation()['find_deals'] }}
   </button>
+
 
   <!-- Summary Section -->
   <div *ngIf="results().length > 0" class="basket-summary">
     <div class="summary-card">
       <div class="summary-header">
-        <h3>Basket Overview</h3>
-        <span class="item-count">{{ totalItemsCount() }} / {{ results().length }} items matched</span>
+        <h3>{{ ui.translation()['basket_overview'] }}</h3>
+        <span class="item-count">{{ totalItemsCount() }} / {{ results().length }} {{ ui.translation()['items_matched'] }}</span>
       </div>
       <div class="total-price">
-        <span class="label">Total Estimated Price:</span>
+        <span class="label">{{ ui.translation()['total_estimated_price'] }}:</span>
         <span class="amount">{{ currencySymbol() }}{{ totalPrice() | number:'1.2-2' }}</span>
       </div>
       
@@ -58,15 +59,15 @@
           [disabled]="totalItemsCount() === 0 || isSaving()" 
           class="save-btn">
           <span *ngIf="isSaving()" class="spinner-small"></span>
-          {{ isSaving() ? 'Saving list...' : '💾 Save as My Grocery List' }}
+          {{ isSaving() ? ui.translation()['saving_list'] : '💾 ' + ui.translation()['save_grocery_list'] }}
         </button>
       </div>
 
       <ng-template #upgradePrompt>
         <div class="upgrade-card">
-          <h4>🌟 Get PRO to save lists!</h4>
-          <p>Saving your grocery lists history is a PRO feature.</p>
-          <a href="/upgrade" class="upgrade-link">Upgrade Now</a>
+          <h4>🌟 {{ ui.translation()['get_pro_title'] }}</h4>
+          <p>{{ ui.translation()['get_pro_desc'] }}</p>
+          <a href="/upgrade" class="upgrade-link">{{ ui.translation()['upgrade_now'] }}</a>
         </div>
       </ng-template>
 
@@ -78,22 +79,22 @@
 
   <div *ngIf="results().length > 0" class="results-section">
     <div class="results-header">
-      <h3>Recommendations</h3>
+      <h3>{{ ui.translation()['recommendations'] }}</h3>
       <div class="user-tier-badge" [class.pro]="ui.user()?.tier === 'pro'">
-        {{ ui.user()?.tier === 'pro' ? '🚀 PRO: Live Scraping Enabled' : '📦 FREE: Searching Database Only' }}
+        {{ ui.user()?.tier === 'pro' ? '🚀 ' + ui.translation()['pro_scraping_enabled'] : '📦 ' + ui.translation()['free_db_only'] }}
       </div>
     </div>
     
     <div *ngFor="let item of results()" class="result-card" [class.is-fresh]="item.isFresh" [class.is-cached]="!item.isFresh">
       <div class="status-indicator">
         <span class="dot"></span>
-        {{ item.isFresh ? 'Live Refresh' : 'Cached Price' }}
+        {{ item.isFresh ? ui.translation()['live_refresh'] : ui.translation()['cached_price'] }}
       </div>
       
       <h4>🛒 {{ item.userInput | titlecase }}</h4>
       
       <div *ngIf="!item.matches || item.matches.length === 0" class="no-match">
-          Could not find this item. Try a different term.
+          {{ ui.translation()['could_not_find_item'] }}
       </div>
 
       <div class="match-list">
@@ -117,7 +118,7 @@
           
           <div class="match-footer">
             <span class="selection-indicator">
-              {{ isSelected(item.userInput, match.id) ? '✅ Selected' : '➕ Select this' }}
+              {{ isSelected(item.userInput, match.id) ? '✅ ' + ui.translation()['selected'] : '➕ ' + ui.translation()['select_this'] }}
             </span>
             <a [href]="match.url" target="_blank" class="view-link" *ngIf="match.url" (click)="$event.stopPropagation()">View →</a>
           </div>

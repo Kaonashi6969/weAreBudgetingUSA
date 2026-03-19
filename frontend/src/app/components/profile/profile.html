@@ -1,15 +1,14 @@
 <div class="profile-container">
   <div class="profile-header">
-    <a routerLink="/" class="back-link">← Back to Shopping</a>
-    <h2>My Profile</h2>
+    <a routerLink="/" class="back-link">← {{ ui.translation()['find_deals'] }}</a>
+    <h2>{{ ui.translation()['dashboard_title'] }}</h2>
   </div>
 
   <!-- Region Preference -->
   <div class="profile-section region-section">
-    <h3>🌍 Region Preference</h3>
-    <p class="section-desc">Your saved region determines which stores and currency are shown.</p>
+    <h3>🌍 {{ ui.translation()['deployment_zone'] }}</h3>
     <div class="region-selector">
-      <label for="profileRegionSelect">Active region:</label>
+      <label for="profileRegionSelect">{{ ui.translation()['active_region_label'] }}</label>
       <select id="profileRegionSelect"
               [ngModel]="ui.activeRegion().id"
               (ngModelChange)="changeRegion($event)">
@@ -19,22 +18,22 @@
   </div>
 
   <div class="profile-section">
-    <h3>🛋️ My Saved Grocery Lists</h3>
+    <h3>🛋️ {{ ui.translation()['saved_inventories'] }}</h3>
 
     <div *ngIf="isLoading()" class="loading">
-      <p>Loading your lists...</p>
+      <p>{{ ui.translation()['loading_lists_label'] }}</p>
     </div>
 
     <div *ngIf="!isLoading() && savedLists().length === 0" class="empty-state">
       <div class="basket-icon">🛒</div>
-      <p>You haven't saved any lists yet.</p>
-      <a routerLink="/" class="btn-primary">Start Budgeting</a>
+      <p>{{ ui.translation()['no_saved_lists'] }}</p>
+      <a routerLink="/" class="btn-primary">{{ ui.translation()['start_budgeting_btn'] }}</a>
     </div>
 
     <div class="list-grid" *ngIf="savedLists().length > 0">
       <div *ngFor="let list of savedLists()" class="list-card">
         <div class="card-header">
-          <h3 class="list-title">{{ list.name || 'Untitled List' }}</h3>
+          <h3 class="list-title">{{ list.name || ui.translation()['untitled_list_fallback'] }}</h3>
           <span class="date">{{ formatDate(list.created_at) }}</span>
           <button class="btn-delete" (click)="deleteList(list.id)">
             <span class="trash-icon">🗑️</span>
@@ -43,7 +42,7 @@
 
         <div class="card-body">
           <div class="summary">
-            <strong>Items:</strong> {{ list.items.length }}
+            <strong>{{ ui.translation()['items_label'] }}:</strong> {{ list.items.length }}
             &mdash; <span class="total-price">{{ currencySymbol() }}{{ calculateTotal(list.items) | number:'1.2-2' }}</span>
           </div>
 
@@ -52,15 +51,15 @@
               <div class="item-name">{{ item.productName }}</div>
               <div class="item-details">
                 <span class="item-price">{{ currencySymbol() }}{{ item.price | number:'1.2-2' }}</span>
-                <span class="store-tag">{{ item.store || 'Unknown' }}</span>
-                <a *ngIf="item.url" [href]="item.url" target="_blank" class="item-link">Open 🔗</a>
+                <span class="store-tag">{{ item.store || ui.translation()['unknown_store_fallback'] }}</span>
+                <a *ngIf="item.url" [href]="item.url" target="_blank" class="item-link">{{ ui.translation()['open_link_btn'] }} 🔗</a>
               </div>
             </li>
           </ul>
         </div>
 
         <div class="card-footer">
-          <button class="btn-secondary" (click)="loadLists()">Refresh</button>
+          <button class="btn-secondary" (click)="loadLists()">{{ ui.translation()['refresh_btn'] }}</button>
         </div>
       </div>
     </div>

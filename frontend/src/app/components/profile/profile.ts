@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
 import { RouterLink } from '@angular/router';
-import { uiStore } from '../../services/ui-store';
+import { UIStore } from '../../services/ui-store';
 
 @Component({
   selector: 'app-profile',
@@ -13,8 +13,8 @@ import { uiStore } from '../../services/ui-store';
   styleUrl: './profile.css'
 })
 export class ProfileComponent implements OnInit {
+  public readonly ui = inject(UIStore);
   private api = inject(ApiService);
-  protected readonly ui = uiStore;
   protected readonly savedLists = signal<any[]>([]);
   protected readonly isLoading = signal(false);
   protected readonly regions = signal<any[]>([]);

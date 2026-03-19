@@ -2,7 +2,7 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiService } from './services/api';
-import { uiStore } from './services/ui-store';
+import { UIStore } from './services/ui-store';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +13,7 @@ import { uiStore } from './services/ui-store';
 })
 export class App implements OnInit {
   public readonly title = signal('Budget Scraper');
-  public readonly ui = uiStore;
+  public readonly ui = inject(UIStore);
   private api = inject(ApiService);
 
   ngOnInit() {

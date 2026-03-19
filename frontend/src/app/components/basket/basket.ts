@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef, signal, computed, inject } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
-import { uiStore, NetworkStatus } from '../../services/ui-store';
+import { UIStore, NetworkStatus } from '../../services/ui-store';
 
 @Component({
   selector: 'app-basket',
@@ -12,6 +12,7 @@ import { uiStore, NetworkStatus } from '../../services/ui-store';
   styleUrl: './basket.css'
 })
 export class BasketComponent {
+  public ui = inject(UIStore);
   private api = inject(ApiService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -36,7 +37,6 @@ export class BasketComponent {
   missingItemsCount = computed(() => this.results().length - this.totalItemsCount());
 
   // Expose UI states
-  ui = uiStore;
   isLoading = computed(() => this.ui.isLoading());
 
   /** Currency symbol derived from the active region (e.g. '$', '£', '€'). */
