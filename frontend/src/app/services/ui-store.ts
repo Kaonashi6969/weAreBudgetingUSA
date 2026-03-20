@@ -54,14 +54,13 @@ export class UIStore {
     this.transloco.setActiveLang(region.id.toLowerCase());
   }
 
-  showToast(message: string, type: ToastMessage['type'] = 'info') {
-    const id = Date.now();
-    this._toasts.update((t) => [...t, { id, message, type }]);
+  showToast(message: string, type: ToastMessage['type'] = 'info', duration = 4000) {
+    const id = Date.now() + Math.random();
+    this._toasts.update((t) => [...t.slice(-4), { id, message, type }]);
 
-    // Auto-remove after 4 seconds
-    setTimeout(() => {
-      this.removeToast(id);
-    }, 4000);
+    if (duration > 0) {
+      setTimeout(() => this.removeToast(id), duration);
+    }
   }
 
   removeToast(id: number) {

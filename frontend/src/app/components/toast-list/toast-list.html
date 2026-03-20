@@ -1,8 +1,21 @@
-<div class="toast-container">
+<div class="toast-stack">
   @for (toast of ui.toasts(); track toast.id) {
-    <div class="toast" [ngClass]="'toast-' + toast.type">
-      {{ toast.message }}
-      <button (click)="ui.removeToast(toast.id)">×</button>
+    <div class="toast-item" [ngClass]="'toast-' + toast.type" role="alert">
+      <div class="toast-icon">
+        @switch (toast.type) {
+          @case ('success') { <span class="material-icons">check_circle</span> }
+          @case ('error') { <span class="material-icons">error</span> }
+          @case ('warning') { <span class="material-icons">warning</span> }
+          @default { <span class="material-icons">info</span> }
+        }
+      </div>
+      <div class="toast-content">
+        {{ toast.message }}
+      </div>
+      <button class="close-btn" (click)="ui.removeToast(toast.id)" aria-label="Close notification">
+        <span class="material-icons">close</span>
+      </button>
+      <div class="progress-bar"></div>
     </div>
   }
 </div>

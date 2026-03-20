@@ -1,38 +1,116 @@
-/* Toasts should be managed globally or in their own specific style file if needed */
-.toast-container {
+.toast-stack {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 9999;
+  top: 24px;
+  right: 24px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column; /* Newest on top if you want, or keep as is */
+  gap: 12px;
+  pointer-events: none;
 }
 
-.toast {
-  padding: 12px 24px;
-  margin-top: 10px;
-  border-radius: 8px;
-  color: white;
-  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
+.toast-item {
+  position: relative;
+  min-width: 300px;
+  max-width: 450px;
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
+  overflow: hidden;
+  animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+
+  &.toast-success {
+    border-left: 4px solid #10b981;
+    .toast-icon { color: #10b981; }
+  }
+
+  &.toast-error {
+    border-left: 4px solid #ef4444;
+    .toast-icon { color: #ef4444; }
+  }
+
+  &.toast-warning {
+    border-left: 4px solid #f59e0b;
+    .toast-icon { color: #f59e0b; }
+  }
+
+  .toast-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .toast-content {
+    flex-grow: 1;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1f2937;
+    padding-right: 8px;
+  }
+
+  .close-btn {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .material-icons {
+      font-size: 18px;
+    }
+  }
+
+  /* Progress bar countdown */
+  .progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: rgba(0, 0, 0, 0.05);
+    width: 100%;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: currentColor;
+      opacity: 0.3;
+      transform-origin: left;
+      animation: progress 4s linear forwards;
+    }
+  }
 }
 
-.toast-success {
-  background-color: #48bb78;
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
-.toast-error {
-  background-color: #f56565;
-}
-
-.toast-warning {
-  background-color: #ed8936;
-}
-
-button {
-  background: transparent;
-  border: none;
-  color: white;
-  margin-left: 10px;
-  cursor: pointer;
+@keyframes progress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
 }
