@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
 import { UIStore, NetworkStatus } from '../../services/ui-store';
 import { ToastListComponent } from '../toast-list/toast-list';
+import { IconComponent } from '../icon/icon';
 import { BasketSearchComponent } from './basket-search';
 import { ProductResultCardComponent } from '../product-result-card/product-result-card';
 import { BasketOverviewComponent } from '../basket-overview/basket-overview';
@@ -16,6 +17,7 @@ import { Store, Region, BasketResult, ProductMatch } from '../../models/types';
     CommonModule,
     FormsModule,
     ToastListComponent,
+    IconComponent,
     BasketSearchComponent,
     ProductResultCardComponent,
     BasketOverviewComponent,
@@ -63,6 +65,12 @@ export class BasketComponent {
 
   /** Currency symbol derived from the active region (e.g. '$', '£', '€'). */
   currencySymbol = computed(() => this.ui.activeRegion()?.currency?.symbol ?? '$');
+
+  addExampleItem(item: string) {
+    const current = this.itemsInput();
+    const newVal = current ? (current.endsWith('\n') ? current + item : current + '\n' + item) : item;
+    this.itemsInput.set(newVal);
+  }
 
   constructor() {
     this.loadRegions();

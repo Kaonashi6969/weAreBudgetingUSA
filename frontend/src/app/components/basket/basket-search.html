@@ -9,6 +9,16 @@
       [placeholder]="translations['placeholder']"
     >
     </textarea>
+    <div class="helper-text">
+      {{ translations['helper_text'] || 'Enter items like: milk, eggs, bread...' }}
+    </div>
+
+    <div class="example-chips">
+      <button class="chip" (click)="onExampleClick('Milk')">Milk</button>
+      <button class="chip" (click)="onExampleClick('Eggs')">Eggs</button>
+      <button class="chip" (click)="onExampleClick('Chicken')">Chicken</button>
+      <button class="chip" (click)="onExampleClick('Bread')">Bread</button>
+    </div>
   </div>
 
   <app-store-selector

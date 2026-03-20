@@ -12,7 +12,52 @@
     (itemsInputChange)="itemsInput.set($event)"
     (storeToggled)="toggleStore($event)"
     (searchRequested)="calculate()"
+    (exampleChipClicked)="addExampleItem($event)"
   />
+
+  @if (results().length === 0 && !isLoading()) {
+    <div class="empty-state-container">
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="icon-wrapper">
+            <app-icon name="savings" />
+          </div>
+          <h3>{{ ui.translation()['empty_card_1_title'] || 'Save More on Groceries' }}</h3>
+          <p>{{ ui.translation()['empty_card_1_desc'] || 'Find the best deals across multiple stores and reduce your total cost.' }}</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon-wrapper">
+            <app-icon name="storefront" />
+          </div>
+          <h3>{{ ui.translation()['empty_card_2_title'] || 'Compare Store Prices' }}</h3>
+          <p>{{ ui.translation()['empty_card_2_desc'] || 'Instantly compare prices from different retailers in one place.' }}</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon-wrapper">
+            <app-icon name="auto_awesome" />
+          </div>
+          <h3>{{ ui.translation()['empty_card_3_title'] || 'Create Smart Lists' }}</h3>
+          <p>{{ ui.translation()['empty_card_3_desc'] || 'Build optimized shopping lists tailored to your needs.' }}</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon-wrapper">
+            <app-icon name="rocket_launch" />
+          </div>
+          <h3>{{ ui.translation()['empty_card_4_title'] || 'Save Time Shopping' }}</h3>
+          <p>{{ ui.translation()['empty_card_4_desc'] || 'Avoid store hopping — get everything optimized in seconds.' }}</p>
+        </div>
+      </div>
+
+      <div class="bottom-cta">
+        <p>{{ ui.translation()['empty_bottom_cta'] || 'Ready to save? Enter your grocery list above to find the best deals.' }}</p>
+      </div>
+
+      <!-- Decorative elements -->
+      <div class="deco deco-1"></div>
+      <div class="deco deco-2"></div>
+      <div class="deco deco-3"></div>
+    </div>
+  }
 
   @if (results().length > 0) {
     <app-basket-overview

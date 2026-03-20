@@ -22,9 +22,14 @@ export class BasketSearchComponent {
   @Output() itemsInputChange = new EventEmitter<string>();
   @Output() storeToggled = new EventEmitter<string>();
   @Output() searchRequested = new EventEmitter<void>();
+  @Output() exampleChipClicked = new EventEmitter<string>();
 
   onItemsInputChange(value: string) {
     this.itemsInputChange.emit(value);
+  }
+
+  onExampleClick(item: string) {
+    this.exampleChipClicked.emit(item);
   }
 
   onStoreToggled(storeId: string) {
