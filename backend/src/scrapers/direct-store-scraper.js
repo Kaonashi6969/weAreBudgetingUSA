@@ -64,7 +64,7 @@ class DirectStoreScraper {
     
     try {
       await page.setExtraHTTPHeaders({
-        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Language': 'hu-HU,hu;q=0.9,en-US;q=0.8,en;q=0.7',
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache'
       });
@@ -85,7 +85,13 @@ class DirectStoreScraper {
       // Quick cookie accept
       try {
         await page.waitForTimeout(1000);
-        const cookieButtons = ["button:has-text('Accept All')", "button:has-text('Accept')", "button#accept-all"];
+        const cookieButtons = [
+          "button:has-text('Accept All')", 
+          "button:has-text('Accept')", 
+          "button#accept-all",
+          "button:has-text('Összes elfogadása')", 
+          "button:has-text('Elfogad')"
+        ];
         for (const selector of cookieButtons) {
           const btn = await page.$(selector);
           if (btn && await btn.isVisible()) {
@@ -96,7 +102,13 @@ class DirectStoreScraper {
       } catch (e) {}
       
       await page.waitForTimeout(2000); 
-      await page.evaluate(() => window.scrollBy(0, 800));
+      await page.evaluate(async () => {
+        // Scroll incrementally to trigger lazy loading
+        for (let i = 0; i < 3; i++) {
+          window.scrollBy(0, 500);
+          await new Promise(r => setTimeout(r, 500));
+        }
+      });
       await page.waitForTimeout(1000);
 
       const items = await page.evaluate((s) => {
@@ -130,17 +142,22 @@ class DirectStoreScraper {
             if (s.imageSelector) {
               const imgEl = el.querySelector(s.imageSelector);
               if (imgEl) {
-                // Check srcset first for high-quality/WebP links, then src or data-src
+                // Check common attributes for lazy-loaded images or high-quality sources
                 const srcset = imgEl.getAttribute("srcset");
+                const dataSrc = imgEl.getAttribute("data-src") || imgEl.getAttribute("data-original") || imgEl.getAttribute("data-lazy-src");
+                const src = imgEl.getAttribute("src") || imgEl.src || "";
+
                 if (srcset) {
                   // Get the first URL in the srcset (usually the best/only one provided)
                   image_url = srcset.split(',')[0].trim().split(' ')[0];
-                } else {
-                  image_url = imgEl.getAttribute("src") || imgEl.getAttribute("data-src") || "";
+                } else if (dataSrc && !dataSrc.startsWith('data:image')) {
+                  image_url = dataSrc;
+                } else if (src) {
+                  image_url = src;
                 }
                 
-                // If it's still a base64 placeholder, try looking for sibling <source> tags
-                if (image_url.startsWith('data:image')) {
+                // If it's still a base64 placeholder or empty, try looking for sibling <source> tags
+                if (!image_url || image_url.startsWith('data:image')) {
                   const pictureEl = imgEl.closest('picture');
                   if (pictureEl) {
                     const sourceEl = pictureEl.querySelector('source');
@@ -166,7 +183,12 @@ class DirectStoreScraper {
               }
             }
 
-            if (price > 10) {
+            // Also fix relative image URLs if they exist
+            if (image_url && !image_url.startsWith("http") && !image_url.startsWith("data:")) {
+              image_url = window.location.origin + (image_url.startsWith("/") ? "" : "/") + image_url;
+            }
+
+            if (price > 0) {
               results.push({ name, price, url: link, image_url });
             }
           }
@@ -183,22 +205,40 @@ class DirectStoreScraper {
     }
   }
 
-async savePrice(productName, storeName, price, url, image_url = "", category = "Requested", regionId = "us") {
+  async savePrice(productName, storeName, price, url, image_url = "", category = "Requested", regionId = "us") {
     try {
       const storeId = storeName.toLowerCase().replace(/\s+/g, "_");
       const productId = productName.toLowerCase().replace(/\s+/g, "_").substring(0, 150);
 
-      await database.run("INSERT OR IGNORE INTO stores (id, name, region) VALUES (?, ?, ?)", [storeId, storeName, regionId]);
-      await database.run("INSERT OR IGNORE INTO products (id, name, category, image_url) VALUES (?, ?, ?, ?)", [productId, productName, category, image_url]);
+      // 1. Ensure store exists
+      await database.run(
+        "INSERT OR IGNORE INTO stores (id, name, region) VALUES (?, ?, ?)", 
+        [storeId, storeName, regionId]
+      );
 
-      // Update image_url if it was ignored during INSERT IGNORE
-      if (image_url) {
-        await database.run("UPDATE products SET image_url = ? WHERE id = ? AND (image_url IS NULL OR image_url = '')", [image_url, productId]);
-      }
+      // 2. Upsert product with its image_url
+      // We use ON CONFLICT to ensure the image_url is ALWAYS updated, even if the product existed with a blank one.
+      await database.run(
+        `INSERT INTO products (id, name, category, image_url) 
+         VALUES (?, ?, ?, ?)
+         ON CONFLICT(id) DO UPDATE SET 
+         name = excluded.name,
+         category = excluded.category,
+         image_url = excluded.image_url`,
+        [productId, productName, category, image_url]
+      );
       
+      // 3. Upsert the current price for this store
       await PriceRepository.upsert(productId, storeId, { price, unit: 'pcs', url });
+
+      if (image_url) {
+        console.log(`✅ [${storeName}] Saved: ${productName} | Image: ${image_url.substring(0, 50)}...`);
+      } else {
+        console.warn(`⚠️ [${storeName}] Saved: ${productName} | NO IMAGE FOUND`);
+      }
+
     } catch (e) {
-      console.error("Save error:", e.message);
+      console.error(`❌ [${storeName}] Save error for ${productName}:`, e.message);
     }
   }
 

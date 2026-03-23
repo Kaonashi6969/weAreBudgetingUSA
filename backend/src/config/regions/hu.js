@@ -72,7 +72,7 @@ const stores = [
     nameSelector: '.product-grid-box__title',
     priceSelector: '.ods-price__value',
     linkSelector: '.odsc-tile__link',
-    imageSelector: '.odsc-tile__img img'
+    imageSelector: '.odsc-image-gallery__image'
   },
   {
     id: "aldi",
@@ -81,12 +81,12 @@ const stores = [
     currency: 'HUF',
     scraperType: 'aldi-scraper',
     url: "https://www.aldi.hu/hu/search.html?search=",
-    itemSelector: 'article.wrapper',
+    itemSelector: '.plp_product',
     nameSelector: '.product-title',
     priceSelector: '.at-product-price_lbl',
-    linkSelector: 'a.at-moreinfo_btn',
+    linkSelector: 'a',
     baseUrl: 'https://www.aldi.hu',
-    imageSelector: '.product-image img'
+    imageSelector: 'img.at-product-images_img'
   }
 ];
 
