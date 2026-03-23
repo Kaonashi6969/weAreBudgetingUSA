@@ -7,6 +7,7 @@ const { getStoresByIds } = require('../config/stores');
 const tokenizer = new natural.WordTokenizer();
 const metaphone = natural.Metaphone;
 const JaroWinklerDistance = natural.JaroWinklerDistance;
+const LevenshteinDistance = natural.LevenshteinDistance;
 
 class BasketService {
   async getStaleTerms(itemsStr, selectedStoreIds = []) {
@@ -51,7 +52,7 @@ class BasketService {
 
   async calculateCheapestBasket(userInput, selectedStoreIds = [], regionId = 'us') {
     const region = getRegion(regionId);
-    const { processedWordPenalty, snackWordPenalty } = region.nlp;
+    const { processedWordPenalty, snackWordPenalty, brandWeights = {} } = region.nlp;
 
     console.log(`Calculate: "${userInput}", Stores: ${selectedStoreIds}, Region: ${regionId}`);
     const inputs = typeof userInput === 'string' 
@@ -63,15 +64,14 @@ class BasketService {
     const results = [];
 
     for (const input of inputs) {
-      const processedInput = input;
-      const lowInput = input.toLowerCase();
+      const lowInput = input.toLowerCase().trim();
 
-      const normalizedInput = processedInput
-        .toLowerCase()
+      const normalizedInput = lowInput
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
         .replace(/[^a-z0-9 ]/g, " ");
 
-      const iWords = normalizedInput.split(/\s+/).filter(w => w.length > 0);
+      const iTokens = tokenizer.tokenize(normalizedInput).map(t => t.toLowerCase());
+      if (iTokens.length === 0) continue;
 
       const scoredOffers = productsWithPrices.map(p => {
         const pNameLower = p.name.toLowerCase();
@@ -79,63 +79,82 @@ class BasketService {
           .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
           .replace(/[^a-z0-9 ]/g, " ");
 
-        // 1. String similarity (JaroWinkler is good for typos, but not enough for substrings)
-        const similarity = JaroWinklerDistance(normalizedInput, cleanPName);
+        const pTokens = tokenizer.tokenize(cleanPName).map(t => t.toLowerCase());
         
-        // 2. Exact word match (The most important part - it's "vaj" regardless of name length)
-        const pTokens = tokenizer.tokenize(cleanPName);
-        const iTokens = tokenizer.tokenize(normalizedInput);
-        
-        // Exact whole word match (e.g. "paradicsom" matches "fuztos paradicsom" but NOT "paradicsomle")
-        const hasExactToken = iTokens.every(it => pTokens.includes(it));
-        
-        let score = similarity;
-
-        if (hasExactToken) {
-            // HUGE boost for finding the actual root word
-            score += 3.0;
-
-            // Category Penalty: penalise processed/liquid versions the user didn’t ask for
-            const cleanPNom = cleanPName.toLowerCase();
-            const isProcessed = processedWordPenalty.some(pw =>
-              pTokens.some(pt => pt.toLowerCase() === pw) || cleanPNom.includes(pw)
-            );
-            const userAskedForProcessed = iTokens.some(it => processedWordPenalty.includes(it));
-
-            if (isProcessed && !userAskedForProcessed) {
-              score -= 3.5;
-            }
-
-            // Snack/Pastry Penalty
-            const isSnack = snackWordPenalty.some(sw => pTokens.includes(sw) || cleanPName.includes(sw));
-            if (isSnack) {
-              score -= 1.8;
-            }
-
-            // Length Bonus: favour shorter, purer names
-            const lengthRatio = normalizedInput.length / cleanPName.length;
-            score += lengthRatio * 0.6;
-        } else {
-            // Not an exact word match (e.g. searching "Paradicsom" but finding "Paradicsomos")
-            score *= 0.1;
+        // 1. Exact Match Check (Highest Priority)
+        // If the normalized input exactly matches the product name (stripped of non-alphanumeric)
+        if (cleanPName.replace(/\s+/g, '') === normalizedInput.replace(/\s+/g, '')) {
+            return { ...p, score: 99.0 }; // Absolute winner
         }
 
-        // Start of name boost
+        // 2. Exact word match check (Must contain all user words)
+        const containsAllTokens = iTokens.every(it => pTokens.includes(it));
+        
+        // 3. Substring match check (Backup for partial words)
+        const containsAsSubstring = iTokens.every(it => cleanPName.includes(it));
+
+        let score = 0;
+
+        if (containsAllTokens) {
+            score += 10.0;
+            // Short name bonus (prefer "Milk" over "Milk with Vitamin D and Omega 3")
+            const lengthPenalty = (cleanPName.length - normalizedInput.length) * 0.05;
+            score -= lengthPenalty;
+        } else if (containsAsSubstring) {
+            score += 5.0;
+        } else {
+            // Fuzzy similarity fallback (JaroWinkler is good for typos)
+            const similarity = JaroWinklerDistance(normalizedInput, cleanPName);
+            score += similarity * 2.0;
+        }
+
+        // 4. Position Bonus (Word appears at the start)
         if (cleanPName.startsWith(normalizedInput)) {
-            score += 0.3;
+            score += 2.0;
+        }
+
+        // 5. NLP Penalties (Category Mismatch)
+        const isProcessed = processedWordPenalty.some(pw => pTokens.includes(pw) || cleanPName.includes(pw));
+        const userAskedForProcessed = iTokens.some(it => processedWordPenalty.includes(it));
+
+        if (isProcessed && !userAskedForProcessed) {
+            score -= 6.0; // Heavy penalty for unwanted "Juice" when asking for "Orange"
+        }
+
+        const isSnack = snackWordPenalty.some(sw => pTokens.includes(sw) || cleanPName.includes(sw));
+        const userAskedForSnack = iTokens.some(it => snackWordPenalty.includes(it));
+
+        if (isSnack && !userAskedForSnack) {
+            score -= 3.0; // Penalty for "Cookies" etc.
+        }
+
+        // 6. Brand Weight/Quality (Optional from config)
+        for (const [brand, weight] of Object.entries(brandWeights)) {
+            if (pTokens.includes(brand.toLowerCase())) {
+                score += weight;
+            }
         }
 
         return { ...p, score };
       });
 
-      // Filter matches and sort by distance score (primary) and price (secondary)
+      // Filter matches and sort:
+      // 1. By score (Relevance)
+      // 2. By price (Secondary, if score is very close)
       const matches = scoredOffers
-        .filter(o => o.score >= 0.8) // Higher threshold because exact matches start at ~1.5
-        .sort((a, b) => (b.score - a.score) || (a.price - b.price));
+        .filter(o => o.score > 0.5) 
+        .sort((a, b) => {
+            // If scores are significantly different, use score
+            if (Math.abs(b.score - a.score) > 0.1) {
+                return b.score - a.score;
+            }
+            // Otherwise, cheaper is better
+            return a.price - b.price;
+        });
 
       console.log(`Input "${input}" found ${matches.length} matches. Best score: ${matches[0]?.score?.toFixed(2) || 0}`);
       
-      const topMatches = matches.slice(0, 5);
+      const topMatches = matches.slice(0, 50); // Increased from 10 to 50 for more variety
 
       if (topMatches.length > 0) {
         results.push({

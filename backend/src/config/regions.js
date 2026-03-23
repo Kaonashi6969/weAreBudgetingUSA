@@ -21,7 +21,12 @@ const REGIONS = {
         'sauce', 'juice', 'drink', 'pureed', 'mix', 'pesto',
         'concentrate', 'canned', 'ketchup', 'mustard'
       ],
-      snackWordPenalty: ['snack', 'cookie', 'croissant', 'pastry', 'roll', 'bun']
+      snackWordPenalty: ['snack', 'cookie', 'croissant', 'pastry', 'roll', 'bun'],
+      brandWeights: {
+        'Great Value': 1.0,  // Prefer store brands for budgeting
+        'Kirkland': 1.0,
+        'Organic': -0.5      // Slight penalty for organic if looking for cheapest (can be adjusted)
+      }
     }
   },
 
