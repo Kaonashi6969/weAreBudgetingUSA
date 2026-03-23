@@ -10,12 +10,13 @@ The project is split into a **Unified Repository** with a clear separation betwe
 
 A layered architecture focused on domain isolation and testability:
 
-- **src/controllers/**: Maps HTTP requests to Service calls. Validates inputs via Zod/Validators.
+- **src/middleware/validators.js**: Zod schemas including `BasketRequestSchema` (validates `items`, `selectedStores`, `region`) — wired as middleware on `POST /basket`.
+- **src/middleware/sanitizer.js**: XSS/HTML sanitization of all request inputs, including recursive sanitization of string properties inside nested objects in arrays.
 - **src/services/**: The "Brain" of the app.
   - `BasketService.js`: Implements the NLP scoring logic and basket aggregation.
   - `BackupService.js`: Manages SQLite snapshots and filesystem integrity.
 - **src/models/**: Implements the **Repository Pattern**. 
-  - Abstracts SQL queries and logic (e.g., `ProductRepository`, `PriceRepository`).
+  - Abstracts SQL queries and logic (e.g., `ProductRepository`, `PriceRepository`, `ListRepository`).
   - Uses `BaseRepository` for shared logic.
 - **src/scrapers/**: Automated data collection layer.
   - Uses **Playwright** with `playwright-extra-plugin-stealth`.
@@ -31,10 +32,12 @@ Modern standalone component architecture using high-performance reactivity and s
   - `ToastListComponent`: Global notification system driven by `UiStore`.
   - `BasketComponent` / `ProfileComponent`: Feature-level logic orchestrators.
   - `ProductResultCard` / `SavedListCard`: Reusable UI bricks for results and data visualization.
+- **src/app/guards/auth.guard.ts**: Functional `CanActivateFn` guard — redirects unauthenticated users to `/` if `UIStore.user()` is null. Applied to `/profile` and `/saved-lists`.
 - **src/app/models/types.ts**: Central **Source of Truth** for all data interfaces, eliminating `any` and ensuring 100% type safety.
 - **src/app/services/**:
   - `ApiService`: Standard HTTP wrapper with JWT injection for authenticated requests and typed Observables.
-  - `UiStore`: **Signal-based** global state for notifications, user session, and active region configuration.
+  - `UiStore`: **Signal-based** global state for notifications, user session, active region, and **basket state** (items input, selected stores, results, selections — all persisted across navigation).
+- **Routing**: `/profile` and `/saved-lists` routes are **lazy-loaded** (`loadComponent`) and **guard-protected** (`canActivate: [authGuard]`), keeping the initial bundle small.
 - **SCSS Styling**: Scoped styles using SCSS pre-processor for variables and logical nesting.
 - **Angular Control Flow**: Migrated to `@if` and `@for` (Angular 17+ Modern Control Flow) for faster rendering and cleaner templates.
 
@@ -46,7 +49,7 @@ The `BasketService.calculateCheapestBasket` logic is the primary differentiator 
 
 ### Scoring Algorithm:
 1. **Normalization**: Text is stripped of unnecessary characters, diacritics, and lowercase-normalized.
-2. **Tokenizer & Metaphone fallback**: Uses `natural.WordTokenizer` for word-level analysis and phonetic checks.
+2. **Tokenizer**: Uses `natural.WordTokenizer` for word-level analysis.
 3. **Exact Token & Position Boost**: If the user's search term is present as a standalone word or at the start of the product name, the score is significantly boosted (up to **99.0** for absolute matches).
 4. **Category/Type Penalties**:
    - **Processed Foods**: If the name contains "sauce", "juice", "drink" but the user didn't ask for it, a **heavy penalty** is applied.

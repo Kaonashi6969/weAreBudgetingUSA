@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../icon/icon';
@@ -13,11 +13,11 @@ import { Store } from '../../models/types';
   styleUrl: './basket-search.scss',
 })
 export class BasketSearchComponent {
-  @Input() itemsInput: string = '';
+  @Input() itemsInput = '';
   @Input() stores: Store[] = [];
   @Input() selectedStores: string[] = [];
-  @Input() isLoading: boolean = false;
-  @Input() translations: any = {};
+  @Input() isLoading = false;
+  @Input() translations: Record<string, string> = {};
 
   @Output() itemsInputChange = new EventEmitter<string>();
   @Output() storeToggled = new EventEmitter<string>();

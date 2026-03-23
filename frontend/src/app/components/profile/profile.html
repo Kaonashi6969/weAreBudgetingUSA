@@ -20,15 +20,15 @@
       <app-icon name="person" />
       <span>Account Preferences</span>
     </h3>
-    
+
     <div class="settings-card">
       <div class="setting-row">
-        <label>Email Address</label>
-        <input type="text" [value]="ui.user()?.email" disabled />
+        <label for="profile-email">Email Address</label>
+        <input id="profile-email" type="text" [value]="ui.user()?.email" disabled />
       </div>
-      
+
       <div class="setting-row">
-        <label>Subscription Tier</label>
+        <span class="setting-label">Subscription Tier</span>
         <div class="tier-info">
           <div class="tier-label">
             <span class="tier-name" [class.pro]="ui.user()?.tier === 'pro'">

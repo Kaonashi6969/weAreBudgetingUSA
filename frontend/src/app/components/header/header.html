@@ -6,7 +6,12 @@
     </a>
 
     <nav class="main-nav">
-      <a routerLink="/saved-lists" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+      <a
+        routerLink="/saved-lists"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-link"
+      >
         <app-icon name="shopping_basket" />
         <span>{{ ui.translation()['my_shopping_list'] }}</span>
       </a>
@@ -17,7 +22,7 @@
             <span class="pro-badge">PRO</span>
           }
           <app-icon name="account_circle" />
-          <span class="username">{{ ui.user()?.username || 'Profile' }}</span>
+          <span class="username">{{ ui.user()?.display_name || 'Profile' }}</span>
           <app-icon [name]="isMenuOpen ? 'expand_less' : 'expand_more'" class="chevron" />
         </button>
 
@@ -27,25 +32,42 @@
               <span class="user-email">{{ ui.user()?.email || 'Welcome' }}</span>
             </div>
             <div class="dropdown-divider"></div>
-            
-            <a routerLink="/saved-lists" class="dropdown-item" routerLinkActive="active" (click)="closeMenu()">
+
+            <a
+              routerLink="/saved-lists"
+              class="dropdown-item"
+              routerLinkActive="active"
+              (click)="closeMenu()"
+            >
               <app-icon name="inventory_2" />
               <span>Saved Inventories</span>
             </a>
-            
-            <a routerLink="/profile" class="dropdown-item" routerLinkActive="active" (click)="closeMenu()">
+
+            <a
+              routerLink="/profile"
+              class="dropdown-item"
+              routerLinkActive="active"
+              (click)="closeMenu()"
+            >
               <app-icon name="settings" />
               <span>Profile Settings</span>
             </a>
 
             <div class="dropdown-divider"></div>
-            
+
             <button class="dropdown-item logout-btn" (click)="closeMenu()">
               <app-icon name="logout" />
               <span>Sign Out</span>
             </button>
           </div>
-          <div class="dropdown-overlay" (click)="closeMenu()"></div>
+          <div
+            class="dropdown-overlay"
+            role="button"
+            tabindex="0"
+            (click)="closeMenu()"
+            (keyup.enter)="closeMenu()"
+            (keydown.space)="closeMenu()"
+          ></div>
         }
       </div>
     </nav>

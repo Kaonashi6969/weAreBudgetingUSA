@@ -43,13 +43,17 @@ h2 {
     text-align: left;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid transparent;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    box-shadow:
+      0 4px 6px -1px rgb(0 0 0 / 0.1),
+      0 2px 4px -2px rgb(0 0 0 / 0.1);
 
     &:hover {
       transform: translateY(-8px);
       background: #ffffff;
       border-color: #3b82f640;
-      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      box-shadow:
+        0 20px 25px -5px rgb(0 0 0 / 0.1),
+        0 8px 10px -6px rgb(0 0 0 / 0.1);
 
       .icon-wrapper {
         background: #3b82f6;
@@ -113,14 +117,35 @@ h2 {
     z-index: 0;
   }
 
-  .deco-1 { top: 10%; left: 5%; width: 10px; height: 10px; }
-  .deco-2 { top: 40%; right: 5%; background: #60a5fa; }
-  .deco-3 { bottom: 20%; left: 3%; background: #93c5fd; width: 8px; height: 8px; }
+  .deco-1 {
+    top: 10%;
+    left: 5%;
+    width: 10px;
+    height: 10px;
+  }
+  .deco-2 {
+    top: 40%;
+    right: 5%;
+    background: #60a5fa;
+  }
+  .deco-3 {
+    bottom: 20%;
+    left: 3%;
+    background: #93c5fd;
+    width: 8px;
+    height: 8px;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .results-grid {

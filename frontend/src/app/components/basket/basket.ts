@@ -9,7 +9,7 @@ import { IconComponent } from '../icon/icon';
 import { BasketSearchComponent } from './basket-search';
 import { ProductResultCardComponent } from '../product-result-card/product-result-card';
 import { BasketOverviewComponent } from '../basket-overview/basket-overview';
-import { Store, Region, BasketResult, ProductMatch } from '../../models/types';
+import { Store, Region, ProductMatch } from '../../models/types';
 
 @Component({
   selector: 'app-basket',
@@ -32,24 +32,34 @@ export class BasketComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
 
-  // Use Signals for performance and reactivity
-  itemsInput = signal('');
-  selectedStores = signal<string[]>([]);
+  // Basket state delegated to UIStore so it survives navigation
+  get itemsInput() {
+    return this.ui.basketItemsInput;
+  }
+  get selectedStores() {
+    return this.ui.basketSelectedStores;
+  }
+  get results() {
+    return this.ui.basketResults;
+  }
+  get selectedItems() {
+    return this.ui.basketSelectedItems;
+  }
+
   stores = signal<Store[]>([]);
   regions = signal<Region[]>([]);
-  results = signal<BasketResult[]>([]);
-
-  // Map: userInput -> selected matches (array for multiple selection)
-  selectedItems = signal<Record<string, ProductMatch[]>>({});
 
   // Pagination state
   displayLimit = signal(3);
-  canLoadMore = computed(() => this.results().some((res) => res.matches.length > this.displayLimit()));
+  canLoadMore = computed(() =>
+    this.results().some((res) => res.matches.length > this.displayLimit()),
+  );
   visibleResults = computed(() => this.results().slice(0, this.displayLimit()));
 
   totalPrice = computed(() =>
     Object.values(this.selectedItems()).reduce(
-      (acc, matches) => acc + matches.reduce((sum, m) => sum + (m.price || 0) * (m.quantity || 1), 0),
+      (acc, matches) =>
+        acc + matches.reduce((sum, m) => sum + (m.price || 0) * (m.quantity || 1), 0),
       0.0,
     ),
   );
@@ -57,8 +67,11 @@ export class BasketComponent implements OnInit {
   isSaving = signal(false);
   listName = signal('');
 
-  totalItemsCount = computed(() => 
-    Object.values(this.selectedItems()).reduce((acc, matches) => acc + matches.reduce((sum, m) => sum + (m.quantity || 1), 0), 0)
+  totalItemsCount = computed(() =>
+    Object.values(this.selectedItems()).reduce(
+      (acc, matches) => acc + matches.reduce((sum, m) => sum + (m.quantity || 1), 0),
+      0,
+    ),
   );
   missingItemsCount = computed(() => this.results().length - this.totalItemsCount());
 
@@ -70,8 +83,12 @@ export class BasketComponent implements OnInit {
 
   addExampleItem(item: string) {
     const current = this.itemsInput();
-    const newVal = current ? (current.endsWith('\n') ? current + item : current + '\n' + item) : item;
-    this.itemsInput.set(newVal);
+    const newVal = current
+      ? current.endsWith('\n')
+        ? current + item
+        : current + '\n' + item
+      : item;
+    this.ui.setBasketItemsInput(newVal);
   }
 
   constructor() {
@@ -80,10 +97,10 @@ export class BasketComponent implements OnInit {
 
   ngOnInit() {
     // Check for incoming search queries from Saved Lists
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       const query = params['search'];
       if (query && query !== this.itemsInput()) {
-        this.itemsInput.set(query);
+        this.ui.setBasketItemsInput(query);
         // Automatically trigger calculation if a query is present
         // Shift to macro task to ensure stores and other state are ready
         setTimeout(() => {
@@ -127,9 +144,9 @@ export class BasketComponent implements OnInit {
     const region = this.regions().find((r: Region) => r.id === regionId);
     if (!region) return;
     this.ui.setRegion(region);
-    this.selectedStores.set([]);
-    this.results.set([]);
-    this.selectedItems.set({});
+    this.ui.setBasketSelectedStores([]);
+    this.ui.setBasketResults([]);
+    this.ui.setBasketSelectedItems({});
     this.loadStores();
 
     // Persist the chosen region to the user’s profile
@@ -154,11 +171,11 @@ export class BasketComponent implements OnInit {
   }
 
   toggleStore(storeId: string) {
-    this.selectedStores.update((current) => {
-      const idx = current.indexOf(storeId);
-      if (idx > -1) return current.filter((id) => id !== storeId);
-      return [...current, storeId];
-    });
+    this.ui.setBasketSelectedStores(
+      this.selectedStores().includes(storeId)
+        ? this.selectedStores().filter((id) => id !== storeId)
+        : [...this.selectedStores(), storeId],
+    );
     this.cdr.detectChanges();
   }
 
@@ -175,16 +192,16 @@ export class BasketComponent implements OnInit {
     }
 
     this.ui.setStatus(NetworkStatus.LOADING);
-    this.results.set([]);
+    this.ui.setBasketResults([]);
     this.cdr.detectChanges();
 
     const regionId = this.ui.activeRegion().id;
 
     this.api.calculateBasket(items, this.selectedStores(), regionId).subscribe({
       next: (res) => {
-        this.results.set(res);
+        this.ui.setBasketResults(res);
         // Do not auto-select the best match per row anymore (the user preferred manual selection)
-        this.selectedItems.set({});
+        this.ui.setBasketSelectedItems({});
         this.displayLimit.set(3);
         this.ui.setStatus(NetworkStatus.SUCCESS);
         this.ui.showToast(`Found ${res.length} items for your basket!`, 'success');
@@ -205,7 +222,7 @@ export class BasketComponent implements OnInit {
   }
 
   selectMatch(userInput: string, match: ProductMatch) {
-    this.selectedItems.update((current) => {
+    this.ui.updateBasketSelectedItems((current) => {
       const selections = current[userInput] || [];
       const index = selections.findIndex((m) => m.id === match.id);
 
@@ -225,7 +242,7 @@ export class BasketComponent implements OnInit {
   }
 
   updateQuantity(userInput: string, matchId: string, delta: number) {
-    this.selectedItems.update((current) => {
+    this.ui.updateBasketSelectedItems((current) => {
       const selections = current[userInput] || [];
       const updated = selections
         .map((m) => {
@@ -258,15 +275,15 @@ export class BasketComponent implements OnInit {
       this.listName.set(name);
     }
 
-    const selected = Object.entries(this.selectedItems()).flatMap(([userInput, matches]) => 
-      matches.map(match => ({
+    const selected = Object.entries(this.selectedItems()).flatMap(([userInput, matches]) =>
+      matches.map((match) => ({
         userInput,
         productName: match.name,
         price: match.price,
         store: match.store_name || match.store,
         url: match.url,
         id: match.id,
-      }))
+      })),
     );
 
     if (selected.length === 0) {

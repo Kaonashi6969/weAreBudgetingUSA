@@ -5,7 +5,6 @@ const { getRegion } = require('../config/regions');
 const { getStoresByIds } = require('../config/stores');
 
 const tokenizer = new natural.WordTokenizer();
-const metaphone = natural.Metaphone;
 const JaroWinklerDistance = natural.JaroWinklerDistance;
 const LevenshteinDistance = natural.LevenshteinDistance;
 

@@ -1,7 +1,14 @@
 import { signal, computed, inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TranslocoService } from '@ngneat/transloco';
-import { NetworkStatus, ToastMessage, Region, User } from '../models/types';
+import {
+  NetworkStatus,
+  ToastMessage,
+  Region,
+  User,
+  BasketResult,
+  ProductMatch,
+} from '../models/types';
 
 export type { ToastMessage, Region, User };
 export { NetworkStatus };
@@ -40,6 +47,30 @@ export class UIStore {
     name: 'United States',
     currency: { code: 'USD', symbol: '$' },
   });
+
+  // ── Basket state (persists across navigation) ─────────────────────────────
+  readonly basketItemsInput = signal<string>('');
+  readonly basketSelectedStores = signal<string[]>([]);
+  readonly basketResults = signal<BasketResult[]>([]);
+  readonly basketSelectedItems = signal<Record<string, ProductMatch[]>>({});
+
+  setBasketItemsInput(v: string) {
+    this.basketItemsInput.set(v);
+  }
+  setBasketSelectedStores(v: string[]) {
+    this.basketSelectedStores.set(v);
+  }
+  setBasketResults(v: BasketResult[]) {
+    this.basketResults.set(v);
+  }
+  setBasketSelectedItems(v: Record<string, ProductMatch[]>) {
+    this.basketSelectedItems.set(v);
+  }
+  updateBasketSelectedItems(
+    fn: (cur: Record<string, ProductMatch[]>) => Record<string, ProductMatch[]>,
+  ) {
+    this.basketSelectedItems.update(fn);
+  }
 
   // Notifications
   private _toasts = signal<ToastMessage[]>([]);

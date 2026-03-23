@@ -50,7 +50,7 @@
   font-weight: 600;
   width: 100%;
   padding: 0;
-  
+
   &::placeholder {
     color: rgba(255, 255, 255, 0.6);
     font-weight: normal;
@@ -175,8 +175,14 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .spinner-small {
@@ -189,5 +195,7 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../icon/icon';
@@ -20,7 +20,7 @@ export class BasketOverviewComponent {
   @Input() missingItemsCount = 0;
   @Input() userTier: 'free' | 'pro' = 'free';
   @Input() isSaving = false;
-  @Input() translations: any = {};
+  @Input() translations: Record<string, string> = {};
 
   @Output() listNameChange = new EventEmitter<string>();
   @Output() saveRequested = new EventEmitter<void>();

@@ -24,19 +24,13 @@
 
     @if (userTier === 'pro') {
       <div class="pro-actions">
-        <button
-          (click)="onSave()"
-          [disabled]="totalItemsCount === 0 || isSaving"
-          class="save-btn"
-        >
+        <button (click)="onSave()" [disabled]="totalItemsCount === 0 || isSaving" class="save-btn">
           @if (isSaving) {
             <span class="spinner-small"></span>
           } @else {
             <app-icon name="cloud_upload" />
           }
-          {{
-            isSaving ? translations['saving_list'] : translations['save_grocery_list']
-          }}
+          {{ isSaving ? translations['saving_list'] : translations['save_grocery_list'] }}
         </button>
       </div>
     } @else {
@@ -52,7 +46,8 @@
         <div class="missing-warning">
           <app-icon name="error_outline" />
           <span>
-            {{ missingItemsCount }} {{ translations['unmatched_rows'] || 'rows without selections' }}
+            {{ missingItemsCount }}
+            {{ translations['unmatched_rows'] || 'rows without selections' }}
           </span>
         </div>
       } @else {

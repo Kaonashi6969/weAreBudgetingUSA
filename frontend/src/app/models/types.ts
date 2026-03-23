@@ -25,7 +25,7 @@ export enum NetworkStatus {
 export interface User {
   id: number;
   email: string;
-  username: string;
+  display_name: string;
   tier: 'free' | 'pro';
   region?: string;
 }

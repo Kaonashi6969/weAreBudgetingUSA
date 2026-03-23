@@ -1,5 +1,11 @@
 <div class="result-card" [class.collapsed]="isCollapsed()">
-  <div class="card-header" (click)="toggleCollapse()">
+  <div
+    class="card-header"
+    role="button"
+    tabindex="0"
+    (click)="toggleCollapse()"
+    (keyup.enter)="toggleCollapse()"
+  >
     <app-icon name="shopping_bag" />
     <h4>{{ item.userInput | titlecase }}</h4>
 
@@ -9,12 +15,12 @@
           @if (first) {
             <div class="selected-summary">
               <app-store-logo [storeId]="match.store" />
-              <span class="price-mini">{{ currencySymbol }}{{ match.price | number: '1.2-2' }}</span>
+              <span class="price-mini"
+                >{{ currencySymbol }}{{ match.price | number: '1.2-2' }}</span
+              >
             </div>
           } @else if ($index < 2) {
-            <div class="summary-extra">
-              +{{ getSelectedMatches().length - 1 }} more
-            </div>
+            <div class="summary-extra">+{{ getSelectedMatches().length - 1 }} more</div>
           }
         }
       </div>
@@ -48,7 +54,7 @@
             (keydown.space)="select(match)"
             [class.selected-match]="isSelected(match.id)"
             (click)="select(match)"
-            [style.animation-delay]="(i * 0.05) + 's'"
+            [style.animation-delay]="i * 0.05 + 's'"
           >
             <div class="match-content">
               @if (match.image_url) {

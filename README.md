@@ -7,11 +7,11 @@ A professional grocery search engine and price comparison tool for USA retailers
 - **Store Filtering**: Select specific retailers (Walmart, Kroger, etc.) to search in.
 - **Top 5 Offers**: See the best 5 prices for every product, ranked by relevance and value.
 - **Just-In-Time Scraper**: Automatically fetches fresh prices using Playwright if data is missing or older than 24h.
-- **NLP Matching**: Advanced scoring algorithm using `natural` (Tokenizer + Metaphone + Jaro-Winkler) that handles exact word matches, brand weighting, and category penalties (e.g., distinguishing between "Tomato" and "Tomato Sauce").
+- **NLP Matching**: Advanced scoring algorithm using `natural` (Tokenizer + Jaro-Winkler) that handles exact word matches, brand weighting, and category penalties (e.g., distinguishing between "Tomato" and "Tomato Sauce").
 - **Google OAuth 2.0**: Secure authentication for saving shopping lists and profiles.
 - **Saved Inventories**: Dedicated page for users to save, name, and retrieve their favorite shopping baskets. Items in saved lists link directly to the retailer's product page.
 - **Modern Frontend**: Built with **Angular 21** (2026 Edition) using **Signals** for reactive state management and **Modern Control Flow** (`@if`, `@for`).
-- **Improved UX**: Manual search selection to prevent "double-adding" and better layout for match badges to avoid overlapping on mobile.
+- **Basket State Persistence**: Shopping list inputs, selected stores, and search results are stored in the global `UIStore` — navigating to Profile and back preserves your basket exactly as you left it.
 
 ## 🏗️ Technical Architecture
 
@@ -28,6 +28,7 @@ The backend follows a **Layered/Clean Architecture**:
   - `StoreSelector` / `RegionSelector`: Modularized selection logic.
   - `ProductResultCard`: Encapsulated matching and selection UI.
   - `SavedListCard`: Reusable list preview for profile management.
+- **Route Guards & Lazy Loading**: `/profile` and `/saved-lists` are lazy-loaded and protected by `AuthGuard` — unauthenticated users are redirected to `/`.
 - **SCSS Styling**: Modern styling pipeline with component-scoped SCSS and global utility variables.
 - **RxJS & Signals**: Efficient state management and change detection using Granular Signals.
 - **Strict Typing**: Full TypeScript coverage with a central [types.ts](frontend/src/app/models/types.ts) library.
@@ -77,7 +78,7 @@ This project has been hardened for production environments with several professi
 - **SSL/HTTPS**: Ready for deployment behind Nginx (template provided in [nginx/nginx.conf.template](nginx/nginx.conf.template)).
 - **Auth Tiering**: Supports **Google OAuth 2.0** with **JWT** tokens.
 - **Environment Management**: Dual configuration via `.env.development` and `.env.production`.
-- **Compression**: Gzip enabled for faster asset delivery.
+- **Nginx**: Domain-parameterised via `${DOMAIN}` environment variable (`envsubst` at deploy time). Includes gzip compression and `Cache-Control: immutable` headers for fingerprinted Angular assets.
 
 ### 💾 Backup & Process Management
 - **Automated Backups**: [backend/src/services/BackupService.js](backend/src/services/BackupService.js) handles database consistency checks and 7-day retention of SQLite snapshots.
@@ -115,7 +116,7 @@ Returns the list of supported retailers for a given region.
 ### POST /api/basket
 Calculate the cheapest basket for a list of items in a region.
 
-**Request Body:**
+**Request Body** (validated by Zod — all fields type-checked on the server):
 ```json
 {
   "items": ["chicken breast", "milk"],

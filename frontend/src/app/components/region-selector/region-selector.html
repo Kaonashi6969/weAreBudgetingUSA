@@ -3,11 +3,11 @@
     <app-icon name="public" />
     <span>{{ sectionLabel }}</span>
   </h3>
-  
+
   <div class="region-grid">
     @for (r of regions; track r.id) {
-      <button 
-        class="region-card" 
+      <button
+        class="region-card"
         [class.active]="activeRegionId === r.id"
         (click)="regionChanged.emit(r.id)"
       >

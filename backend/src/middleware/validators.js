@@ -14,6 +14,19 @@ const BasketItemSchema = z.object({
   quantity: z.coerce.number().int().positive().default(1)
 });
 
+// Schema for the POST /basket request
+const BasketRequestSchema = z.object({
+  items: z.union([
+    z.string().min(1).max(2000),
+    z.array(z.string().min(1).max(200)).min(1).max(50)
+  ]),
+  selectedStores: z.union([
+    z.array(z.string().min(1).max(50)),
+    z.string().max(500)
+  ]).optional(),
+  region: z.string().regex(/^[a-z]{2}$/).optional().default('us')
+});
+
 // Generic middleware helper for validating requests
 const validate = (schema) => (req, res, next) => {
   try {
@@ -40,5 +53,6 @@ const validate = (schema) => (req, res, next) => {
 module.exports = {
   ProductFilterSchema,
   BasketItemSchema,
+  BasketRequestSchema,
   validate
 };

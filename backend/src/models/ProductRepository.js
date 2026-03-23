@@ -56,7 +56,9 @@ class ProductRepository extends BaseRepository {
       query += ` WHERE ${conditions.join(' AND ')}`;
     }
 
-    console.log(`[DB Exec] ${query} | Params: ${JSON.stringify(params)}`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[DB Exec] ${query} | Params: ${JSON.stringify(params)}`);
+    }
     return await database.all(query, params);
   }
 }

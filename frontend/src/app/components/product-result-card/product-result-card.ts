@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe, DecimalPipe } from '@angular/common';
 import { IconComponent } from '../icon/icon';
 import { StoreLogoComponent } from '../store-logo/store-logo';
@@ -11,7 +11,7 @@ import { BasketResult, ProductMatch } from '../../models/types';
   templateUrl: './product-result-card.html',
   styleUrl: './product-result-card.scss',
 })
-export class ProductResultCardComponent {
+export class ProductResultCardComponent implements OnInit {
   @Input({ required: true }) item!: BasketResult;
   @Input() selectedItems: Record<string, ProductMatch[]> = {};
   @Input() currencySymbol = '$';
@@ -21,7 +21,11 @@ export class ProductResultCardComponent {
   @Input() initialDisplayLimit = 3;
 
   @Output() matchSelected = new EventEmitter<{ userInput: string; match: ProductMatch }>();
-  @Output() quantityChanged = new EventEmitter<{ userInput: string; matchId: string; delta: number }>();
+  @Output() quantityChanged = new EventEmitter<{
+    userInput: string;
+    matchId: string;
+    delta: number;
+  }>();
 
   isCollapsed = signal(false);
   displayLimit = signal(3);
@@ -32,7 +36,7 @@ export class ProductResultCardComponent {
 
   loadMore(event: Event) {
     event.stopPropagation();
-    this.displayLimit.update(n => n + 10);
+    this.displayLimit.update((n) => n + 10);
   }
 
   canLoadMore(): boolean {

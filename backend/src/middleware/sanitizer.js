@@ -23,7 +23,17 @@ const sanitizeMiddleware = (req, res, next) => {
       if (typeof req.body[key] === 'string') {
         req.body[key] = sanitizeInput(req.body[key]);
       } else if (Array.isArray(req.body[key])) {
-        req.body[key] = req.body[key].map(item => typeof item === 'string' ? sanitizeInput(item) : item);
+        req.body[key] = req.body[key].map(item => {
+          if (typeof item === 'string') return sanitizeInput(item);
+          if (item && typeof item === 'object') {
+            const sanitized = { ...item };
+            for (const k in sanitized) {
+              if (typeof sanitized[k] === 'string') sanitized[k] = sanitizeInput(sanitized[k]);
+            }
+            return sanitized;
+          }
+          return item;
+        });
       }
     }
   }

@@ -79,7 +79,9 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  transition: background-color 0.2s, transform 0.1s;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
   margin-top: 10px;
 
   &:hover:not(:disabled) {
@@ -108,5 +110,7 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

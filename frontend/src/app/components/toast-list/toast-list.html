@@ -3,10 +3,18 @@
     <div class="toast-item" [ngClass]="'toast-' + toast.type" role="alert">
       <div class="toast-icon">
         @switch (toast.type) {
-          @case ('success') { <span class="material-icons">check_circle</span> }
-          @case ('error') { <span class="material-icons">error</span> }
-          @case ('warning') { <span class="material-icons">warning</span> }
-          @default { <span class="material-icons">info</span> }
+          @case ('success') {
+            <span class="material-icons">check_circle</span>
+          }
+          @case ('error') {
+            <span class="material-icons">error</span>
+          }
+          @case ('warning') {
+            <span class="material-icons">warning</span>
+          }
+          @default {
+            <span class="material-icons">info</span>
+          }
         }
       </div>
       <div class="toast-content">

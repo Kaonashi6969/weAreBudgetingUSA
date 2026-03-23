@@ -24,8 +24,10 @@
     .btn-view-details {
       background: #eff6ff;
       color: #1d4ed8;
-      
-      app-icon { transform: translateX(4px); }
+
+      app-icon {
+        transform: translateX(4px);
+      }
     }
   }
 
@@ -54,7 +56,7 @@
       .title-group {
         display: flex;
         flex-direction: column;
-        
+
         .list-title {
           margin: 0;
           font-size: 1.1rem;
@@ -88,10 +90,18 @@
         background: #fff;
         color: #94a3b8;
 
-        app-icon { font-size: 18px; }
+        app-icon {
+          font-size: 18px;
+        }
 
-        &.refresh:hover { background: #f0fdf4; color: #16a34a; }
-        &.delete:hover { background: #fef2f2; color: #ef4444; }
+        &.refresh:hover {
+          background: #f0fdf4;
+          color: #16a34a;
+        }
+        &.delete:hover {
+          background: #fef2f2;
+          color: #ef4444;
+        }
       }
     }
   }
@@ -116,7 +126,7 @@
         display: flex;
         flex-direction: column;
         gap: 2px;
-        
+
         .stat-label {
           font-size: 0.7rem;
           text-transform: uppercase;
@@ -161,7 +171,7 @@
         &:hover {
           background: #f8fafc;
           padding-left: 4px;
-          
+
           .dot {
             background: #3b82f6;
             transform: scale(1.2);
@@ -176,7 +186,7 @@
             transform: scale(1.1);
           }
         }
-        
+
         .dot {
           width: 5px;
           height: 5px;
@@ -232,7 +242,7 @@
         margin-top: 4px;
         cursor: pointer;
         text-align: center;
-        
+
         &:hover {
           text-decoration: underline;
         }

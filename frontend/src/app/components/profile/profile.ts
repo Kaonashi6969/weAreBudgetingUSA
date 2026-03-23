@@ -6,19 +6,12 @@ import { RouterLink } from '@angular/router';
 import { UIStore } from '../../services/ui-store';
 import { IconComponent } from '../icon/icon';
 import { RegionSelectorComponent } from '../region-selector/region-selector';
-import { SavedListCardComponent } from '../saved-list-card/saved-list-card';
 import { SavedList, Region } from '../../models/types';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    FormsModule,
-    IconComponent,
-    RegionSelectorComponent,
-  ],
+  imports: [CommonModule, RouterLink, FormsModule, IconComponent, RegionSelectorComponent],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })

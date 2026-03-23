@@ -28,7 +28,9 @@
       <div class="stat-divider"></div>
       <div class="stat-item">
         <span class="stat-label">Total Est.</span>
-        <span class="stat-value price">{{ currencySymbol }}{{ calculateTotal(list.items) | number: '1.2-2' }}</span>
+        <span class="stat-value price"
+          >{{ currencySymbol }}{{ calculateTotal(list.items) | number: '1.2-2' }}</span
+        >
       </div>
     </div>
 
@@ -60,9 +62,17 @@
           </a>
         }
       }
-      
+
       @if (!isExpanded && list.items.length > 5) {
-        <div class="more-items" (click)="toggleExpand()">+ {{ list.items.length - 5 }} more items</div>
+        <div
+          class="more-items"
+          role="button"
+          tabindex="0"
+          (click)="toggleExpand()"
+          (keyup.enter)="toggleExpand()"
+        >
+          + {{ list.items.length - 5 }} more items
+        </div>
       }
     </div>
   </div>
