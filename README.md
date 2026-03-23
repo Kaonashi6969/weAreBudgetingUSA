@@ -7,11 +7,11 @@ A professional grocery search engine and price comparison tool for USA retailers
 - **Store Filtering**: Select specific retailers (Walmart, Kroger, etc.) to search in.
 - **Top 5 Offers**: See the best 5 prices for every product, ranked by relevance and value.
 - **Just-In-Time Scraper**: Automatically fetches fresh prices using Playwright if data is missing or older than 24h.
-- **NLP Matching**: Advanced scoring algorithm using `natural` (Jaro-Winkler + Exact Token Boost) that handles product names and category penalties (e.g., distinguishing between "Tomato" and "Tomato Sauce").
+- **NLP Matching**: Advanced scoring algorithm using `natural` (Tokenizer + Metaphone + Jaro-Winkler) that handles exact word matches, brand weighting, and category penalties (e.g., distinguishing between "Tomato" and "Tomato Sauce").
 - **Google OAuth 2.0**: Secure authentication for saving shopping lists and profiles.
-- **Profile & Lists**: Authenticated users can save, name, and retrieve their favorite shopping baskets.
+- **Saved Inventories**: Dedicated page for users to save, name, and retrieve their favorite shopping baskets. Items in saved lists link directly to the retailer's product page.
 - **Modern Frontend**: Built with **Angular 21** (2026 Edition) using **Signals** for reactive state management and **Modern Control Flow** (`@if`, `@for`).
-- **Strict Quality Control**: Integrated **ESLint**, **Stylelint**, and **Prettier** for consistent code standards.
+- **Improved UX**: Manual search selection to prevent "double-adding" and better layout for match badges to avoid overlapping on mobile.
 
 ## 🏗️ Technical Architecture
 

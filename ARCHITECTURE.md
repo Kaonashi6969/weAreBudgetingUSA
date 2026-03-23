@@ -45,13 +45,15 @@ Modern standalone component architecture using high-performance reactivity and s
 The `BasketService.calculateCheapestBasket` logic is the primary differentiator of this engine. It uses the `natural` NLP library to rank offers.
 
 ### Scoring Algorithm:
-1. **Normalization**: Text is stripped of unnecessary characters and lowercase-normalized.
-2. **Jaro-Winkler Similarity**: Measures the character-level similarity between input and product name.
-3. **Exact Token Boost**: If the user's search term is present as a standalone whole word (e.g., "butter"), the score is boosted by **+3.0**. This ensures "Butter" ranked above "Buttermelt".
+1. **Normalization**: Text is stripped of unnecessary characters, diacritics, and lowercase-normalized.
+2. **Tokenizer & Metaphone fallback**: Uses `natural.WordTokenizer` for word-level analysis and phonetic checks.
+3. **Exact Token & Position Boost**: If the user's search term is present as a standalone word or at the start of the product name, the score is significantly boosted (up to **99.0** for absolute matches).
 4. **Category/Type Penalties**:
-   - **Processed Foods**: If the name contains "sauce", "juice", "drink" but the user didn't ask for it, a **-3.5 penalty** is applied (filtering out pasta sauces when looking for raw tomatoes).
+   - **Processed Foods**: If the name contains "sauce", "juice", "drink" but the user didn't ask for it, a **heavy penalty** is applied.
    - **Snack/Pastry Penalty**: Detects items like "cookie" or "croissant" when searching for basic ingredients to prevent noise.
-5. **Length Bonus**: Shorter, more precise matches are favored via a length ratio bonus.
+5. **Brand Weighting**: Support for brand-specific weights via [regions.js](backend/src/config/regions.js) to favor or penalize certain brands in search results.
+6. **Selection UX**: Manual selection of search results ensures the user picks exactly what they need, avoiding accidental increments and "double-adding".
+7. **External Deep-Linking**: Saved items now include direct breadcrumb links to the original retailer's product page for immediate purchase.
 
 ---
 
