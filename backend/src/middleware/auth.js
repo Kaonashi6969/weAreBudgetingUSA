@@ -5,17 +5,25 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const jwt = require('jsonwebtoken');
 const database = require('../db/database');
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'dummy_id_for_dev';
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'dummy_secret_for_dev';
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_change_me';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_only';
 
-if (process.env.AUTH_ENABLED === 'true' && (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET)) {
-  console.warn('WARNING: Auth is enabled but Google credentials are missing! Server may crash if you visit login routes.');
+// In production, credentials must be set — bail out early rather than crash silently later.
+if (process.env.AUTH_ENABLED === 'true') {
+  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+    console.error('FATAL: AUTH_ENABLED=true but GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET are not set.');
+    process.exit(1);
+  }
+  if (!process.env.JWT_SECRET) {
+    console.error('FATAL: AUTH_ENABLED=true but JWT_SECRET is not set.');
+    process.exit(1);
+  }
 }
 
 passport.use(new GoogleStrategy({
-    clientID: GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
+    clientID: GOOGLE_CLIENT_ID || 'dummy_id_for_dev',
+    clientSecret: GOOGLE_CLIENT_SECRET || 'dummy_secret_for_dev',
     callbackURL: "/api/auth/google/callback"
   },
   async (accessToken, refreshToken, profile, done) => {

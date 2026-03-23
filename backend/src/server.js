@@ -9,6 +9,7 @@ const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const { passport } = require('./middleware/auth');
+const { devAuthMiddleware } = require('./middleware/dev-auth');
 const database = require('./db/database');
 const apiRoutes = require('./routes/api');
 const authRoutes = require('./routes/auth');
@@ -35,24 +36,12 @@ app.use(compression());
 app.use(cookieParser());
 app.use(express.json());
 
-// Dev-only Mock User Middleware (Injects tester1 by default)
-if (process.env.NODE_ENV === 'development') {
-  app.use(async (req, res, next) => {
-    try {
-      // Find the tester1 user from the seed script
-      const user = await database.get('SELECT * FROM users WHERE email = ?', ['tester1@example.com']);
-      if (user) {
-        req.user = user;
-        console.log(`🛠️ Dev mode: Mocking user ${user.email}`);
-      }
-    } catch (err) {
-      console.error('Error fetching mock user:', err);
-    }
-    next();
-  });
-}
-
 app.use(sanitizeMiddleware); // Clean all JSON/Query inputs
+
+// Inject mock user in dev so all routes behave as authenticated without real OAuth
+if (process.env.NODE_ENV === 'development') {
+  app.use(devAuthMiddleware);
+}
 
 // Initialize Passport only if AUTH_ENABLED
 if (AUTH_ENABLED) {

@@ -1,14 +1,13 @@
 const passport = require('passport');
 
 /**
- * Higher-order middleware to conditionally enable authentication
- * @param {Function} middleware - The actual passport/auth middleware
- * @returns {Function} Express middleware
+ * Wraps a passport middleware so it is skipped when AUTH_ENABLED=false.
+ * In dev, req.user is already populated by devAuthMiddleware — just pass through.
+ * In prod, delegates to the real passport strategy.
  */
 const optionalAuth = (middleware) => (req, res, next) => {
-  if (process.env.AUTH_ENABLED === 'false') {
-    // If auth is disabled, let and inject a dummy user if needed
-    req.user = { id: 'dev-user', tier: 'pro', display_name: 'Developer' };
+  if (process.env.AUTH_ENABLED !== 'true') {
+    // devAuthMiddleware already set req.user from the seeded mock account
     return next();
   }
   return middleware(req, res, next);

@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const { generateToken } = require('../middleware/auth');
+const { optionalAuth } = require('../middleware/optional-auth');
 const database = require('../db/database');
+
+const jwtAuth = optionalAuth(passport.authenticate('jwt', { session: false }));
 
 // Initiate Google Auth
 router.get('/google',
@@ -34,23 +37,8 @@ router.get('/logout', (req, res) => {
 });
 
 // Current user profile
-router.get('/me', async (req, res, next) => {
-  if (process.env.NODE_ENV === 'development') {
-    try {
-      if (!database.db) await database.initialize();
-      const mockEmail = process.env.DEV_MOCK_USER_EMAIL || 'tester1@example.com';
-      const user = await database.get('SELECT * FROM users WHERE email = ?', [mockEmail]);
-      if (user) {
-        console.log(`🛠️ [Auth] Dev mode: Returning mock user ${mockEmail}`);
-        return res.json(user);
-      }
-    } catch (err) {
-      console.error('Auth Mock me error:', err);
-    }
-  }
-
-  passport.authenticate('jwt', { session: false })(req, res, next);
-}, (req, res) => {
+router.get('/me', jwtAuth, (req, res) => {
+  if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
   res.json(req.user);
 });
 
@@ -62,15 +50,8 @@ router.patch('/region', async (req, res) => {
       return res.status(400).json({ error: 'Missing or invalid region field' });
     }
 
-    // Resolve the user from JWT or dev mock
-    let userId;
-    if (process.env.NODE_ENV === 'development') {
-      const mockEmail = process.env.DEV_MOCK_USER_EMAIL || 'tester1@example.com';
-      const user = await database.get('SELECT id FROM users WHERE email = ?', [mockEmail]);
-      userId = user?.id;
-    } else if (req.user?.id) {
-      userId = req.user.id;
-    }
+    // Resolve the user from req.user (set by devAuthMiddleware in dev, or JWT in prod)
+    const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
