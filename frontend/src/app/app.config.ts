@@ -13,7 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch()),
     provideTransloco({
       config: {
-        availableLangs: ['us', 'uk', 'es', 'de'],
+        availableLangs: ['us', 'uk', 'es', 'de', 'hu'],
         defaultLang: 'us',
         // Remove this option if your application doesn't support changing language in runtime.
         reRenderOnLangChange: true,

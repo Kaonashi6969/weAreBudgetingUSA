@@ -3,21 +3,11 @@ const { chromium } = require("playwright");
 const database = require("../db/database");
 const PriceRepository = require('../models/PriceRepository');
 const ProductRepository = require('../models/ProductRepository');
-const { getStoresForRegion, getAllActiveStores } = require('../config/stores');
-const krogerApiFetcher = require('./kroger-api-fetcher');
-const walmartApiFetcher = require('./walmart-api-fetcher');
-const instacartApiFetcher = require('./instacart-api-fetcher');
+const { getStoresForRegion, getAllActiveStores, API_FETCHERS } = require('../config/regions');
 
-/**
- * Dispatch map: scraperType → fetcher function.
- * To support a new store, register its scraperType here and create its fetcher.
- * Browser DOM scraping is used automatically for any store without an entry here.
- */
-const API_FETCHERS = {
-  'kroger-api':    (store, term) => krogerApiFetcher.searchProducts(term, store.zipCode),
-  'walmart-api':   (store, term) => walmartApiFetcher.searchProducts(term),
-  'instacart-api': (store, term) => instacartApiFetcher.searchProducts(term, store.zipCode)
-};
+// API_FETCHERS is assembled automatically from all region files in src/config/regions/.
+// To add scraper support for a new store, register it in that store's region file —
+// no changes needed here.
 
 class DirectStoreScraper {
   constructor() {
