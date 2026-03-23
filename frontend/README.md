@@ -1,6 +1,6 @@
-# Budget Management - USA Edition (Frontend)
+# Budget Management - Multi-Region Edition (Frontend)
 
-This project is a high-performance **Angular 21** application using **Signals**, **Modern Control Flow**, and a **Standalone Component Architecture**.
+This project is a high-performance **Angular 21** application using **Signals**, **Modern Control Flow**, **Transloco I18n**, and a **Standalone Component Architecture**.
 
 ## 🚀 Development Server
 
@@ -11,6 +11,17 @@ ng serve
 ```
 
 Once the server is running, navigate to `http://localhost:4200/`.
+
+## 🌐 Internationalization (I18n)
+
+The application supports multiple languages and regions:
+- **Languages**: English, Hungarian, Spanish, German, Ukrainian.
+- **Regions**: USA (`us`), Hungary (`hu`).
+- **Framework**: Powered by **@ngneat/transloco**. Translation files are located in `public/assets/i18n/`.
+
+To add a new language:
+1. Create a JSON file in `public/assets/i18n/`.
+2. Register it in `src/app/app.config.ts` under `availableLangs`.
 
 ## 🛠️ Commands & Quality Control
 

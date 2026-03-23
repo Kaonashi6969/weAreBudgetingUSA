@@ -10,6 +10,9 @@ The project is split into a **Unified Repository** with a clear separation betwe
 
 A layered architecture focused on domain isolation and testability:
 
+- **src/config/regions/**: The **Region Plugin System**.
+  - `index.js`: Dynamically loads all `<region>.js` files from the directory.
+  - `<id>.js` (e.g., `hu.js`, `us.js`): Self-contained configuration for a market. Defines metadata (currency, NLP rules), store selectors (item, name, price, image), and scraper registrations.
 - **src/middleware/validators.js**: Zod schemas including `BasketRequestSchema` (validates `items`, `selectedStores`, `region`) — wired as middleware on `POST /basket`.
 - **src/middleware/sanitizer.js**: XSS/HTML sanitization of all request inputs, including recursive sanitization of string properties inside nested objects in arrays.
 - **src/services/**: The "Brain" of the app.
@@ -20,7 +23,7 @@ A layered architecture focused on domain isolation and testability:
   - Uses `BaseRepository` for shared logic.
 - **src/scrapers/**: Automated data collection layer.
   - Uses **Playwright** with `playwright-extra-plugin-stealth`.
-  - modular `direct-store-scraper.js` that pulls configurations for multiple retailers (Walmart, Kroger).
+  - `direct-store-scraper.js`: A universal engine that executes DOM-based scraping or calls specialized `API_FETCHERS` based on the active region/store configuration. Support for lazy-loading (auto-scroll) and relative URL resolution.
 - **src/db/database.js**: SQLite connection management and schema initializations.
 
 ### 🎨 Frontend (Angular 21)

@@ -1,13 +1,15 @@
-﻿# 🛒 Cheapest Grocery Basket Finder - USA Edition
+﻿# 🛒 Cheapest Grocery Basket Finder - Multi-Region Edition
 
-A professional grocery search engine and price comparison tool for USA retailers (Walmart, Kroger, etc.). Built with a modern **Angular frontend** and a scalable **layered Node.js backend**.
+A professional grocery search engine and price comparison tool for global retailers. Built with a modular **Region Plugin System**, a modern **Angular frontend**, and a scalable **layered Node.js backend**.
 
 ## ✨ Features
 
-- **Store Filtering**: Select specific retailers (Walmart, Kroger, etc.) to search in.
+- **Multi-Region Support**: Easily toggle between markets (USA, Hungary, etc.). Each region is a standalone plugin.
+- **Store Filtering**: Select specific retailers (Walmart, Kroger, Tesco, Auchan, Lidl, Aldi) to search in.
 - **Top 5 Offers**: See the best 5 prices for every product, ranked by relevance and value.
-- **Just-In-Time Scraper**: Automatically fetches fresh prices using Playwright if data is missing or older than 24h.
-- **NLP Matching**: Advanced scoring algorithm using `natural` (Tokenizer + Jaro-Winkler) that handles exact word matches, brand weighting, and category penalties (e.g., distinguishing between "Tomato" and "Tomato Sauce").
+- **Just-In-Time Scraper**: Automatically fetches fresh prices using Playwright if data is missing or older than 24h. Supports DOM scraping and API-based fetchers.
+- **Advanced NLP Matching**: Multi-language scoring engine using `natural` (Tokenizer + Jaro-Winkler) that handles exact word matches, brand weighting, and category penalties tailored per region.
+- **I18n Localisation**: Full internationalization support (EN, HU, ES, DE, UK) using **Transloco**.
 - **Google OAuth 2.0**: Secure authentication for saving shopping lists and profiles.
 - **Saved Inventories**: Dedicated page for users to save, name, and retrieve their favorite shopping baskets. Items in saved lists link directly to the retailer's product page.
 - **Modern Frontend**: Built with **Angular 21** (2026 Edition) using **Signals** for reactive state management and **Modern Control Flow** (`@if`, `@for`).
@@ -16,23 +18,23 @@ A professional grocery search engine and price comparison tool for USA retailers
 ## 🏗️ Technical Architecture
 
 ### Backend (Node.js + Express + SQLite)
-The backend follows a **Layered/Clean Architecture**:
+The backend follows a **Layered/Clean Architecture** with a **Plugin-Based Config**:
+- **Region Plugins** (backend/src/config/regions/): Modular `.js` files that define how each market behaves and looks.
 - **Controllers** (backend/src/controllers/): Handle API requests.
 - **Services** (backend/src/services/): Core business logic (basket calculation, stale data detection).
 - **Repositories** (backend/src/models/): Abstracted database access using the Repository Pattern.
-- **Scrapers** (backend/src/scrapers/): Playwright-based bots with modular store configurations.
+- **Scrapers** (backend/src/scrapers/): Playwright-based bots and API fetchers.
 
 ### Frontend (Angular 21)
-- **Standalone Component Library**: Highly modular architecture with reusable components:
-  - `IconComponent`: Unified SVG renderer with flexbox centering.
-  - `StoreSelector` / `RegionSelector`: Modularized selection logic.
+- **Standalone Component Library**: Highly modular architecture:
+  - `IconComponent`: Unified SVG renderer.
+  - `StoreSelector` / `RegionSelector`: Modularized selection and branding logic.
   - `ProductResultCard`: Encapsulated matching and selection UI.
-  - `SavedListCard`: Reusable list preview for profile management.
-- **Route Guards & Lazy Loading**: `/profile` and `/saved-lists` are lazy-loaded and protected by `AuthGuard` — unauthenticated users are redirected to `/`.
-- **SCSS Styling**: Modern styling pipeline with component-scoped SCSS and global utility variables.
-- **RxJS & Signals**: Efficient state management and change detection using Granular Signals.
+  - `SavedListCard`: Reusable list preview.
+- **Internationalization**: Managed via `Transloco` with support for dynamic language switching.
+- **Route Guards & Lazy Loading**: `/profile` and `/saved-lists` are lazy-loaded and protected by `AuthGuard`.
+- **RxJS & Signals**: Efficient state management and change detection.
 - **Strict Typing**: Full TypeScript coverage with a central [types.ts](frontend/src/app/models/types.ts) library.
-- **Proxy Configuration**: Seamless development with proxy.conf.json for live-reloading.
 
 ## 🚀 Quick Start
 
