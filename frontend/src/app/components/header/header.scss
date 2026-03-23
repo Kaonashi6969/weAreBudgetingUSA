@@ -174,12 +174,30 @@
 }
 
 @media (max-width: 640px) {
-  .app-name,
-  .nav-link span {
+  .nav-link span,
+  .username {
     display: none;
   }
 
   .header-container {
     padding: 0 1rem;
+  }
+
+  .logo-area {
+    font-size: 1.2rem;
+
+    .logo-icon {
+      font-size: 1.6rem;
+    }
+  }
+
+  .main-nav {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-name {
+    display: none;
   }
 }

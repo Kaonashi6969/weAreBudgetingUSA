@@ -154,3 +154,25 @@ h2 {
   gap: 20px;
   margin-top: 30px;
 }
+
+@media (max-width: 640px) {
+  .basket-container {
+    margin: 8px;
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+  }
+
+  .empty-state-container {
+    gap: 24px;
+    padding: 20px 0;
+
+    .feature-card {
+      padding: 20px;
+    }
+  }
+}
