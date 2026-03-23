@@ -166,7 +166,7 @@ export class BasketComponent implements OnInit {
         this.stores.set(stores);
         this.cdr.detectChanges();
       },
-      error: () => this.ui.showToast('Failed to load stores', 'error'),
+      error: () => this.ui.showToast(this.ui.translate('failed_load_stores'), 'error'),
     });
   }
 
@@ -187,7 +187,7 @@ export class BasketComponent implements OnInit {
       .filter((i) => i.trim());
 
     if (items.length === 0) {
-      this.ui.showToast('Please enter at least one product name', 'warning');
+      this.ui.showToast(this.ui.translate('enter_at_least_one'), 'warning');
       return;
     }
 
@@ -204,13 +204,13 @@ export class BasketComponent implements OnInit {
         this.ui.setBasketSelectedItems({});
         this.displayLimit.set(3);
         this.ui.setStatus(NetworkStatus.SUCCESS);
-        this.ui.showToast(`Found ${res.length} items for your basket!`, 'success');
+        this.ui.showToast(this.ui.translate('found_items', { count: res.length }), 'success');
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error(err);
         this.ui.setStatus(NetworkStatus.ERROR);
-        this.ui.showToast('Failed to calculate basket. Please try again.', 'error');
+        this.ui.showToast(this.ui.translate('failed_calculate'), 'error');
         this.cdr.detectChanges();
       },
     });
@@ -287,20 +287,20 @@ export class BasketComponent implements OnInit {
     );
 
     if (selected.length === 0) {
-      this.ui.showToast('Please select items first', 'warning');
+      this.ui.showToast(this.ui.translate('select_items_first'), 'warning');
       return;
     }
 
     this.isSaving.set(true);
     this.api.saveList(selected, this.listName()).subscribe({
       next: () => {
-        this.ui.showToast(`'${this.listName()}' saved to your profile!`, 'success');
+        this.ui.showToast(this.ui.translate('list_saved', { name: this.listName() }), 'success');
         this.isSaving.set(false);
         this.listName.set('');
         this.cdr.detectChanges();
       },
       error: () => {
-        this.ui.showToast('Please login to save lists', 'error');
+        this.ui.showToast(this.ui.translate('login_to_save'), 'error');
         this.isSaving.set(false);
         this.cdr.detectChanges();
       },

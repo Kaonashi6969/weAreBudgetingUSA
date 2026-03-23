@@ -14,10 +14,9 @@
     </div>
 
     <div class="example-chips">
-      <button class="chip" (click)="onExampleClick('Milk')">Milk</button>
-      <button class="chip" (click)="onExampleClick('Eggs')">Eggs</button>
-      <button class="chip" (click)="onExampleClick('Chicken')">Chicken</button>
-      <button class="chip" (click)="onExampleClick('Bread')">Bread</button>
+      @for (item of examples; track item) {
+        <button class="chip" (click)="onExampleClick(item)">{{ item }}</button>
+      }
     </div>
   </div>
 

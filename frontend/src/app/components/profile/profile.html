@@ -4,7 +4,7 @@
       <app-icon name="arrow_back" />
       <span>{{ ui.translation()['find_deals'] }}</span>
     </a>
-    <h2>Profile Settings</h2>
+    <h2>{{ ui.translation()['profile_settings'] }}</h2>
   </div>
 
   <app-region-selector
@@ -18,24 +18,28 @@
   <div class="profile-section">
     <h3>
       <app-icon name="person" />
-      <span>Account Preferences</span>
+      <span>{{ ui.translation()['account_preferences'] }}</span>
     </h3>
 
     <div class="settings-card">
       <div class="setting-row">
-        <label for="profile-email">Email Address</label>
+        <label for="profile-email">{{ ui.translation()['email_address'] }}</label>
         <input id="profile-email" type="text" [value]="ui.user()?.email" disabled />
       </div>
 
       <div class="setting-row">
-        <span class="setting-label">Subscription Tier</span>
+        <span class="setting-label">{{ ui.translation()['subscription_tier'] }}</span>
         <div class="tier-info">
           <div class="tier-label">
             <span class="tier-name" [class.pro]="ui.user()?.tier === 'pro'">
               {{ ui.user()?.tier?.toUpperCase() || 'FREE' }}
             </span>
             <span class="tier-status">
-              {{ ui.user()?.tier === 'pro' ? 'Unlimited access enabled' : 'Basic features active' }}
+              {{
+                ui.user()?.tier === 'pro'
+                  ? ui.translation()['unlimited_access_enabled']
+                  : (ui.translation()['basic_features_active'] || 'Basic features active')
+              }}
             </span>
           </div>
           @if (ui.user()?.tier !== 'pro') {

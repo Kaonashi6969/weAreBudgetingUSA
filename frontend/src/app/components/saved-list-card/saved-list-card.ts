@@ -19,6 +19,10 @@ export class SavedListCardComponent {
   @Input() unknownStoreText = 'Unknown Store';
   @Input() openLinkText = 'Open';
   @Input() refreshText = 'Refresh';
+  @Input() totalEstText = 'Total Est.';
+  @Input() moreItemsText = 'more items';
+  @Input() showLessText = 'Show Less';
+  @Input() viewFullListText = 'View Full List';
 
   @Output() delete = new EventEmitter<number>();
   @Output() refresh = new EventEmitter<void>();

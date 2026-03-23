@@ -85,6 +85,10 @@ export class UIStore {
     this.transloco.setActiveLang(region.id.toLowerCase());
   }
 
+  translate(key: string, params: Record<string, any> = {}): string {
+    return this.transloco.translate(key, params);
+  }
+
   showToast(message: string, type: ToastMessage['type'] = 'info', duration = 4000) {
     const id = Date.now() + Math.random();
     this._toasts.update((t) => [...t.slice(-4), { id, message, type }]);

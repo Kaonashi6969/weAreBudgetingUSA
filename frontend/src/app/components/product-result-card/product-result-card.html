@@ -44,7 +44,7 @@
         @if (i < displayLimit()) {
           @if (i === 3) {
             <div class="similar-items-divider">
-              <span>Similar Items</span>
+              <span>{{ similarItemsText }}</span>
             </div>
           }
           <div
@@ -117,7 +117,7 @@
     @if (!isCollapsed() && canLoadMore()) {
       <div class="load-more-container">
         <button class="load-more-button" (click)="loadMore($event)">
-          Load more items <app-icon name="expand_more" />
+          {{ loadMoreText }} <app-icon name="expand_more" />
         </button>
       </div>
     }
@@ -125,7 +125,7 @@
     @if (item.matches && item.matches.length > 0) {
       <div class="footer-actions" [class.hidden]="isCollapsed()">
         <button class="done-button" (click)="markAsDone($event)">
-          <app-icon name="check" /> Done with this item
+          <app-icon name="check" /> {{ doneText }}
         </button>
       </div>
     }

@@ -39,6 +39,10 @@
             [unknownStoreText]="ui.translation()['unknown_store_fallback']"
             [openLinkText]="ui.translation()['open_link_btn']"
             [refreshText]="ui.translation()['refresh_btn']"
+            [totalEstText]="ui.translation()['total_est_short'] || 'Total Est.'"
+            [moreItemsText]="ui.translation()['items_label'] || 'items'"
+            [showLessText]="ui.translation()['show_less'] || 'Show Less'"
+            [viewFullListText]="ui.translation()['view_full_list'] || 'View Full List'"
             (delete)="deleteList($event)"
             (refresh)="loadLists()"
           />

@@ -24,6 +24,11 @@ export class BasketSearchComponent {
   @Output() searchRequested = new EventEmitter<void>();
   @Output() exampleChipClicked = new EventEmitter<string>();
 
+  get examples(): string[] {
+    const list = this.translations['example_chips_list'] || 'Milk,Eggs,Chicken,Bread';
+    return list.split(',').map((s) => s.trim());
+  }
+
   onItemsInputChange(value: string) {
     this.itemsInputChange.emit(value);
   }

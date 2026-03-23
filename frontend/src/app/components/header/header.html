@@ -40,7 +40,7 @@
               (click)="closeMenu()"
             >
               <app-icon name="inventory_2" />
-              <span>Saved Inventories</span>
+              <span>{{ ui.translation()['saved_inventories'] }}</span>
             </a>
 
             <a
@@ -50,14 +50,14 @@
               (click)="closeMenu()"
             >
               <app-icon name="settings" />
-              <span>Profile Settings</span>
+              <span>{{ ui.translation()['profile_settings'] }}</span>
             </a>
 
             <div class="dropdown-divider"></div>
 
             <button class="dropdown-item logout-btn" (click)="closeMenu()">
               <app-icon name="logout" />
-              <span>Sign Out</span>
+              <span>{{ ui.translation()['sign_out'] || 'Sign Out' }}</span>
             </button>
           </div>
           <div

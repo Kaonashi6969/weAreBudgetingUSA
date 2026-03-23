@@ -18,6 +18,9 @@ export class ProductResultCardComponent implements OnInit {
   @Input() noMatchText = 'No match found';
   @Input() selectedText = 'Selected';
   @Input() selectThisText = 'Select this';
+  @Input() similarItemsText = 'Similar Items';
+  @Input() loadMoreText = 'Load more items';
+  @Input() doneText = 'Done with this item';
   @Input() initialDisplayLimit = 3;
 
   @Output() matchSelected = new EventEmitter<{ userInput: string; match: ProductMatch }>();
