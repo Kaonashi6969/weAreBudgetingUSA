@@ -56,10 +56,7 @@ import { CommonModule } from '@angular/common';
         background: #ff8200;
         border-color: #ff8200;
       }
-      .auchan {
-        background: #e1001a;
-        border-color: #e1001a;
-      }
+        
     `,
   ],
 })
@@ -67,7 +64,7 @@ export class StoreLogoComponent {
   storeId = input.required<string>();
 
   // Hardcoded list of supported logos for now
-  private supportedLogos = ['walmart', 'kroger', 'instacart', 'auchan'];
+  private supportedLogos = ['walmart', 'kroger', 'instacart', 'auchan', 'lidl', 'aldi', 'tesco'];
 
   hasLogo = computed(() => {
     return this.supportedLogos.includes(this.storeId().toLowerCase());
