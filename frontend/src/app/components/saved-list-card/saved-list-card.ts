@@ -1,12 +1,13 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { IconComponent } from '../icon/icon';
 import { SavedList, SavedListItem } from '../../models/types';
 
 @Component({
   selector: 'app-saved-list-card',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, IconComponent],
+  imports: [CommonModule, DecimalPipe, IconComponent, RouterLink],
   templateUrl: './saved-list-card.html',
   styleUrl: './saved-list-card.scss',
 })
@@ -21,6 +22,12 @@ export class SavedListCardComponent {
 
   @Output() delete = new EventEmitter<number>();
   @Output() refresh = new EventEmitter<void>();
+
+  isExpanded = false;
+
+  toggleExpand() {
+    this.isExpanded = !this.isExpanded;
+  }
 
   calculateTotal(items: SavedListItem[]): number {
     return items.reduce((acc, item) => acc + item.price, 0);

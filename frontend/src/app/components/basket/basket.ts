@@ -1,6 +1,7 @@
-import { Component, ChangeDetectorRef, signal, computed, inject } from '@angular/core';
+import { Component, ChangeDetectorRef, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api';
 import { UIStore, NetworkStatus } from '../../services/ui-store';
 import { ToastListComponent } from '../toast-list/toast-list';
@@ -25,9 +26,10 @@ import { Store, Region, BasketResult, ProductMatch } from '../../models/types';
   templateUrl: './basket.html',
   styleUrl: './basket.scss',
 })
-export class BasketComponent {
+export class BasketComponent implements OnInit {
   public ui = inject(UIStore);
   private api = inject(ApiService);
+  private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
 
   // Use Signals for performance and reactivity
@@ -74,6 +76,31 @@ export class BasketComponent {
 
   constructor() {
     this.loadRegions();
+  }
+
+  ngOnInit() {
+    // Check for incoming search queries from Saved Lists
+    this.route.queryParams.subscribe(params => {
+      const query = params['search'];
+      if (query && query !== this.itemsInput()) {
+        this.itemsInput.set(query);
+        // Automatically trigger calculation if a query is present
+        // Shift to macro task to ensure stores and other state are ready
+        setTimeout(() => {
+          if (this.stores().length > 0) {
+            this.calculate();
+          } else {
+            // Wait for stores to load if they aren't ready yet
+            const timer = setInterval(() => {
+              if (this.stores().length > 0) {
+                this.calculate();
+                clearInterval(timer);
+              }
+            }, 500);
+          }
+        }, 100);
+      }
+    });
   }
 
   // ── Region ──────────────────────────────────────────────────────────────────
@@ -156,14 +183,8 @@ export class BasketComponent {
     this.api.calculateBasket(items, this.selectedStores(), regionId).subscribe({
       next: (res) => {
         this.results.set(res);
-        // Auto-select the best match per row
-        const initialSelections: Record<string, ProductMatch[]> = {};
-        res.forEach((item: BasketResult) => {
-          if (item.matches?.length > 0) {
-            initialSelections[item.userInput] = [item.matches[0]];
-          }
-        });
-        this.selectedItems.set(initialSelections);
+        // Do not auto-select the best match per row anymore (the user preferred manual selection)
+        this.selectedItems.set({});
         this.displayLimit.set(3);
         this.ui.setStatus(NetworkStatus.SUCCESS);
         this.ui.showToast(`Found ${res.length} items for your basket!`, 'success');
@@ -189,13 +210,9 @@ export class BasketComponent {
       const index = selections.findIndex((m) => m.id === match.id);
 
       if (index > -1) {
-        // Increment quantity if already selected
-        const updatedSelections = [...selections];
-        updatedSelections[index] = {
-          ...updatedSelections[index],
-          quantity: (updatedSelections[index].quantity || 1) + 1,
-        };
-        return { ...current, [userInput]: updatedSelections };
+        // If already selected, don't auto-increment on click
+        // This prevents double-increment if the user clicks an already-selected (auto-highlighted) item
+        return current;
       } else {
         // Add new selection
         return {

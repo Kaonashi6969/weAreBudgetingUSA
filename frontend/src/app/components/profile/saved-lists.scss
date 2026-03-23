@@ -43,188 +43,71 @@
 }
 
 .profile-section {
-  background: #f8fafc;
-  padding: 24px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  margin-bottom: 24px;
+  animation: fadeIn 0.6s ease-out;
+}
 
-  h3 {
+.list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 10px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: #f8fafc;
+  border-radius: 16px;
+  border: 2px dashed #e2e8f0;
+
+  .basket-icon {
+    width: 64px;
+    height: 64px;
+    background: #ebf2ff;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin: 0 0 20px 0;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #1e293b;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: #3b82f6;
 
-    app-icon {
-      color: #3b82f6;
-    }
+    app-icon { font-size: 2rem; }
   }
-}
 
-.settings-card {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.setting-row {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  label {
-    display: block;
-    font-weight: 600;
+  p {
     color: #475569;
-    font-size: 0.9rem;
-    margin: 0;
+    font-size: 1.1rem;
+    margin-bottom: 24px;
   }
 
-  input {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 1rem;
-    background: white;
-    transition: border-color 0.2s;
-
-    &:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    &:disabled {
-      background: #f1f5f9;
-      color: #64748b;
-      cursor: not-allowed;
-    }
-  }
-}
-
-.tier-info {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: white;
-  padding: 16px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-
-  .tier-label {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    
-    .tier-name {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: #1e293b;
-
-      &.pro {
-        color: #fbbf24;
-        background: linear-gradient(45deg, #f59e0b, #fbbf24);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-    }
-
-    .tier-status {
-      font-size: 0.75rem;
-      color: #64748b;
-      font-weight: 500;
-    }
-  }
-
-  .upgrade-btn {
-    padding: 10px 20px;
-    background-color: #2563eb;
+  .btn-primary {
+    display: inline-flex;
+    padding: 12px 24px;
+    background: #2563eb;
     color: white;
-    border: none;
+    text-decoration: none;
     border-radius: 8px;
     font-weight: 600;
-    cursor: pointer;
     transition: all 0.2s;
 
     &:hover {
-      background-color: #1d4ed8;
+      background: #1d4ed8;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     }
   }
 }
 
-.list-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.list-card {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.list-title {
-  margin: 0;
-  font-size: 1rem;
-  color: #2d3748;
-  font-weight: 700;
-  flex-grow: 1;
-}
-
-.card-header {
-  padding: 1rem;
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.card-header .date {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #94a3b8;
-}
-
-.btn-delete {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-
-.btn-delete:hover {
-  background: #fee2e2;
-}
-
-.card-body {
-  padding: 1.25rem;
-  flex-grow: 1;
-}
-
-.summary {
-  margin-bottom: 1rem;
-  font-size: 0.95rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #edf2f7;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .total-price {

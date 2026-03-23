@@ -6,17 +6,48 @@
     </a>
 
     <nav class="main-nav">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-        <app-icon name="shopping_cart" />
-        <span>{{ ui.translation()['optimizer_title'] }}</span>
+      <a routerLink="/saved-lists" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+        <app-icon name="shopping_basket" />
+        <span>{{ ui.translation()['my_shopping_list'] }}</span>
       </a>
-      <a routerLink="/profile" routerLinkActive="active" class="nav-link profile-link">
-        @if (ui.user()?.tier === 'pro') {
-          <span class="pro-badge">PRO</span>
+
+      <div class="profile-container">
+        <button class="nav-link profile-btn" (click)="toggleMenu()" [class.active]="isMenuOpen">
+          @if (ui.user()?.tier === 'pro') {
+            <span class="pro-badge">PRO</span>
+          }
+          <app-icon name="account_circle" />
+          <span class="username">{{ ui.user()?.username || 'Profile' }}</span>
+          <app-icon [name]="isMenuOpen ? 'expand_less' : 'expand_more'" class="chevron" />
+        </button>
+
+        @if (isMenuOpen) {
+          <div class="profile-dropdown">
+            <div class="dropdown-header">
+              <span class="user-email">{{ ui.user()?.email || 'Welcome' }}</span>
+            </div>
+            <div class="dropdown-divider"></div>
+            
+            <a routerLink="/saved-lists" class="dropdown-item" routerLinkActive="active" (click)="closeMenu()">
+              <app-icon name="inventory_2" />
+              <span>Saved Inventories</span>
+            </a>
+            
+            <a routerLink="/profile" class="dropdown-item" routerLinkActive="active" (click)="closeMenu()">
+              <app-icon name="settings" />
+              <span>Profile Settings</span>
+            </a>
+
+            <div class="dropdown-divider"></div>
+            
+            <button class="dropdown-item logout-btn" (click)="closeMenu()">
+              <app-icon name="logout" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+          <div class="dropdown-overlay" (click)="closeMenu()"></div>
         }
-        <app-icon name="account_circle" />
-        <span class="username">{{ ui.user()?.username || 'Profile' }}</span>
-      </a>
+      </div>
     </nav>
   </div>
 </header>

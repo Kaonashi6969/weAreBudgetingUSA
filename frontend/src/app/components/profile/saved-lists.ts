@@ -10,19 +10,19 @@ import { SavedListCardComponent } from '../saved-list-card/saved-list-card';
 import { SavedList, Region } from '../../models/types';
 
 @Component({
-  selector: 'app-profile',
+  selector: 'app-saved-lists',
   standalone: true,
   imports: [
     CommonModule,
     RouterLink,
     FormsModule,
     IconComponent,
-    RegionSelectorComponent,
+    SavedListCardComponent,
   ],
-  templateUrl: './profile.html',
-  styleUrl: './profile.scss',
+  templateUrl: './saved-lists.html',
+  styleUrl: './saved-lists.scss',
 })
-export class ProfileComponent implements OnInit {
+export class SavedListsComponent implements OnInit {
   public readonly ui = inject(UIStore);
   private api = inject(ApiService);
   protected readonly savedLists = signal<SavedList[]>([]);

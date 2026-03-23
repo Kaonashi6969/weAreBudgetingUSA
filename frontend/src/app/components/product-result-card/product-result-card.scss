@@ -247,9 +247,10 @@
 
 .match-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 0.25rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .store-badge {
@@ -272,12 +273,12 @@
   border-radius: 50px;
   border: 1px solid #c6f6d5;
   box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
-  margin-right: auto;
 }
 
 .price-text {
   font-weight: 700;
   color: #2d3748;
+  margin-left: auto;
 }
 
 .product-name {

@@ -16,4 +16,14 @@ export class HeaderComponent {
 
   // Derived labels from UI translation
   public readonly appName = 'BudgetMate';
+
+  isMenuOpen = false;
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu() {
+    this.isMenuOpen = false;
+  }
 }
