@@ -21,7 +21,8 @@ router.get('/google/callback',
     // Set token in an HTTP-only cookie
     res.cookie('jwt', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', 
+      secure: true, // Always true for SameSite=None
+      sameSite: 'none', // Critical for Capacitor mobile app to store the cookie
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 

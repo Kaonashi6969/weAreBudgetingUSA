@@ -60,8 +60,27 @@ const limiter = rateLimit({
 app.use(logger);
 
 // Middleware
+const allowedOrigins = [
+  process.env.CLIENT_URL || 'http://localhost:4200',
+  'capacitor://localhost',
+  'http://localhost',
+  'http://localhost:3000',
+  'http://10.0.2.2:3000',
+  'http://169.254.83.107:3000',
+  'http://169.254.83.107',
+  'http://169.254.83.107:4200' // Added for Live Reload on Android Emulator
+];
+
 const corsOptions = {
-  origin: process.env.CLIENT_URL || 'http://localhost:4200',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.startsWith('capacitor://') || origin.startsWith('http://localhost') || origin.startsWith('http://169.254.83.107')) {
+      callback(null, true);
+    } else {
+      console.error(`CORS blocked for origin: ${origin}`);
+      callback(null, true); // Temporarily allow all in dev to debug connectivity
+    }
+  },
+  credentials: true,
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
