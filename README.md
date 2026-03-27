@@ -14,6 +14,8 @@ A professional grocery search engine and price comparison tool for global retail
 - **Saved Inventories**: Dedicated page for users to save, name, and retrieve their favorite shopping baskets. Items in saved lists link directly to the retailer's product page.
 - **Modern Frontend**: Built with **Angular 21** (2026 Edition) using **Signals** for reactive state management and **Modern Control Flow** (`@if`, `@for`).
 - **Basket State Persistence**: Shopping list inputs, selected stores, and search results are stored in the global `UIStore` — navigating to Profile and back preserves your basket exactly as you left it.
+- **Dark Mode**: Fully automatic dark/light theming synchronized with the OS `prefers-color-scheme` setting. Can be overridden manually. All colors are driven by a CSS custom-property token system defined in `styles.scss`.
+- **Native Mobile Ready**: Capacitor integration exposes native device APIs (e.g. camera). `NativeService` wraps Capacitor calls with graceful web fallbacks.
 
 ## 🏗️ Technical Architecture
 

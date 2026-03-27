@@ -39,9 +39,10 @@ Modern standalone component architecture using high-performance reactivity and s
 - **src/app/models/types.ts**: Central **Source of Truth** for all data interfaces, eliminating `any` and ensuring 100% type safety.
 - **src/app/services/**:
   - `ApiService`: Standard HTTP wrapper with JWT injection for authenticated requests and typed Observables.
-  - `UiStore`: **Signal-based** global state for notifications, user session, active region, and **basket state** (items input, selected stores, results, selections — all persisted across navigation).
+  - `UiStore`: **Signal-based** global state for notifications, user session, active region, basket state, and **dark mode** (`darkMode` signal initialized from `window.matchMedia`, toggled via `setDarkMode()`).
+  - `NativeService`: Wraps **Capacitor** device APIs (camera, etc.) with `isNative()` detection and graceful web fallbacks.
 - **Routing**: `/profile` and `/saved-lists` routes are **lazy-loaded** (`loadComponent`) and **guard-protected** (`canActivate: [authGuard]`), keeping the initial bundle small.
-- **SCSS Styling**: Scoped styles using SCSS pre-processor for variables and logical nesting.
+- **SCSS Styling**: Scoped styles using SCSS pre-processor. A **CSS design-token system** is defined in `styles.scss` as `:root` custom properties with a `@mixin dark-tokens` block applied under both `@media (prefers-color-scheme: dark)` and `[data-theme="dark"]`. The `AppComponent` sets the attribute reactively via `effect()`, and listens for OS preference changes via `matchMedia.addEventListener`.
 - **Angular Control Flow**: Migrated to `@if` and `@for` (Angular 17+ Modern Control Flow) for faster rendering and cleaner templates.
 
 ---
