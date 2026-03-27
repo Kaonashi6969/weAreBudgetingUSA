@@ -5,11 +5,12 @@ import { ApiService } from './services/api';
 import { UIStore } from './services/ui-store';
 import { User } from './models/types';
 import { HeaderComponent } from './components/header/header';
+import { BottomTabsComponent } from './components/bottom-tabs/bottom-tabs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule, HeaderComponent],
+  imports: [CommonModule, RouterModule, HeaderComponent, BottomTabsComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

@@ -1,21 +1,39 @@
 <div class="search-section">
   <div class="input-section">
-    <label for="items">{{ translations['shopping_list_label'] }}</label>
-    <textarea
-      id="items"
-      [ngModel]="itemsInput"
-      (ngModelChange)="onItemsInputChange($event)"
-      rows="5"
-      [placeholder]="translations['placeholder']"
-    >
-    </textarea>
-    <div class="helper-text">
-      {{ translations['helper_text'] || 'Enter items like: milk, eggs, bread...' }}
+    <label for="search">{{ translations['add_item_label'] || 'Add an item to your cart' }}</label>
+    <div class="search-input-wrapper">
+      <app-icon name="search" class="search-icon" />
+      <input
+        type="text"
+        id="search"
+        [ngModel]="itemsInput"
+        (ngModelChange)="onItemsInputChange($event)"
+        (keyup.enter)="onSearch()"
+        [placeholder]="translations['search_placeholder'] || 'Search for a product...'"
+        autocomplete="off"
+      />
+      @if (itemsInput.trim()) {
+        <button class="clear-btn" type="button" (click)="onClear()">
+          <app-icon name="close" />
+        </button>
+      }
+      <button
+        class="inline-search-btn"
+        type="button"
+        (click)="onSearch()"
+        [disabled]="isLoading || !itemsInput.trim()"
+      >
+        @if (isLoading) {
+          <span class="spinner"></span>
+        } @else {
+          <app-icon name="arrow_forward" />
+        }
+      </button>
     </div>
 
     <div class="example-chips">
       @for (item of examples; track item) {
-        <button class="chip" (click)="onExampleClick(item)">{{ item }}</button>
+        <button class="chip" type="button" (click)="onExampleClick(item)">{{ item }}</button>
       }
     </div>
   </div>
@@ -26,13 +44,4 @@
     [label]="translations['filter_sources']"
     (toggled)="onStoreToggled($event)"
   />
-
-  <button (click)="onSearch()" [disabled]="isLoading || !itemsInput.trim()" class="search-btn">
-    @if (isLoading) {
-      <span class="spinner"></span>
-    } @else {
-      <app-icon name="search" />
-    }
-    <span>{{ isLoading ? translations['running_matchmaker'] : translations['find_deals'] }}</span>
-  </button>
 </div>

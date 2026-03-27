@@ -1,5 +1,5 @@
 <div class="basket-container">
-  <h2 class="centered">{{ ui.translation()['my_shopping_list'] }}</h2>
+  <h2 class="centered">{{ ui.translation()['my_shopping_cart'] || 'My Shopping Cart' }}</h2>
 
   <app-toast-list />
 
@@ -13,58 +13,179 @@
     (storeToggled)="toggleStore($event)"
     (searchRequested)="calculate()"
     (exampleChipClicked)="addExampleItem($event)"
+    (clearRequested)="clearSearch()"
   />
 
-  @if (results().length === 0 && !isLoading()) {
+  <!-- Search Results (transient — shown while browsing results for current query) -->
+  @if (results().length > 0) {
+    <div class="search-results-section">
+      <div class="section-header">
+        <h3>
+          <app-icon name="search" />
+          {{ ui.translation()['results_for'] || 'Results for' }}
+          &ldquo;{{ lastSearchQuery() }}&rdquo;
+        </h3>
+        <button class="dismiss-results-btn" (click)="clearSearch()">
+          <app-icon name="close" />
+        </button>
+      </div>
+      <div class="results-grid">
+        @for (item of results(); track item.userInput) {
+          <app-product-result-card
+            [item]="item"
+            [selectedItems]="selectedItems()"
+            [currencySymbol]="currencySymbol()"
+            [noMatchText]="ui.translation()['could_not_find_item']"
+            [selectedText]="ui.translation()['selected']"
+            [selectThisText]="ui.translation()['add_to_cart'] || 'Add to cart'"
+            [similarItemsText]="ui.translation()['similar_items']"
+            [loadMoreText]="ui.translation()['load_more_items']"
+            [doneText]="ui.translation()['done_browsing'] || 'Done'"
+            [initialDisplayLimit]="5"
+            (matchSelected)="selectMatch($event.userInput, $event.match)"
+            (quantityChanged)="updateQuantity($event.userInput, $event.matchId, $event.delta)"
+          />
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Cart Section (persistent � accumulates items across searches) -->
+  @if (cartItems().length > 0) {
+    <div class="cart-section" [class.collapsed]="cartCollapsed()">
+      <div class="cart-header" (click)="cartCollapsed.set(!cartCollapsed())">
+        <h3>
+          <app-icon name="shopping_cart" />
+          {{ ui.translation()['your_cart'] || 'Your Cart' }}
+        </h3>
+        <div class="cart-header-right">
+          @if (cartCollapsed()) {
+            <span class="cart-summary-mini">
+              {{ totalItemsCount() }} {{ ui.translation()['items_in_cart'] || 'items' }}
+              &middot;
+              {{ currencySymbol() }}{{ totalPrice() | number: '1.2-2' }}
+            </span>
+          }
+          <span class="cart-badge">{{ totalItemsCount() }}</span>
+          <app-icon [name]="cartCollapsed() ? 'expand_more' : 'expand_less'" class="cart-toggle-icon" />
+        </div>
+      </div>
+
+      <div class="cart-collapsible">
+        @for (item of cartItems(); track item.id) {
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <span class="cart-item-name">{{ item.name }}</span>
+              <span class="cart-item-store">{{ item.store_name || item.store }}</span>
+            </div>
+            <span class="cart-item-price">
+              {{ currencySymbol() }}{{ item.price | number: '1.2-2' }}
+            </span>
+            <div class="cart-qty-controls">
+              <button class="qty-btn" (click)="updateQuantity(item.userInput, item.id, -1)">
+                <app-icon name="remove" />
+              </button>
+              <span class="qty-value">{{ item.quantity || 1 }}</span>
+              <button class="qty-btn" (click)="updateQuantity(item.userInput, item.id, 1)">
+                <app-icon name="add" />
+              </button>
+            </div>
+            <button
+              class="cart-remove-btn"
+              (click)="removeCartItem(item.userInput, item.id)"
+              [attr.aria-label]="'Remove ' + item.name"
+            >
+              <app-icon name="delete_outline" />
+            </button>
+          </div>
+        }
+      
+
+      <div class="cart-total">
+        <span class="cart-total-label">
+          {{ ui.translation()['total_estimated_price'] || 'Estimated Total' }}
+        </span>
+        <span class="cart-total-amount">
+          {{ currencySymbol() }}{{ totalPrice() | number: '1.2-2' }}
+        </span>
+      </div>
+
+      <app-basket-overview
+        [listName]="listName()"
+        [totalItemsCount]="totalItemsCount()"
+        [resultsLength]="cartItems().length"
+        [totalPrice]="totalPrice()"
+        [currencySymbol]="currencySymbol()"
+        [missingItemsCount]="0"
+        [userTier]="ui.user()?.tier || 'free'"
+        [isSaving]="isSaving()"
+        [translations]="ui.translation()"
+        (listNameChange)="listName.set($event)"
+        (saveRequested)="saveBasketToList()"
+      />
+      </div>
+    </div>
+  }
+
+  <!-- Empty State (no cart items and no search results) -->
+  @if (cartItems().length === 0 && results().length === 0 && !isLoading()) {
     <div class="empty-state-container">
       <div class="feature-grid">
         <div class="feature-card">
           <div class="icon-wrapper">
-            <app-icon name="savings" />
+            <app-icon name="search" />
           </div>
-          <h3>{{ ui.translation()['empty_card_1_title'] || 'Save More on Groceries' }}</h3>
-          <p>
-            {{
-              ui.translation()['empty_card_1_desc'] ||
-                'Find the best deals across multiple stores and reduce your total cost.'
-            }}
-          </p>
+          <div class="card-content">
+            <h3>{{ ui.translation()['empty_card_1_title'] || 'Search & Add' }}</h3>
+            <p>
+              {{
+                ui.translation()['empty_card_1_desc'] ||
+                  'Search for products one at a time and add them to your cart.'
+              }}
+            </p>
+          </div>
         </div>
         <div class="feature-card">
           <div class="icon-wrapper">
             <app-icon name="storefront" />
           </div>
-          <h3>{{ ui.translation()['empty_card_2_title'] || 'Compare Store Prices' }}</h3>
-          <p>
-            {{
-              ui.translation()['empty_card_2_desc'] ||
-                'Instantly compare prices from different retailers in one place.'
-            }}
-          </p>
+          <div class="card-content">
+            <h3>{{ ui.translation()['empty_card_2_title'] || 'Compare Store Prices' }}</h3>
+            <p>
+              {{
+                ui.translation()['empty_card_2_desc'] ||
+                  'Instantly compare prices from different retailers in one place.'
+              }}
+            </p>
+          </div>
         </div>
         <div class="feature-card">
           <div class="icon-wrapper">
-            <app-icon name="auto_awesome" />
+            <app-icon name="shopping_cart" />
           </div>
-          <h3>{{ ui.translation()['empty_card_3_title'] || 'Create Smart Lists' }}</h3>
-          <p>
-            {{
-              ui.translation()['empty_card_3_desc'] ||
-                'Build optimized shopping lists tailored to your needs.'
-            }}
-          </p>
+          <div class="card-content">
+            <h3>{{ ui.translation()['empty_card_3_title'] || 'Build Your Cart' }}</h3>
+            <p>
+              {{
+                ui.translation()['empty_card_3_desc'] ||
+                  'Pick the best deals item by item and build an optimized grocery list.'
+              }}
+            </p>
+          </div>
         </div>
         <div class="feature-card">
           <div class="icon-wrapper">
-            <app-icon name="rocket_launch" />
+            <app-icon name="savings" />
           </div>
-          <h3>{{ ui.translation()['empty_card_4_title'] || 'Save Time Shopping' }}</h3>
-          <p>
-            {{
-              ui.translation()['empty_card_4_desc'] ||
-                'Avoid store hopping — get everything optimized in seconds.'
-            }}
-          </p>
+          <div class="card-content">
+            <h3>{{ ui.translation()['empty_card_4_title'] || 'Save Money' }}</h3>
+            <p>
+              {{
+                ui.translation()['empty_card_4_desc'] ||
+                  'See your running total and save your optimized list when ready.'
+              }}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -72,52 +193,14 @@
         <p>
           {{
             ui.translation()['empty_bottom_cta'] ||
-              'Ready to save? Enter your grocery list above to find the best deals.'
+              'Start by searching for a product above to find the best deals.'
           }}
         </p>
       </div>
 
-      <!-- Decorative elements -->
       <div class="deco deco-1"></div>
       <div class="deco deco-2"></div>
       <div class="deco deco-3"></div>
-    </div>
-  }
-
-  @if (results().length > 0) {
-    <app-basket-overview
-      [listName]="listName()"
-      [totalItemsCount]="totalItemsCount()"
-      [resultsLength]="results().length"
-      [totalPrice]="totalPrice()"
-      [currencySymbol]="currencySymbol()"
-      [missingItemsCount]="missingItemsCount()"
-      [userTier]="ui.user()?.tier || 'free'"
-      [isSaving]="isSaving()"
-      [translations]="ui.translation()"
-      (listNameChange)="listName.set($event)"
-      (saveRequested)="saveBasketToList()"
-    />
-  }
-
-  @if (!isLoading() && results().length > 0) {
-    <div class="results-grid">
-      @for (item of results(); track item.userInput) {
-        <app-product-result-card
-          [item]="item"
-          [selectedItems]="selectedItems()"
-          [currencySymbol]="currencySymbol()"
-          [noMatchText]="ui.translation()['could_not_find_item']"
-          [selectedText]="ui.translation()['selected']"
-          [selectThisText]="ui.translation()['select_this']"
-          [similarItemsText]="ui.translation()['similar_items']"
-          [loadMoreText]="ui.translation()['load_more_items']"
-          [doneText]="ui.translation()['done_with_this_item']"
-          [initialDisplayLimit]="3"
-          (matchSelected)="selectMatch($event.userInput, $event.match)"
-          (quantityChanged)="updateQuantity($event.userInput, $event.matchId, $event.delta)"
-        />
-      }
     </div>
   }
 </div>

@@ -1,8 +1,106 @@
-/* You can add global styles to this file, and also import other style files */
+/* ─── Design tokens ─── */
+:root {
+  /* Brand */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #eff6ff;
+  --color-primary-ring: rgba(37, 99, 235, 0.2);
+
+  --color-accent: #10b981;
+  --color-accent-light: #ecfdf5;
+
+  /* Neutrals */
+  --color-bg: #f7fafc;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
+  --color-text: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-text-muted: #94a3b8;
+
+  /* Semantic */
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+
+  /* Spacing – mobile-first */
+  --header-height: 56px;
+  --bottom-tabs-height: 60px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --page-gutter: 1rem;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+
+  @media (min-width: 768px) {
+    --header-height: auto;
+    --page-gutter: 1.5rem;
+  }
+}
+
+/* ─── Reset & mobile foundations ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+}
 
 body {
-  font-family: Roboto, sans-serif;
+  font-family: 'Inter', Roboto, system-ui, -apple-system, sans-serif;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* Prevent 300ms tap delay & highlight flash on mobile */
+a,
+button,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Disable hover effects on touch devices */
+@media (hover: none) {
+  .feature-card:hover,
+  .match-item:hover,
+  .store-card:hover,
+  .region-card:hover,
+  .list-card-wrapper:hover,
+  .nav-link:hover {
+    transform: none !important;
+    box-shadow: inherit !important;
+  }
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Safe area padding utility */
+.safe-bottom {
+  padding-bottom: var(--safe-bottom);
 }

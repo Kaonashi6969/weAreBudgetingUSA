@@ -23,6 +23,7 @@ export class BasketSearchComponent {
   @Output() storeToggled = new EventEmitter<string>();
   @Output() searchRequested = new EventEmitter<void>();
   @Output() exampleChipClicked = new EventEmitter<string>();
+  @Output() clearRequested = new EventEmitter<void>();
 
   get examples(): string[] {
     const list = this.translations['example_chips_list'] || 'Milk,Eggs,Chicken,Bread';
@@ -34,7 +35,13 @@ export class BasketSearchComponent {
   }
 
   onExampleClick(item: string) {
+    this.itemsInputChange.emit(item);
     this.exampleChipClicked.emit(item);
+  }
+
+  onClear() {
+    this.itemsInputChange.emit('');
+    this.clearRequested.emit();
   }
 
   onStoreToggled(storeId: string) {

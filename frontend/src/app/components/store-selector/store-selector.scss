@@ -1,57 +1,68 @@
 ﻿.store-selection {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .section-label {
   display: block;
-  margin-bottom: 12px;
-  font-weight: 500;
-  color: #475569;
-  font-size: 0.95rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #475569);
+  font-size: 0.9rem;
 }
 
 .store-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 
 .store-card {
-  flex: 0 1 auto;
-  min-width: 80px;
-  max-width: 110px;
-  padding: 10px;
-  background: white;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
+  flex: 0 0 auto;
+  min-width: 72px;
+  max-width: 100px;
+  padding: 10px 8px;
+  background: var(--color-surface, #fff);
+  border: 1.5px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-sm, 8px);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 4px;
+  transition: border-color 0.15s ease, background 0.15s ease;
   position: relative;
   overflow: hidden;
 
-  &:hover {
-    border-color: #94a3b8;
-    background-color: #f8fafc;
-    transform: translateY(-1px);
+  &:active {
+    background-color: var(--color-primary-light, #eff6ff);
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-text-muted, #94a3b8);
+      background-color: #f8fafc;
+    }
   }
 
   &.active {
-    border-color: #3b82f6;
-    background-color: #eff6ff;
+    border-color: var(--color-primary, #3b82f6);
+    background-color: var(--color-primary-light, #eff6ff);
 
     .store-name {
       color: #1e40af;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .check-badge {
       opacity: 1;
       transform: scale(1);
     }
+  }
+
+  @media (max-width: 767px) {
+    flex: 1 0 calc(33.33% - 8px);
+    max-width: none;
+    min-width: 0;
   }
 }
 
@@ -79,9 +90,10 @@
 }
 
 .store-name {
-  font-size: 0.75rem;
-  color: #64748b;
+  font-size: 0.7rem;
+  color: var(--color-text-secondary, #64748b);
   text-align: center;
+  line-height: 1.2;
 }
 
 .check-badge {
@@ -90,14 +102,14 @@
   right: 4px;
   width: 14px;
   height: 14px;
-  background-color: #3b82f6;
+  background-color: var(--color-primary, #3b82f6);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   transform: scale(0.5);
-  transition: all 0.2s;
+  transition: opacity 0.15s ease, transform 0.15s ease;
 
   .check-icon {
     width: 6px;
@@ -106,15 +118,5 @@
     border-bottom: 1.5px solid white;
     transform: rotate(-45deg);
     margin-top: -1px;
-  }
-}
-
-@media (max-width: 480px) {
-  .store-grid {
-    justify-content: space-between;
-  }
-  .store-card {
-    min-width: calc(33% - 8px);
-    max-width: none;
   }
 }

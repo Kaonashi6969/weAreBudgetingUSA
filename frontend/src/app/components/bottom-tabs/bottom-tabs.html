@@ -1,0 +1,14 @@
+<nav class="bottom-tabs">
+  <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="tab-item">
+    <app-icon name="home" />
+    <span>{{ (ui.translation() || {})['home'] || 'Home' }}</span>
+  </a>
+  <a routerLink="/saved-lists" routerLinkActive="active" class="tab-item">
+    <app-icon name="shopping_basket" />
+    <span>{{ (ui.translation() || {})['my_shopping_list'] }}</span>
+  </a>
+  <a routerLink="/profile" routerLinkActive="active" class="tab-item">
+    <app-icon name="account_circle" />
+    <span>{{ (ui.translation() || {})['profile'] || 'Profile' }}</span>
+  </a>
+</nav>

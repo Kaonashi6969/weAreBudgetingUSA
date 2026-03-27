@@ -1,15 +1,25 @@
-.main {
+:host {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  background-color: #f7fafc;
-  font-family:
-    'Inter',
-    system-ui,
-    -apple-system,
-    sans-serif;
+  min-height: 100dvh; // dynamic viewport for mobile browsers
+  background-color: var(--color-bg, #f7fafc);
 }
 
 .content-wrapper {
+  flex: 1;
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: var(--page-gutter);
+  padding-top: calc(var(--page-gutter) + var(--safe-top));
+
+  @media (max-width: 767px) {
+    // Space for bottom tabs + safe area
+    padding-bottom: calc(var(--bottom-tabs-height) + var(--safe-bottom) + 1rem);
+  }
+
+  @media (min-width: 768px) {
+    padding: 2rem 1.5rem;
+  }
 }

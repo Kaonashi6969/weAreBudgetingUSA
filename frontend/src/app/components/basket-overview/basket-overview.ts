@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../icon/icon';
 import { UpgradeBannerComponent } from '../upgrade-banner/upgrade-banner';
@@ -7,7 +7,7 @@ import { UpgradeBannerComponent } from '../upgrade-banner/upgrade-banner';
 @Component({
   selector: 'app-basket-overview',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent, UpgradeBannerComponent, DecimalPipe],
+  imports: [CommonModule, FormsModule, IconComponent, UpgradeBannerComponent],
   templateUrl: './basket-overview.html',
   styleUrl: './basket-overview.scss',
 })

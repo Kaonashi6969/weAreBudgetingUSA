@@ -49,12 +49,11 @@ export class BasketComponent implements OnInit {
   stores = signal<Store[]>([]);
   regions = signal<Region[]>([]);
 
-  // Pagination state
-  displayLimit = signal(3);
-  canLoadMore = computed(() =>
-    this.results().some((res) => res.matches.length > this.displayLimit()),
-  );
-  visibleResults = computed(() => this.results().slice(0, this.displayLimit()));
+  // Track what was last searched (for display in results header)
+  lastSearchQuery = signal('');
+
+  // Auto-collapse cart when browsing search results
+  cartCollapsed = signal(false);
 
   totalPrice = computed(() =>
     Object.values(this.selectedItems()).reduce(
@@ -73,7 +72,13 @@ export class BasketComponent implements OnInit {
       0,
     ),
   );
-  missingItemsCount = computed(() => this.results().length - this.totalItemsCount());
+
+  /** Flat list of all cart items with their search term attached. */
+  cartItems = computed(() =>
+    Object.entries(this.selectedItems()).flatMap(([userInput, matches]) =>
+      matches.map((match) => ({ ...match, userInput })),
+    ),
+  );
 
   // Expose UI states
   isLoading = computed(() => this.ui.isLoading());
@@ -82,13 +87,28 @@ export class BasketComponent implements OnInit {
   currencySymbol = computed(() => this.ui.activeRegion()?.currency?.symbol ?? '$');
 
   addExampleItem(item: string) {
-    const current = this.itemsInput();
-    const newVal = current
-      ? current.endsWith('\n')
-        ? current + item
-        : current + '\n' + item
-      : item;
-    this.ui.setBasketItemsInput(newVal);
+    this.ui.setBasketItemsInput(item);
+    this.calculate();
+  }
+
+  clearSearch() {
+    this.ui.setBasketItemsInput('');
+    this.ui.setBasketResults([]);
+    this.lastSearchQuery.set('');
+    this.cartCollapsed.set(false);
+    this.cdr.detectChanges();
+  }
+
+  removeCartItem(userInput: string, matchId: string) {
+    this.ui.updateBasketSelectedItems((current) => {
+      const selections = (current[userInput] || []).filter((m) => m.id !== matchId);
+      if (selections.length === 0) {
+        const { [userInput]: _, ...rest } = current;
+        return rest;
+      }
+      return { ...current, [userInput]: selections };
+    });
+    this.cdr.detectChanges();
   }
 
   constructor() {
@@ -182,29 +202,33 @@ export class BasketComponent implements OnInit {
   // ── Basket Calculation ───────────────────────────────────────────────────────
 
   calculate() {
-    const items = this.itemsInput()
-      .split('\n')
-      .filter((i) => i.trim());
+    const query = this.itemsInput().trim();
 
-    if (items.length === 0) {
+    if (!query) {
       this.ui.showToast(this.ui.translate('enter_at_least_one'), 'warning');
       return;
     }
 
+    this.lastSearchQuery.set(query);
     this.ui.setStatus(NetworkStatus.LOADING);
-    this.ui.setBasketResults([]);
+    // Don't clear previous results — they stay visible until the new ones arrive
+    // Collapse cart so new results are immediately visible
+    if (this.cartItems().length > 0) {
+      this.cartCollapsed.set(true);
+    }
     this.cdr.detectChanges();
 
     const regionId = this.ui.activeRegion().id;
 
-    this.api.calculateBasket(items, this.selectedStores(), regionId).subscribe({
+    this.api.calculateBasket([query], this.selectedStores(), regionId).subscribe({
       next: (res) => {
-        this.ui.setBasketResults(res);
-        // Do not auto-select the best match per row anymore (the user preferred manual selection)
-        this.ui.setBasketSelectedItems({});
-        this.displayLimit.set(3);
+        // Merge new results with existing ones (replace if same userInput, prepend otherwise)
+        const existing = this.results().filter(
+          (r) => !res.some((nr) => nr.userInput === r.userInput),
+        );
+        this.ui.setBasketResults([...res, ...existing]);
+        // Don't clear selectedItems — cart persists across searches
         this.ui.setStatus(NetworkStatus.SUCCESS);
-        this.ui.showToast(this.ui.translate('found_items', { count: res.length }), 'success');
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -214,11 +238,6 @@ export class BasketComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
-  }
-
-  loadMore() {
-    this.displayLimit.update((n) => n + 10);
-    this.cdr.detectChanges();
   }
 
   selectMatch(userInput: string, match: ProductMatch) {
