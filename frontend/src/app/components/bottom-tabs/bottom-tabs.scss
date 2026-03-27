@@ -10,11 +10,11 @@
   justify-content: space-around;
   align-items: flex-start;
   padding-top: 6px;
-  padding-bottom: var(--safe-bottom, 0px);
+  padding-bottom: var(--safe-bottom, 0);
   z-index: 2000;
-  box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 -1px 8px rgb(0 0 0 / 4%);
 
-  @media (min-width: 768px) {
+  @media (width >= 768px) {
     display: none;
   }
 }

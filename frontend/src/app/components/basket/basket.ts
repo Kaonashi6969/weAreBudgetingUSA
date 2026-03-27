@@ -103,7 +103,8 @@ export class BasketComponent implements OnInit {
     this.ui.updateBasketSelectedItems((current) => {
       const selections = (current[userInput] || []).filter((m) => m.id !== matchId);
       if (selections.length === 0) {
-        const { [userInput]: _, ...rest } = current;
+        const { [userInput]: _removed, ...rest } = current;
+        void _removed;
         return rest;
       }
       return { ...current, [userInput]: selections };

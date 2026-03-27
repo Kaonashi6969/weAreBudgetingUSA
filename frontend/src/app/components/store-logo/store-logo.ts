@@ -56,7 +56,6 @@ import { CommonModule } from '@angular/common';
         background: #ff8200;
         border-color: #ff8200;
       }
-        
     `,
   ],
 })

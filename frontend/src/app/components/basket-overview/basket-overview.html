@@ -21,7 +21,11 @@
           } @else {
             <app-icon name="cloud_upload" />
           }
-          {{ isSaving ? translations['saving_list'] : (translations['save_grocery_list'] || 'Save Grocery List') }}
+          {{
+            isSaving
+              ? translations['saving_list']
+              : translations['save_grocery_list'] || 'Save Grocery List'
+          }}
         </button>
       </div>
     } @else {

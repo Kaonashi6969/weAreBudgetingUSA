@@ -1,15 +1,14 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Platform } from '@angular/cdk/platform';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NativeService {
-
-  constructor(private platform: Platform) {}
+  private platform = inject(Platform);
 
   async takePicture() {
     if (!this.isNative()) return null;
@@ -18,7 +17,7 @@ export class NativeService {
       quality: 90,
       allowEditing: false,
       resultType: CameraResultType.Uri,
-      source: CameraSource.Camera
+      source: CameraSource.Camera,
     });
 
     return image.webPath;
@@ -58,6 +57,6 @@ export class NativeService {
 
   isNative(): boolean {
     // Basic check for Capacitor/Cordova environment
-    return (window as any).Capacitor !== undefined;
+    return (window as unknown as Record<string, unknown>)['Capacitor'] !== undefined;
   }
 }

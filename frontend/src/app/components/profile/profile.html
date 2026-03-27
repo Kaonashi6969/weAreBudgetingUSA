@@ -38,7 +38,7 @@
               {{
                 ui.user()?.tier === 'pro'
                   ? ui.translation()['unlimited_access_enabled']
-                  : (ui.translation()['basic_features_active'] || 'Basic features active')
+                  : ui.translation()['basic_features_active'] || 'Basic features active'
               }}
             </span>
           </div>

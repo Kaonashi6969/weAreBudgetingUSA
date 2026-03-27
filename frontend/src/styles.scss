@@ -4,14 +4,13 @@
   --color-primary: #2563eb;
   --color-primary-hover: #1d4ed8;
   --color-primary-light: #eff6ff;
-  --color-primary-ring: rgba(37, 99, 235, 0.2);
-
+  --color-primary-ring: rgb(37 99 235 / 20%);
   --color-accent: #10b981;
   --color-accent-light: #ecfdf5;
 
   /* Neutrals */
   --color-bg: #f7fafc;
-  --color-surface: #ffffff;
+  --color-surface: #fff;
   --color-border: #e2e8f0;
   --color-border-light: #f1f5f9;
   --color-text: #1e293b;
@@ -37,11 +36,11 @@
   --radius-full: 9999px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 8%);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 8%);
+  --shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 10%);
 
-  @media (min-width: 768px) {
+  @media (width >= 768px) {
     --header-height: auto;
     --page-gutter: 1.5rem;
   }
@@ -55,13 +54,17 @@
 }
 
 html {
-  -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   overscroll-behavior-y: none;
 }
 
 body {
-  font-family: 'Inter', Roboto, system-ui, -apple-system, sans-serif;
+  font-family:
+    Inter,
+    Roboto,
+    system-ui,
+    -apple-system,
+    sans-serif;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;

@@ -5,7 +5,7 @@
 }
 
 .list-card-wrapper {
-  background: #ffffff;
+  background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: var(--radius-lg);
   padding: 1.25rem;
@@ -17,12 +17,14 @@
   min-width: 0;
   width: 100%;
   box-sizing: border-box;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
 
   @media (hover: hover) {
     &:hover {
       box-shadow: var(--shadow-md);
-      border-color: rgba(59, 130, 246, 0.25);
+      border-color: rgb(59 130 246 / 25%);
 
       .icon-circle {
         background: var(--color-primary);
@@ -57,7 +59,9 @@
         justify-content: center;
         color: #64748b;
         flex-shrink: 0;
-        transition: background 0.2s, color 0.2s;
+        transition:
+          background 0.2s,
+          color 0.2s;
       }
 
       .title-group {
@@ -136,7 +140,7 @@
         height: 20px;
         background: #e2e8f0;
 
-        @media (max-width: 767px) {
+        @media (width <= 767px) {
           display: none;
         }
       }
@@ -216,7 +220,7 @@
             border-radius: 4px;
             font-weight: 600;
 
-            @media (max-width: 767px) {
+            @media (width <= 767px) {
               display: none;
             }
           }
@@ -263,7 +267,9 @@
       font-weight: 600;
       font-size: 0.9rem;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      transition:
+        background 0.2s,
+        color 0.2s;
 
       @media (hover: hover) {
         &:hover {

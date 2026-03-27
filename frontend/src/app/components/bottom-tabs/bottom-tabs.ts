@@ -9,7 +9,7 @@ import { IconComponent } from '../icon/icon';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, IconComponent],
   templateUrl: './bottom-tabs.html',
-  styleUrl: './bottom-tabs.scss'
+  styleUrl: './bottom-tabs.scss',
 })
 export class BottomTabsComponent {
   ui = inject(UIStore);

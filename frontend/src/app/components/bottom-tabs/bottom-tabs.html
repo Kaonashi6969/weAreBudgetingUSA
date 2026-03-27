@@ -1,5 +1,10 @@
 <nav class="bottom-tabs">
-  <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="tab-item">
+  <a
+    routerLink="/"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    class="tab-item"
+  >
     <app-icon name="home" />
     <span>{{ (ui.translation() || {})['home'] || 'Home' }}</span>
   </a>

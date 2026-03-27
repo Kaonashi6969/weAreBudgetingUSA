@@ -85,7 +85,7 @@ export class UIStore {
     this.transloco.setActiveLang(region.id.toLowerCase());
   }
 
-  translate(key: string, params: Record<string, any> = {}): string {
+  translate(key: string, params: Record<string, unknown> = {}): string {
     return this.transloco.translate(key, params);
   }
 

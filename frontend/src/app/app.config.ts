@@ -11,10 +11,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(
-      withFetch(),
-      withInterceptors([apiInterceptor])
-    ),
+    provideHttpClient(withFetch(), withInterceptors([apiInterceptor])),
     provideTransloco({
       config: {
         availableLangs: ['us', 'uk', 'es', 'de', 'hu'],

@@ -53,7 +53,7 @@
   <!-- Cart Section (persistent � accumulates items across searches) -->
   @if (cartItems().length > 0) {
     <div class="cart-section" [class.collapsed]="cartCollapsed()">
-      <div class="cart-header" (click)="cartCollapsed.set(!cartCollapsed())">
+      <div class="cart-header" role="button" tabindex="0" (click)="cartCollapsed.set(!cartCollapsed())" (keydown.enter)="cartCollapsed.set(!cartCollapsed())" (keydown.space)="cartCollapsed.set(!cartCollapsed())">
         <h3>
           <app-icon name="shopping_cart" />
           {{ ui.translation()['your_cart'] || 'Your Cart' }}
@@ -67,7 +67,10 @@
             </span>
           }
           <span class="cart-badge">{{ totalItemsCount() }}</span>
-          <app-icon [name]="cartCollapsed() ? 'expand_more' : 'expand_less'" class="cart-toggle-icon" />
+          <app-icon
+            [name]="cartCollapsed() ? 'expand_more' : 'expand_less'"
+            class="cart-toggle-icon"
+          />
         </div>
       </div>
 
@@ -99,30 +102,29 @@
             </button>
           </div>
         }
-      
 
-      <div class="cart-total">
-        <span class="cart-total-label">
-          {{ ui.translation()['total_estimated_price'] || 'Estimated Total' }}
-        </span>
-        <span class="cart-total-amount">
-          {{ currencySymbol() }}{{ totalPrice() | number: '1.2-2' }}
-        </span>
-      </div>
+        <div class="cart-total">
+          <span class="cart-total-label">
+            {{ ui.translation()['total_estimated_price'] || 'Estimated Total' }}
+          </span>
+          <span class="cart-total-amount">
+            {{ currencySymbol() }}{{ totalPrice() | number: '1.2-2' }}
+          </span>
+        </div>
 
-      <app-basket-overview
-        [listName]="listName()"
-        [totalItemsCount]="totalItemsCount()"
-        [resultsLength]="cartItems().length"
-        [totalPrice]="totalPrice()"
-        [currencySymbol]="currencySymbol()"
-        [missingItemsCount]="0"
-        [userTier]="ui.user()?.tier || 'free'"
-        [isSaving]="isSaving()"
-        [translations]="ui.translation()"
-        (listNameChange)="listName.set($event)"
-        (saveRequested)="saveBasketToList()"
-      />
+        <app-basket-overview
+          [listName]="listName()"
+          [totalItemsCount]="totalItemsCount()"
+          [resultsLength]="cartItems().length"
+          [totalPrice]="totalPrice()"
+          [currencySymbol]="currencySymbol()"
+          [missingItemsCount]="0"
+          [userTier]="ui.user()?.tier || 'free'"
+          [isSaving]="isSaving()"
+          [translations]="ui.translation()"
+          (listNameChange)="listName.set($event)"
+          (saveRequested)="saveBasketToList()"
+        />
       </div>
     </div>
   }
