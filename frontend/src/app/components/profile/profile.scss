@@ -123,7 +123,7 @@
     }
 
     &:disabled {
-      background: #f1f5f9;
+      background: var(--color-surface-hover);
       color: var(--color-text-secondary, #64748b);
       cursor: not-allowed;
     }
@@ -157,8 +157,8 @@
       color: var(--color-text, #1e293b);
 
       &.pro {
-        color: #fbbf24;
-        background: linear-gradient(45deg, #f59e0b, #fbbf24);
+        color: var(--color-warning);
+        background: linear-gradient(45deg, var(--color-warning), #fbbf24);
         background-clip: text;
         -webkit-text-fill-color: transparent;
       }

@@ -35,7 +35,7 @@
   }
 
   h2 {
-    color: #1e293b;
+    color: var(--color-text);
     margin: 0;
     font-weight: 700;
     font-size: 1.75rem;
@@ -45,8 +45,8 @@
     text-align: left;
     margin-bottom: 0;
     padding: 1rem;
-    background: #fff;
-    border-bottom: 1px solid #edf2f7;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border-light);
 
     .back-link {
       display: none;
@@ -60,9 +60,9 @@
 }
 
 .profile-section {
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   box-shadow: var(--shadow-sm);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
@@ -70,7 +70,7 @@
   h3 {
     margin: 0 0 0.5rem;
     font-size: 1.05rem;
-    color: #1e293b;
+    color: var(--color-text);
   }
 
   @media (width <= 767px) {
@@ -85,7 +85,7 @@
 .section-desc {
   margin: 0 0 1rem;
   font-size: 0.875rem;
-  color: #718096;
+  color: var(--color-text-muted);
 }
 
 .list-grid {
@@ -103,21 +103,21 @@
 .loading {
   text-align: center;
   padding: 2rem;
-  color: #64748b;
+  color: var(--color-text-secondary);
   font-weight: 500;
 }
 
 .empty-state {
   text-align: center;
   padding: 3rem 1.5rem;
-  background: #f8fafc;
+  background: var(--color-surface-alt);
   border-radius: var(--radius-lg);
-  border: 2px dashed #e2e8f0;
+  border: 2px dashed var(--color-border);
 
   .basket-icon {
     width: 64px;
     height: 64px;
-    background: #eff6ff;
+    background: var(--color-primary-light);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -131,7 +131,7 @@
   }
 
   p {
-    color: #475569;
+    color: var(--color-text-secondary);
     font-size: 1rem;
     margin-bottom: 1.5rem;
   }
@@ -148,7 +148,7 @@
 
     @media (hover: hover) {
       &:hover {
-        background: #1d4ed8;
+        background: var(--color-primary-hover);
       }
     }
   }
@@ -156,15 +156,15 @@
 
 .card-footer {
   padding: 0.75rem 1rem;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  background: var(--color-surface-alt);
+  border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
 }
 
 .btn-secondary {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   padding: 0.4rem 0.8rem;
   font-size: 0.8rem;
   border-radius: var(--radius-sm);
@@ -181,17 +181,17 @@
   label {
     font-size: 0.9rem;
     font-weight: 600;
-    color: #4a5568;
+    color: var(--color-text-secondary);
     white-space: nowrap;
   }
 
   select {
     padding: 0.45rem 0.75rem;
-    border: 1px solid #cbd5e0;
+    border: 1px solid var(--color-border-muted);
     border-radius: var(--radius-md);
     font-size: 0.9rem;
-    color: #2d3748;
-    background: #f8fafc;
+    color: var(--color-text);
+    background: var(--color-surface-alt);
     cursor: pointer;
     min-width: 200px;
 

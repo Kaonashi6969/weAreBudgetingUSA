@@ -48,6 +48,16 @@ export class UIStore {
     currency: { code: 'USD', symbol: '$' },
   });
 
+  // Dark mode — starts from OS preference, can be overridden manually
+  private _darkMode = signal(
+    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches,
+  );
+  readonly darkMode = this._darkMode.asReadonly();
+
+  setDarkMode(value: boolean) {
+    this._darkMode.set(value);
+  }
+
   // ── Basket state (persists across navigation) ─────────────────────────────
   readonly basketItemsInput = signal<string>('');
   readonly basketSelectedStores = signal<string[]>([]);

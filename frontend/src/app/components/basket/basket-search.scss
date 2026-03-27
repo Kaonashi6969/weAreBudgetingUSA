@@ -43,8 +43,8 @@
     }
 
     .chip {
-      background: var(--color-primary-light, #eff6ff);
-      border: 1px solid #dbeafe;
+      background: var(--color-primary-light);
+      border: 1px solid var(--color-primary-tint-border);
       padding: 6px 14px;
       border-radius: var(--radius-full);
       font-size: 0.85rem;
@@ -55,7 +55,7 @@
       font-weight: 500;
 
       &:active {
-        background: #dbeafe;
+        background: var(--color-primary-tint);
         transform: scale(0.96);
       }
     }
@@ -68,7 +68,7 @@
   gap: 8px;
   border: 2px solid var(--color-border, #e2e8f0);
   border-radius: var(--radius-md);
-  background: #f8fafc;
+  background: var(--color-surface-alt);
   padding: 0 4px 0 12px;
   transition:
     border-color 0.2s ease,
@@ -118,7 +118,7 @@
     -webkit-tap-highlight-color: transparent;
 
     &:active {
-      background: #f1f5f9;
+      background: var(--color-surface-hover);
     }
 
     app-icon {
@@ -152,8 +152,8 @@
     }
 
     &:disabled {
-      background: #e2e8f0;
-      color: var(--color-text-muted, #94a3b8);
+      background: var(--color-border);
+      color: var(--color-text-muted);
       cursor: not-allowed;
     }
 
@@ -167,7 +167,7 @@
   width: 18px;
   height: 18px;
   border: 2px solid rgb(255 255 255 / 30%);
-  border-top-color: white;
+  border-top-color: currentcolor;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

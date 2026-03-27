@@ -81,7 +81,7 @@
   border: none;
   cursor: pointer;
   padding: 6px;
-  color: #a0aec0;
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -129,9 +129,9 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.2rem 0.5rem;
-  background: #f0fff4;
+  background: var(--color-success-bg);
   border-radius: 6px;
-  border: 1px solid #c6f6d5;
+  border: 1px solid var(--color-success-border);
 
   app-store-logo {
     transform: scale(0.75);
@@ -142,15 +142,15 @@
 .summary-extra {
   font-size: 0.7rem;
   font-weight: 600;
-  color: var(--color-text-secondary, #718096);
-  background: #edf2f7;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-hover);
   padding: 0.15rem 0.4rem;
   border-radius: 4px;
 }
 
 .price-mini {
   font-weight: 700;
-  color: #2f855a;
+  color: var(--color-success-text);
   font-size: 0.85rem;
 }
 
@@ -209,7 +209,7 @@
   &.selected-match {
     border-color: var(--color-primary, #3182ce);
     border-width: 2px;
-    background: #ebf8ff;
+    background: var(--color-primary-tint);
   }
 }
 
@@ -233,7 +233,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f7fafc;
+  background: var(--color-surface-alt);
   border-radius: 6px;
   overflow: hidden;
 
@@ -282,14 +282,14 @@
 .exact-badge {
   font-size: 0.65rem;
   font-weight: 700;
-  color: #38a169;
+  color: var(--color-success-text);
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
-  background: #f0fff4;
+  background: var(--color-success-bg);
   padding: 0.1rem 0.4rem;
   border-radius: 9999px;
-  border: 1px solid #c6f6d5;
+  border: 1px solid var(--color-success-border);
 
   app-icon {
     font-size: 0.8rem;
@@ -372,15 +372,15 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #ebf8ff;
+  background: var(--color-primary-tint);
   padding: 4px 8px;
   border-radius: 9999px;
-  border: 1px solid #bee3f8;
+  border: 1px solid var(--color-primary-tint-border);
 }
 
 .qty-btn {
-  background: var(--color-surface, #fff);
-  border: 1px solid #90cdf4;
+  background: var(--color-surface);
+  border: 1px solid var(--color-primary-tint-border);
   color: var(--color-primary, #3182ce);
   width: 28px;
   height: 28px;
@@ -414,7 +414,7 @@
 .qty-text {
   font-weight: 700;
   font-size: 0.9rem;
-  color: #2b6cb0;
+  color: var(--color-primary-emphasis);
   min-width: 1.25rem;
   text-align: center;
 }
@@ -470,8 +470,8 @@
 
 .load-more-button {
   background: transparent;
-  border: 1px solid #cbd5e0;
-  color: var(--color-text-secondary, #718096);
+  border: 1px solid var(--color-border-muted);
+  color: var(--color-text-secondary);
   padding: 0.5rem 1.25rem;
   border-radius: 9999px;
   font-size: 0.85rem;
@@ -483,14 +483,14 @@
   transition: background 0.15s ease;
 
   &:active {
-    background: #f7fafc;
+    background: var(--color-surface-alt);
   }
 
   @media (hover: hover) {
     &:hover {
-      background: #f7fafc;
-      border-color: #a0aec0;
-      color: #4a5568;
+      background: var(--color-surface-alt);
+      border-color: var(--color-text-muted);
+      color: var(--color-text-secondary);
     }
   }
 
@@ -530,12 +530,12 @@
   transition: background 0.15s ease;
 
   &:active {
-    background: #2b6cb0;
+    background: var(--color-primary-emphasis);
   }
 
   @media (hover: hover) {
     &:hover {
-      background: #2b6cb0;
+      background: var(--color-primary-emphasis);
     }
   }
 
