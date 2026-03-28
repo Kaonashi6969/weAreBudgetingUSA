@@ -75,12 +75,16 @@ class Database {
         )
       `);
 
-      // Ensure products table has image_url column
+      // Ensure products table has updated schema
       try {
         const productCols = await this.all("PRAGMA table_info(products)");
         if (!productCols.some(col => col.name === 'image_url')) {
           await this.run("ALTER TABLE products ADD COLUMN image_url TEXT");
           console.log('Added image_url column to products table');
+        }
+        if (!productCols.some(col => col.name === 'dietary_tags')) {
+          await this.run("ALTER TABLE products ADD COLUMN dietary_tags TEXT DEFAULT '[]'");
+          console.log('Migration: added dietary_tags column to products table');
         }
       } catch (err) {
         console.error('Error migrating products table:', err);

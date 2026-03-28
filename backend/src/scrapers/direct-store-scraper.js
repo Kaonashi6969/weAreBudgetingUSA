@@ -142,34 +142,35 @@ class DirectStoreScraper {
             if (s.imageSelector) {
               const imgEl = el.querySelector(s.imageSelector);
               if (imgEl) {
-                // Check common attributes for lazy-loaded images or high-quality sources
+                // Better image detection for Tesco and others
                 const srcset = imgEl.getAttribute("srcset");
-                const dataSrc = imgEl.getAttribute("data-src") || imgEl.getAttribute("data-original") || imgEl.getAttribute("data-lazy-src");
+                const dataSrc = imgEl.getAttribute("data-src") || 
+                                imgEl.getAttribute("data-original") || 
+                                imgEl.getAttribute("data-lazy-src") ||
+                                imgEl.getAttribute("data-srcset");
                 const src = imgEl.getAttribute("src") || imgEl.src || "";
 
                 if (srcset) {
-                  // Get the first URL in the srcset (usually the best/only one provided)
                   image_url = srcset.split(',')[0].trim().split(' ')[0];
                 } else if (dataSrc && !dataSrc.startsWith('data:image')) {
                   image_url = dataSrc;
-                } else if (src) {
+                } else if (src && !src.startsWith('data:image')) {
                   image_url = src;
                 }
                 
-                // If it's still a base64 placeholder or empty, try looking for sibling <source> tags
+                // Fallback to searching for images in child picture/source tags
                 if (!image_url || image_url.startsWith('data:image')) {
-                  const pictureEl = imgEl.closest('picture');
-                  if (pictureEl) {
-                    const sourceEl = pictureEl.querySelector('source');
-                    if (sourceEl) {
-                      const sourceSrcset = sourceEl.getAttribute('srcset');
-                      if (sourceSrcset) {
-                        image_url = sourceSrcset.split(',')[0].trim().split(' ')[0];
-                      }
-                    }
+                  const source = el.querySelector('source');
+                  if (source) {
+                    const sSet = source.getAttribute('srcset');
+                    if (sSet) image_url = sSet.split(',')[0].trim().split(' ')[0];
                   }
                 }
               }
+            } else {
+              // If no specific image selector, try a generic find
+              const anyImg = el.querySelector('img');
+              if (anyImg) image_url = anyImg.getAttribute('src') || anyImg.src;
             }
             
             if (link && !link.startsWith("http")) {
@@ -189,12 +190,47 @@ class DirectStoreScraper {
             }
 
             if (price > 0) {
-              results.push({ name, price, url: link, image_url });
+              // Enhanced dietary tags for Hungarian/English
+              const lowerName = name.toLowerCase();
+              const dietaryTags = [];
+              
+              // Vegan: English + Hungarian (növényi, vegán)
+              if (lowerName.includes('vegan') || lowerName.includes('vegán') || lowerName.includes('plant-based') || lowerName.includes('növényi')) {
+                dietaryTags.push('vegan');
+              }
+              
+              // Gluten-Free: English + Hungarian (gluténmentes, gm, mentes)
+              // Note: "gm" usually stands for gluténmentes in HU shops
+              if (lowerName.includes('gluten-free') || lowerName.includes('gluténmentes') || lowerName.includes(' gm ') || lowerName.startsWith('gm ') || lowerName.endsWith(' gm')) {
+                dietaryTags.push('gf');
+              }
+              
+              // Keto: Simple keyword
+              if (lowerName.includes('keto') || lowerName.includes('ketogén')) {
+                dietaryTags.push('keto');
+              }
+              
+              // Bio/Organic: English + Hungarian (bio, öko, organikus)
+              if (lowerName.includes('bio ') || lowerName.startsWith('bio ') || lowerName.includes('organic') || lowerName.includes('öko') || lowerName.includes('organikus')) {
+                dietaryTags.push('bio');
+              }
+
+              results.push({ name, price, url: link, image_url, dietary_tags: dietaryTags });
             }
           }
         });
         return results;
       }, store);
+
+      // 4. Save results to DB
+      for (const item of items) {
+        const productId = item.name.toLowerCase().replace(/\s+/g, "_").substring(0, 150);
+        await ProductRepository.upsertWithPrice({
+          ...item,
+          id: productId,
+          category: "Scraped"
+        }, store.id);
+      }
 
       return items;
     } catch (err) {

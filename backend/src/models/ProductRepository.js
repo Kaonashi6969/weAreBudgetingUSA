@@ -14,13 +14,17 @@ class ProductRepository extends BaseRepository {
   async upsertWithPrice(item, storeId) {
     // 1. Insert or update product
     // Note: Database schema uses 'category' string, not 'category_id'
+    // Ensure dietary_tags is stored as JSON string
+    const dietaryTags = JSON.stringify(item.dietary_tags || []);
+
     await database.run(
-      `INSERT INTO products (id, name, image_url, category)
-       VALUES (?, ?, ?, ?)
+      `INSERT INTO products (id, name, image_url, category, dietary_tags)
+       VALUES (?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET
        name = excluded.name,
-       image_url = excluded.image_url`,
-      [item.id, item.name, item.image_url, item.category || 'General']
+       image_url = excluded.image_url,
+       dietary_tags = excluded.dietary_tags`,
+      [item.id, item.name, item.image_url, item.category || 'General', dietaryTags]
     );
 
     // 2. Insert or update price
@@ -33,7 +37,7 @@ class ProductRepository extends BaseRepository {
 
   async getWithPrices(selectedStoreIds = [], regionId = null) {
     let query = `
-      SELECT p.id, p.name, p.image_url, pr.price, s.name as store, pr.url, pr.updated_at, s.id as store_id
+      SELECT p.id, p.name, p.image_url, p.dietary_tags, pr.price, s.name as store, pr.url, pr.updated_at, s.id as store_id
       FROM products p 
       JOIN prices pr ON p.id = pr.product_id
       JOIN stores s ON pr.store_id = s.id

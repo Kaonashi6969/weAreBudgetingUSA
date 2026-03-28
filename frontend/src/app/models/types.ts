@@ -33,6 +33,8 @@ export interface User {
 export interface ProductMatch {
   id: string;
   name: string;
+  brand?: string;
+  dietary_tags?: string | string[];
   price: number;
   store: string;
   store_name?: string;

@@ -63,6 +63,7 @@ export class UIStore {
   readonly basketSelectedStores = signal<string[]>([]);
   readonly basketResults = signal<BasketResult[]>([]);
   readonly basketSelectedItems = signal<Record<string, ProductMatch[]>>({});
+  readonly basketDietaryFilters = signal<string[]>([]);
 
   setBasketItemsInput(v: string) {
     this.basketItemsInput.set(v);
@@ -72,6 +73,11 @@ export class UIStore {
   }
   setBasketResults(v: BasketResult[]) {
     this.basketResults.set(v);
+  }
+  toggleBasketDietaryFilter(filterId: string) {
+    this.basketDietaryFilters.update((prev) =>
+      prev.includes(filterId) ? prev.filter((id) => id !== filterId) : [...prev, filterId],
+    );
   }
   setBasketSelectedItems(v: Record<string, ProductMatch[]>) {
     this.basketSelectedItems.set(v);

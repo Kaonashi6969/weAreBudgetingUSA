@@ -36,6 +36,30 @@
         <button class="chip" type="button" (click)="onExampleClick(item)">{{ item }}</button>
       }
     </div>
+
+    <!-- Dietary Filter Chips -->
+    <div class="dietary-chips" [class.has-active]="activeDietaryFilters.length > 0">
+      <div class="dietary-label">
+        <app-icon name="filter_list" />
+        <span>{{ translations['dietary_filters_label'] || 'Dietary Preference' }}</span>
+      </div>
+      <div class="chips-scroll">
+        @for (filter of dietaryFilters; track filter.id) {
+          <button
+            class="diet-chip"
+            [class.active]="isFilterActive(filter.id)"
+            type="button"
+            (click)="onDietaryToggle(filter.id)"
+          >
+            <app-icon [name]="filter.icon" />
+            <span>{{ filter.label }}</span>
+            @if (isFilterActive(filter.id)) {
+              <app-icon name="check" class="check-icon" />
+            }
+          </button>
+        }
+      </div>
+    </div>
   </div>
 
   <app-store-selector

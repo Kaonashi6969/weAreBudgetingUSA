@@ -7,9 +7,11 @@
     [itemsInput]="itemsInput()"
     [stores]="stores()"
     [selectedStores]="selectedStores()"
+    [activeDietaryFilters]="activeDietaryFilters()"
     [isLoading]="isLoading()"
     [translations]="ui.translation()"
     (itemsInputChange)="itemsInput.set($event)"
+    (dietaryFilterToggled)="ui.toggleBasketDietaryFilter($event)"
     (storeToggled)="toggleStore($event)"
     (searchRequested)="calculate()"
     (exampleChipClicked)="addExampleItem($event)"
@@ -17,7 +19,7 @@
   />
 
   <!-- Search Results (transient — shown while browsing results for current query) -->
-  @if (results().length > 0) {
+  @if (filteredResults().length > 0) {
     <div class="search-results-section">
       <div class="section-header">
         <h3>
@@ -25,12 +27,15 @@
           {{ ui.translation()['results_for'] || 'Results for' }}
           &ldquo;{{ lastSearchQuery() }}&rdquo;
         </h3>
+        <span class="dietary-count" *ngIf="activeDietaryFilters().length > 0">
+          ({{ activeDietaryFilters().length }} {{ ui.translation()['filters_active'] || 'filters active' }})
+        </span>
         <button class="dismiss-results-btn" (click)="clearSearch()">
           <app-icon name="close" />
         </button>
       </div>
       <div class="results-grid">
-        @for (item of results(); track item.userInput) {
+        @for (item of filteredResults(); track item.userInput) {
           <app-product-result-card
             [item]="item"
             [selectedItems]="selectedItems()"
@@ -47,6 +52,21 @@
           />
         }
       </div>
+    </div>
+  } @else if (results().length > 0) {
+    <div class="search-results-section no-filtered-matches">
+      <div class="section-header">
+        <h3 class="flex items-center gap-2">
+          <app-icon name="warning" />
+          {{ ui.translation()['no_dietary_matches'] || 'No results matching filters' }}
+        </h3>
+        <button class="dismiss-results-btn" (click)="clearSearch()">
+          <app-icon name="close" />
+        </button>
+      </div>
+      <p class="centered p-4 color-text-secondary border-b border-light">
+        {{ ui.translation()['adjust_filters_hint'] || 'Adjust your dietary filters above to see more results.' }}
+      </p>
     </div>
   }
 

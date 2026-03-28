@@ -45,6 +45,55 @@ export class BasketComponent implements OnInit {
   get selectedItems() {
     return this.ui.basketSelectedItems;
   }
+  get activeDietaryFilters() {
+    return this.ui.basketDietaryFilters;
+  }
+
+  /**
+   * Filtered search results based on active dietary filters.
+   * Keyword-based matching logic applied locally.
+   */
+  filteredResults = computed(() => {
+    const results = this.results();
+    const activeFilters = this.activeDietaryFilters();
+
+    if (activeFilters.length === 0) return results;
+
+    const filterKeywords: Record<string, string[]> = {
+      vegan: ['vegan', 'plant-based', 'veganer', 'vegetalien'],
+      'gf': ['gluten-free', 'glutenfrei', 'sans gluten', 'gf'],
+      keto: ['keto', 'ketogenic', 'low carb'],
+      bio: ['bio', 'organic', 'biologisch', 'öko'],
+    };
+
+    return results.map((result) => ({
+      ...result,
+      matches: result.matches.filter((match) => {
+        // 1. Try matching against structured dietary_tags (if they exist)
+        if (match.dietary_tags) {
+          try {
+            const tags = Array.isArray(match.dietary_tags)
+              ? match.dietary_tags
+              : JSON.parse(match.dietary_tags as string);
+            
+            if (activeFilters.every((filterId) => tags.includes(filterId))) {
+              return true;
+            }
+          } catch (e) {
+            // Fallback to keyword matching if JSON parse fails
+          }
+        }
+
+        // 2. Fallback to keyword matching for backward compatibility/legacy data
+        const text = `${match.name} ${match.brand || ''}`.toLowerCase();
+        // Item must match ALL active filters (AND logic)
+        return activeFilters.every((filterId) => {
+          const keywords = filterKeywords[filterId] || [filterId];
+          return keywords.some((kw) => text.includes(kw));
+        });
+      }),
+    }));
+  });
 
   stores = signal<Store[]>([]);
   regions = signal<Region[]>([]);

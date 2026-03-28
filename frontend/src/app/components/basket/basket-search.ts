@@ -18,25 +18,48 @@ export class BasketSearchComponent {
   @Input() selectedStores: string[] = [];
   @Input() isLoading = false;
   @Input() translations: Record<string, string> = {};
+  @Input() activeDietaryFilters: string[] = [];
 
   @Output() itemsInputChange = new EventEmitter<string>();
   @Output() storeToggled = new EventEmitter<string>();
   @Output() searchRequested = new EventEmitter<void>();
   @Output() exampleChipClicked = new EventEmitter<string>();
   @Output() clearRequested = new EventEmitter<void>();
+  @Output() dietaryFilterToggled = new EventEmitter<string>();
 
   get examples(): string[] {
     const list = this.translations['example_chips_list'] || 'Milk,Eggs,Chicken,Bread';
     return list.split(',').map((s) => s.trim());
   }
 
-  onItemsInputChange(value: string) {
-    this.itemsInputChange.emit(value);
+  get dietaryFilters(): { id: string; label: string; icon: string }[] {
+    return [
+      { id: 'vegan', label: this.translations['filter_vegan'] || 'Vegan', icon: 'eco' },
+      {
+        id: 'gluten-free',
+        label: this.translations['filter_gluten_free'] || 'Gluten Free',
+        icon: 'cancel',
+      },
+      { id: 'keto', label: this.translations['filter_keto'] || 'Keto', icon: 'fitness_center' },
+      { id: 'bio', label: this.translations['filter_bio'] || 'Bio / Organic', icon: 'spa' },
+    ];
+  }
+
+  isFilterActive(id: string): boolean {
+    return this.activeDietaryFilters.includes(id);
+  }
+
+  onDietaryToggle(id: string) {
+    this.dietaryFilterToggled.emit(id);
   }
 
   onExampleClick(item: string) {
     this.itemsInputChange.emit(item);
     this.exampleChipClicked.emit(item);
+  }
+
+  onItemsInputChange(v: string) {
+    this.itemsInputChange.emit(v);
   }
 
   onClear() {
