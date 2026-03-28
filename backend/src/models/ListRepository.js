@@ -27,6 +27,13 @@ class ListRepository extends BaseRepository {
       [listId, userId]
     );
   }
+
+  async update(userId, listId, name, items) {
+    return await database.run(
+      `UPDATE user_lists SET name = ?, items = ? WHERE id = ? AND user_id = ?`,
+      [name, JSON.stringify(items), listId, userId]
+    );
+  }
 }
 
 module.exports = new ListRepository();

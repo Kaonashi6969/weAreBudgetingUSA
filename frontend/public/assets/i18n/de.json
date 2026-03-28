@@ -65,6 +65,16 @@
   "subscription_tier": "Abonnement-Stufe",
   "unlimited_access_enabled": "Unbegrenzter Zugriff aktiviert",
   "profile_settings": "Profileinstellungen",
+  "show_less": "Weniger anzeigen",
+  "view_full_list": "Vollständige Liste anzeigen",
+  "basic_features_active": "Grundfunktionen aktiv",
+  "edit_list": "Bearbeiten",
+  "save_changes": "Speichern",
+  "cancel_edit": "Abbrechen",
+  "remove_item": "Artikel entfernen",
+  "list_name_label": "Listenname",
+  "add_item": "Artikel hinzufügen",
+  "item_name_placeholder": "Produktname...",
   "sign_out": "Abmelden",
   "example_chips_list": "Milch,Eier,Hähnchen,Brot"
 }

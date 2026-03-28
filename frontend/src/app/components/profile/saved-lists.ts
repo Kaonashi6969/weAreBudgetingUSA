@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
 import { UIStore } from '../../services/ui-store';
 import { IconComponent } from '../icon/icon';
 import { SavedListCardComponent } from '../saved-list-card/saved-list-card';
-import { SavedList, Region } from '../../models/types';
+import { SavedList, SavedListItem } from '../../models/types';
 
 @Component({
   selector: 'app-saved-lists',
@@ -20,35 +20,21 @@ export class SavedListsComponent implements OnInit {
   private api = inject(ApiService);
   protected readonly savedLists = signal<SavedList[]>([]);
   protected readonly isLoading = signal(false);
-  protected readonly regions = signal<Region[]>([]);
+  protected readonly savingId = signal<number | null>(null);
   protected readonly currencySymbol = computed(
     () => this.ui.activeRegion()?.currency?.symbol ?? '$',
   );
 
   ngOnInit() {
     this.loadLists();
-    this.api.getRegions().subscribe({
-      next: (regions) => this.regions.set(regions),
-    });
-  }
-
-  changeRegion(regionId: string) {
-    const region = this.regions().find((r: Region) => r.id === regionId);
-    if (!region) return;
-    this.ui.setRegion(region);
-    this.api.updateUserRegion(regionId).subscribe({
-      error: (err) => console.warn('Could not save region preference:', err.message),
-    });
   }
 
   loadLists() {
     this.isLoading.set(true);
     this.api.getSavedLists().subscribe({
       next: (lists) => {
-        // Parse items if they are stored as JSON string in SQL
         const formattedLists = lists.map((list) => ({
           ...list,
-          // Handle potential serialized JSON from legacy backend
           items:
             typeof (list as unknown as { items: string }).items === 'string'
               ? JSON.parse((list as unknown as { items: string }).items)
@@ -70,5 +56,16 @@ export class SavedListsComponent implements OnInit {
         this.loadLists();
       });
     }
+  }
+
+  saveEdit(event: { id: number; name: string; items: SavedListItem[] }) {
+    this.savingId.set(event.id);
+    this.api.updateList(event.id, event.name, event.items).subscribe({
+      next: () => {
+        this.savingId.set(null);
+        this.loadLists();
+      },
+      error: () => this.savingId.set(null),
+    });
   }
 }

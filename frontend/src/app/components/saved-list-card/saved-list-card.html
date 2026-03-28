@@ -1,44 +1,74 @@
-<div class="list-card-wrapper">
+<div class="list-card-wrapper" [class.edit-mode]="isEditMode()">
   <div class="card-header">
     <div class="header-left">
       <div class="icon-circle">
         <app-icon name="receipt_long" />
       </div>
       <div class="title-group">
-        <h3 class="list-title">{{ list.name || untitledText }}</h3>
-        <span class="date">{{ formatDate(list.created_at) }}</span>
+        @if (isEditMode()) {
+          <input
+            class="edit-name-input"
+            type="text"
+            [ngModel]="editedName()"
+            (ngModelChange)="editedName.set($event)"
+            [placeholder]="listNameText"
+          />
+        } @else {
+          <h3 class="list-title">{{ list.name || untitledText }}</h3>
+          <span class="date">{{ formatDate(list.created_at) }}</span>
+        }
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn-action refresh" (click)="refresh.emit()" [title]="refreshText">
-        <app-icon name="refresh" />
-      </button>
-      <button class="btn-action delete" (click)="delete.emit(list.id)" title="Delete list">
-        <app-icon name="delete_outline" />
-      </button>
+      @if (!isEditMode()) {
+        <button class="btn-action edit" (click)="enterEdit()" [title]="editText">
+          <app-icon name="edit" />
+        </button>
+        <button class="btn-action refresh" (click)="refresh.emit()" [title]="refreshText">
+          <app-icon name="refresh" />
+        </button>
+        <button class="btn-action delete" (click)="delete.emit(list.id)" title="Delete list">
+          <app-icon name="delete_outline" />
+        </button>
+      }
     </div>
   </div>
 
   <div class="card-body">
-    <div class="stats-row">
-      <div class="stat-item">
-        <span class="stat-label">{{ itemsText }}</span>
-        <span class="stat-value">{{ list.items.length }}</span>
+    @if (!isEditMode()) {
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-label">{{ itemsText }}</span>
+          <span class="stat-value">{{ list.items.length }}</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-label">{{ totalEstText }}</span>
+          <span class="stat-value price"
+            >{{ currencySymbol }}{{ calculateTotal(list.items) | number: '1.2-2' }}</span
+          >
+        </div>
       </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-label">{{ totalEstText }}</span>
-        <span class="stat-value price"
-          >{{ currencySymbol }}{{ calculateTotal(list.items) | number: '1.2-2' }}</span
-        >
+    } @else {
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-label">{{ itemsText }}</span>
+          <span class="stat-value">{{ editedItems().length }}</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-label">{{ totalEstText }}</span>
+          <span class="stat-value price"
+            >{{ currencySymbol }}{{ calculateTotal(editedItems()) | number: '1.2-2' }}</span
+          >
+        </div>
       </div>
-    </div>
+    }
 
     <div class="items-preview">
-      @let visibleItems = isExpanded ? list.items : list.items.slice(0, 5);
-      @for (item of visibleItems; track item.id) {
-        @if (item.url) {
-          <a [href]="item.url" target="_blank" class="preview-item">
+      @if (isEditMode()) {
+        @for (item of editedItems(); track item.id; let i = $index) {
+          <div class="preview-item edit-item">
             <span class="dot"></span>
             <span class="name">{{ item.productName }}</span>
             <div class="item-meta">
@@ -46,38 +76,101 @@
                 <span class="store-label">{{ item.store }}</span>
               }
               <span class="price">{{ currencySymbol }}{{ item.price | number: '1.2-2' }}</span>
-              <app-icon name="open_in_new" class="external-icon" />
+              <button
+                class="btn-remove-item"
+                (click)="removeItem(i)"
+                [title]="removeItemText"
+                type="button"
+              >
+                <app-icon name="close" />
+              </button>
             </div>
-          </a>
-        } @else {
-          <a [routerLink]="['/']" [queryParams]="{ search: item.productName }" class="preview-item">
-            <span class="dot"></span>
-            <span class="name">{{ item.productName }}</span>
-            <div class="item-meta">
-              @if (item.store) {
-                <span class="store-label">{{ item.store }}</span>
-              }
-              <span class="price">{{ currencySymbol }}{{ item.price | number: '1.2-2' }}</span>
-            </div>
-          </a>
+          </div>
         }
-      }
 
-      @if (!isExpanded && list.items.length > 5) {
-        <div
-          class="more-items"
-          role="button"
-          tabindex="0"
-          (click)="toggleExpand()"
-          (keyup.enter)="toggleExpand()"
-        >
-          + {{ list.items.length - 5 }} {{ moreItemsText }}
+        <div class="add-item-row">
+          <input
+            class="add-item-input"
+            type="text"
+            [ngModel]="newItemName()"
+            (ngModelChange)="newItemName.set($event)"
+            [placeholder]="itemNamePlaceholder"
+            (keyup.enter)="addItem()"
+          />
+          <input
+            class="add-price-input"
+            type="number"
+            min="0"
+            step="0.01"
+            [ngModel]="newItemPrice()"
+            (ngModelChange)="newItemPrice.set($event === '' ? '' : +$event)"
+            placeholder="0.00"
+            (keyup.enter)="addItem()"
+          />
+          <button class="btn-add-item" type="button" (click)="addItem()" [title]="addItemText">
+            <app-icon name="add" />
+          </button>
         </div>
+      } @else {
+        @let visibleItems = isExpanded ? list.items : list.items.slice(0, 5);
+        @for (item of visibleItems; track item.id) {
+          @if (item.url) {
+            <a [href]="item.url" target="_blank" class="preview-item">
+              <span class="dot"></span>
+              <span class="name">{{ item.productName }}</span>
+              <div class="item-meta">
+                @if (item.store) {
+                  <span class="store-label">{{ item.store }}</span>
+                }
+                <span class="price">{{ currencySymbol }}{{ item.price | number: '1.2-2' }}</span>
+                <app-icon name="open_in_new" class="external-icon" />
+              </div>
+            </a>
+          } @else {
+            <a
+              [routerLink]="['/']"
+              [queryParams]="{ search: item.productName }"
+              class="preview-item"
+            >
+              <span class="dot"></span>
+              <span class="name">{{ item.productName }}</span>
+              <div class="item-meta">
+                @if (item.store) {
+                  <span class="store-label">{{ item.store }}</span>
+                }
+                <span class="price">{{ currencySymbol }}{{ item.price | number: '1.2-2' }}</span>
+              </div>
+            </a>
+          }
+        }
+
+        @if (!isExpanded && list.items.length > 5) {
+          <div
+            class="more-items"
+            role="button"
+            tabindex="0"
+            (click)="toggleExpand()"
+            (keyup.enter)="toggleExpand()"
+          >
+            + {{ list.items.length - 5 }} {{ moreItemsText }}
+          </div>
+        }
       }
     </div>
   </div>
 
-  @if (list.items.length > 5) {
+  @if (isEditMode()) {
+    <div class="card-footer edit-actions">
+      <button class="btn-cancel" type="button" (click)="cancelEdit()">
+        <app-icon name="close" />
+        <span>{{ cancelText }}</span>
+      </button>
+      <button class="btn-save" type="button" (click)="commitSave()">
+        <app-icon name="check" />
+        <span>{{ saveText }}</span>
+      </button>
+    </div>
+  } @else if (list.items.length > 5) {
     <div class="card-footer">
       <button class="btn-view-details" (click)="toggleExpand()">
         <span>{{ isExpanded ? showLessText : viewFullListText }}</span>

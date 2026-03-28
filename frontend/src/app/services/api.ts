@@ -61,6 +61,10 @@ export class ApiService {
     return this.http.delete<void>(`${this.apiUrl}/lists/${id}`);
   }
 
+  updateList(id: number, name: string, items: SavedListItem[]): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/lists/${id}`, { name, items });
+  }
+
   /** Persists the user’s preferred region on the server. */
   updateUserRegion(regionId: string): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/auth/region`, { region: regionId });

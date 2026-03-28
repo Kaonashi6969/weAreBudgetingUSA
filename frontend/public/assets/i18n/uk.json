@@ -65,6 +65,16 @@
   "subscription_tier": "Рівень підписки",
   "unlimited_access_enabled": "Необмежений доступ увімкнено",
   "profile_settings": "Налаштування профілю",
+  "show_less": "Показати менше",
+  "view_full_list": "Повний список",
+  "basic_features_active": "Базові функції активні",
+  "edit_list": "Редагувати",
+  "save_changes": "Зберегти",
+  "cancel_edit": "Скасувати",
+  "remove_item": "Видалити пункт",
+  "list_name_label": "Назва списку",
+  "add_item": "Додати пункт",
+  "item_name_placeholder": "Назва продукту...",
   "sign_out": "Вийти",
   "example_chips_list": "Молоко,Яйця,Курка,Хліб"
 }

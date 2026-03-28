@@ -43,8 +43,16 @@
             [moreItemsText]="ui.translation()['items_label'] || 'items'"
             [showLessText]="ui.translation()['show_less'] || 'Show Less'"
             [viewFullListText]="ui.translation()['view_full_list'] || 'View Full List'"
+            [editText]="ui.translation()['edit_list'] || 'Edit'"
+            [saveText]="ui.translation()['save_changes'] || 'Save'"
+            [cancelText]="ui.translation()['cancel_edit'] || 'Cancel'"
+            [removeItemText]="ui.translation()['remove_item'] || 'Remove'"
+            [listNameText]="ui.translation()['list_name_label'] || 'List name'"
+            [addItemText]="ui.translation()['add_item'] || 'Add item'"
+            [itemNamePlaceholder]="ui.translation()['item_name_placeholder'] || 'Product name...'"
             (delete)="deleteList($event)"
             (refresh)="loadLists()"
+            (save)="saveEdit($event)"
           />
         }
       </div>

@@ -65,6 +65,16 @@
   "subscription_tier": "Subscription Tier",
   "unlimited_access_enabled": "Unlimited access enabled",
   "profile_settings": "Profile Settings",
+  "show_less": "Show Less",
+  "view_full_list": "View Full List",
+  "basic_features_active": "Basic features active",
+  "edit_list": "Edit",
+  "save_changes": "Save Changes",
+  "cancel_edit": "Cancel",
+  "remove_item": "Remove item",
+  "list_name_label": "List name",
+  "add_item": "Add item",
+  "item_name_placeholder": "Product name...",
   "sign_out": "Sign Out",
   "example_chips_list": "Milk,Eggs,Chicken,Bread"
 }

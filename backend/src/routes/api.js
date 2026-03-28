@@ -18,6 +18,7 @@ router.post('/basket', validate(BasketRequestSchema), BasketController.processBa
 // Grocery List routes
 router.post('/lists', ListController.saveList);
 router.get('/lists', ListController.getLists);
+router.patch('/lists/:id', ListController.updateList);
 router.delete('/lists/:id', ListController.deleteList);
 
 module.exports = router;

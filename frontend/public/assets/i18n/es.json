@@ -65,6 +65,16 @@
   "subscription_tier": "Nivel de Suscripción",
   "unlimited_access_enabled": "Acceso ilimitado activado",
   "profile_settings": "Ajustes de Perfil",
+  "show_less": "Mostrar menos",
+  "view_full_list": "Ver lista completa",
+  "basic_features_active": "Funciones básicas activas",
+  "edit_list": "Editar",
+  "save_changes": "Guardar cambios",
+  "cancel_edit": "Cancelar",
+  "remove_item": "Eliminar artículo",
+  "list_name_label": "Nombre de la lista",
+  "add_item": "Añadir artículo",
+  "item_name_placeholder": "Nombre del producto...",
   "sign_out": "Cerrar sesión",
   "example_chips_list": "Leche,Huevos,Pollo,Pan"
 }

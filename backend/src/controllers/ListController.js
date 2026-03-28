@@ -57,6 +57,24 @@ class ListController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
+
+  async updateList(req, res) {
+    try {
+      const userId = req.user?.id || 'guest';
+      const listId = req.params.id;
+      const { name, items } = req.body;
+
+      if (!items || !Array.isArray(items)) {
+        return res.status(400).json({ error: 'Missing or invalid items array' });
+      }
+
+      await ListRepository.update(userId, listId, name || 'My Grocery List', items);
+      res.json({ success: true });
+    } catch (err) {
+      console.error('Error updating list:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
 }
 
 module.exports = new ListController();
