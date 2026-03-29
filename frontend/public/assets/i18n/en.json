@@ -50,7 +50,7 @@
   "empty_card_4_desc": "Avoid store hopping — get everything optimized in one go.",
   "dietary_filters_label": "Dietary Preference",
   "filter_vegan": "Vegan",
-  "filter_gf": "Gluten-Free",
+  "filter_gluten_free": "Gluten-Free",
   "filter_keto": "Keto",
   "filter_bio": "Organic",
   "filters_active": "filters active",
@@ -93,5 +93,6 @@
   "done_browsing": "Done",
   "profile": "Profile",
   "home": "Home",
-  "results_for": "Results for"
+  "results_for": "Results for",
+  "your_cart": "Your Cart"
 }

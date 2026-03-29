@@ -17,6 +17,10 @@ A professional grocery search engine and price comparison tool for global retail
 - **Dark Mode**: Fully automatic dark/light theming synchronized with the OS `prefers-color-scheme` setting. Can be overridden manually. All colors are driven by a CSS custom-property token system defined in `styles.scss`.
 - **Native Mobile Ready**: Capacitor integration exposes native device APIs (e.g. camera). `NativeService` wraps Capacitor calls with graceful web fallbacks.
 
+## 🤖 GitHub Copilot
+
+For specific project conventions and coding standards, refer to [.github/copilot-instructions.md](.github/copilot-instructions.md). This file contains architecture-specific guidelines for both Frontend (Angular 21) and Backend (Node.js).
+
 ## 🏗️ Technical Architecture
 
 ### Backend (Node.js + Express + SQLite)

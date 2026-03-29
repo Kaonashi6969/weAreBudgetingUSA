@@ -64,7 +64,6 @@ export class BasketSearchComponent {
 
   onClear() {
     this.itemsInputChange.emit('');
-    this.clearRequested.emit();
   }
 
   onStoreToggled(storeId: string) {
