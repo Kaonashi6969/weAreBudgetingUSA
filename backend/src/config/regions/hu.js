@@ -46,7 +46,10 @@ const stores = [
     nameSelector: "h2 a, .gyT8MW_titleLink",
     priceSelector: ".gyT8MW_priceText",
     linkSelector: "h2 a, .gyT8MW_titleLink",
-    imageSelector: "img.gyT8MW_image"
+    imageSelector: "img.gyT8MW_image",
+    maxPages: 3,
+    pagination: { param: 'page', start: 2, increment: 1 },
+    nextPageSelector: 'a[data-testid="next"]',
   },
   {
     id: 'auchan',
@@ -60,6 +63,9 @@ const stores = [
     priceSelector: '.q79l0cL0',
     linkSelector:  'a.xtt1nL9f',
     imageSelector: 'img.tVOcaHnl',
+    maxPages: 3,
+    pagination: { param: 'page', start: 2, increment: 1 },
+    nextPageSelector: 'a[rel="next"], .pagination__next',
   },
   {
     id: "lidl",
@@ -72,7 +78,10 @@ const stores = [
     nameSelector: '.product-grid-box__title',
     priceSelector: '.ods-price__value',
     linkSelector: '.odsc-tile__link',
-    imageSelector: '.odsc-image-gallery__image'
+    imageSelector: '.odsc-image-gallery__image',
+    maxPages: 3,
+    pagination: { param: 'page', start: 2, increment: 1 },
+    nextPageSelector: '.btn-pagination--next, [data-testid="pagination-next"]',
   },
   {
     id: "aldi",
@@ -86,7 +95,10 @@ const stores = [
     priceSelector: '.at-product-price_lbl',
     linkSelector: 'a',
     baseUrl: 'https://www.aldi.hu',
-    imageSelector: 'img.at-product-images_img'
+    imageSelector: 'img.at-product-images_img',
+    maxPages: 3,
+    pagination: { param: 'offset', start: 24, increment: 24 },
+    nextPageSelector: '.pagination__next, [aria-label="Következő oldal"]',
   }
 ];
 

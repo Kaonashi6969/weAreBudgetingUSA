@@ -5,7 +5,7 @@ const scraper = new DirectStoreScraper();
 class BasketController {
   async processBasket(req, res) {
     try {
-      const { items, selectedStores, region = 'us' } = req.body;
+      const { items, selectedStores, region = 'us', filters = [] } = req.body;
 
       if (!items) {
         return res.status(400).json({
@@ -17,33 +17,27 @@ class BasketController {
 
       const storeList = Array.isArray(selectedStores) ? selectedStores : (selectedStores ? selectedStores.split(',') : []);
       const itemsStr = Array.isArray(items) ? items.join('\n') : items;
+      const filterList = Array.isArray(filters) ? filters : [];
       const isPro = req.user?.tier === 'pro';
 
       // JIT Scraping — restricted to PRO users
       const staleTerms = await BasketService.getStaleTerms(itemsStr, storeList);
-      let scrapedTerms = [];
 
       if (staleTerms.length > 0) {
         if (isPro) {
-          console.log(`🕒 PRO User: Found ${staleTerms.length} stale/missing terms. Updating cache...`);
+          console.log(`🕒 PRO: ${staleTerms.length} stale/missing term(s). Refreshing cache...`);
           for (const term of staleTerms) {
             await scraper.scrapeOnDemand(term, storeList, region);
-            scrapedTerms.push(term.toLowerCase());
           }
         } else {
-          console.log(`ℹ️ FREE User: ${staleTerms.length} stale terms found, skipping JIT scraping.`);
+          console.log(`ℹ️ FREE: ${staleTerms.length} stale term(s), skipping JIT scrape.`);
         }
       }
 
-      const results = await BasketService.calculateCheapestBasket(itemsStr, storeList, region);
+      const results = await BasketService.searchProducts(itemsStr, storeList, region, filterList);
 
-      const finalResults = results.map(item => ({
-        ...item,
-        isFresh: scrapedTerms.includes(item.userInput.toLowerCase())
-      }));
-
-      console.log(`Basket result: ${JSON.stringify(finalResults).substring(0, 200)}...`);
-      res.json(finalResults);
+      console.log(`Basket result: ${results.length} groups returned.`);
+      res.json(results);
     } catch (err) {
       console.error('Error processing basket:', err);
       res.status(500).json({

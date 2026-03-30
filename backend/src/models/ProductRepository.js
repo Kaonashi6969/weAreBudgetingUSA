@@ -37,7 +37,7 @@ class ProductRepository extends BaseRepository {
 
   async getWithPrices(selectedStoreIds = [], regionId = null) {
     let query = `
-      SELECT p.id, p.name, p.image_url, p.dietary_tags, pr.price, s.name as store, pr.url, pr.updated_at, s.id as store_id
+      SELECT p.id, p.name, p.image_url, p.dietary_tags, pr.price, s.name as store, pr.url, pr.updated_at, s.id as store_id, pr.package_size, pr.package_unit
       FROM products p 
       JOIN prices pr ON p.id = pr.product_id
       JOIN stores s ON pr.store_id = s.id
@@ -63,7 +63,19 @@ class ProductRepository extends BaseRepository {
     if (process.env.NODE_ENV !== 'production') {
       console.log(`[DB Exec] ${query} | Params: ${JSON.stringify(params)}`);
     }
-    return await database.all(query, params);
+    const rows = await database.all(query, params);
+
+    // Parse dietary_tags from stored JSON string to an array
+    return rows.map(row => ({
+      ...row,
+      dietary_tags: (() => {
+        try {
+          return Array.isArray(row.dietary_tags) ? row.dietary_tags : JSON.parse(row.dietary_tags || '[]');
+        } catch {
+          return [];
+        }
+      })(),
+    }));
   }
 }
 

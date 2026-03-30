@@ -64,30 +64,62 @@ class Database {
 
   async initialize() {
     try {
-      // Create Products table
+      // Create Products table (no UNIQUE on name — same product can exist with prices per store)
       await this.run(`
         CREATE TABLE IF NOT EXISTS products (
           id TEXT PRIMARY KEY,
-          name TEXT NOT NULL UNIQUE,
-          category TEXT NOT NULL,
+          name TEXT NOT NULL,
+          category TEXT NOT NULL DEFAULT 'General',
           image_url TEXT,
+          dietary_tags TEXT DEFAULT '[]',
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
       `);
 
-      // Ensure products table has updated schema
+      // Migration: remove UNIQUE constraint from products.name (SQLite requires table recreation)
       try {
-        const productCols = await this.all("PRAGMA table_info(products)");
+        const tableDef = await this.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='products'");
+        if (tableDef && tableDef.sql && /name\s+TEXT\s+NOT\s+NULL\s+UNIQUE/i.test(tableDef.sql)) {
+          console.log('Migration: removing UNIQUE constraint from products.name...');
+          const rows = await this.all('SELECT * FROM products');
+          await this.run('BEGIN TRANSACTION');
+          await this.run(`
+            CREATE TABLE products_new (
+              id TEXT PRIMARY KEY,
+              name TEXT NOT NULL,
+              category TEXT NOT NULL DEFAULT 'General',
+              image_url TEXT,
+              dietary_tags TEXT DEFAULT '[]',
+              created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+          `);
+          for (const row of rows) {
+            await this.run(
+              'INSERT OR IGNORE INTO products_new (id, name, category, image_url, dietary_tags, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+              [row.id, row.name, row.category || 'General', row.image_url || null, row.dietary_tags || '[]', row.created_at],
+            );
+          }
+          await this.run('DROP TABLE products');
+          await this.run('ALTER TABLE products_new RENAME TO products');
+          await this.run('COMMIT');
+          console.log(`Migration complete: ${rows.length} products copied, UNIQUE constraint removed.`);
+        }
+      } catch (err) {
+        try { await this.run('ROLLBACK'); } catch (e) { /* ignore */ }
+        console.error('Error during products table migration:', err);
+      }
+
+      // Ensure all columns exist (covers any remaining edge cases)
+      try {
+        const productCols = await this.all('PRAGMA table_info(products)');
         if (!productCols.some(col => col.name === 'image_url')) {
-          await this.run("ALTER TABLE products ADD COLUMN image_url TEXT");
-          console.log('Added image_url column to products table');
+          await this.run('ALTER TABLE products ADD COLUMN image_url TEXT');
         }
         if (!productCols.some(col => col.name === 'dietary_tags')) {
           await this.run("ALTER TABLE products ADD COLUMN dietary_tags TEXT DEFAULT '[]'");
-          console.log('Migration: added dietary_tags column to products table');
         }
       } catch (err) {
-        console.error('Error migrating products table:', err);
+        console.error('Error ensuring product columns:', err);
       }
 
       // Create Stores table
@@ -162,6 +194,35 @@ class Database {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
       `);
+
+      // Create Recipes table
+      await this.run(`
+        CREATE TABLE IF NOT EXISTS recipes (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          description TEXT,
+          image_url TEXT,
+          category TEXT DEFAULT 'General',
+          region TEXT NOT NULL DEFAULT 'us',
+          servings INTEGER DEFAULT 4,
+          ingredients TEXT NOT NULL, -- JSON array of strings/objects
+          instructions TEXT, -- Optional markdown or plain text
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
+      // Migration: add region column if missing
+      try {
+        await this.run(`ALTER TABLE recipes ADD COLUMN region TEXT NOT NULL DEFAULT 'us'`);
+      } catch { /* column already exists */ }
+
+      // Migration: add package_size and package_unit to prices
+      try {
+        await this.run(`ALTER TABLE prices ADD COLUMN package_size REAL`);
+      } catch { /* column already exists */ }
+      try {
+        await this.run(`ALTER TABLE prices ADD COLUMN package_unit TEXT`);
+      } catch { /* column already exists */ }
 
       console.log('Database tables initialized');
     } catch (err) {

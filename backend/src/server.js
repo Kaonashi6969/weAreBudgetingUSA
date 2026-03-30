@@ -17,14 +17,33 @@ const { scheduler } = require('./scheduler');
 const { logger } = require('./middleware/logger');
 const { sanitizeMiddleware } = require('./middleware/sanitizer');
 const { errorHandler, notFound } = require('./middleware/error-handler');
+const { seed: seedRecipes } = require('../seed-recipes');
+const { ALL_STORES } = require('./config/regions');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const AUTH_ENABLED = process.env.AUTH_ENABLED === 'true';
 
-// Initialize database on startup
-database.initialize().then(() => {
+// Initialize database on startup, then seed stores & recipes
+database.initialize().then(async () => {
   console.log('✅ Database initialized successfully.');
+
+  // Sync region-config stores into the DB so JOINs work
+  for (const store of ALL_STORES) {
+    const region = store.regions?.[0] || 'us';
+    await database.run(
+      `INSERT INTO stores (id, name, region) VALUES (?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET name = excluded.name, region = excluded.region`,
+      [store.id, store.name, region],
+    );
+  }
+  console.log(`✅ ${ALL_STORES.length} stores synced to database.`);
+
+  try {
+    await seedRecipes();
+  } catch (err) {
+    console.warn('⚠️ Recipe seeding failed:', err.message);
+  }
 }).catch(err => {
   console.error('Failed to initialize database:', err);
   process.exit(1);

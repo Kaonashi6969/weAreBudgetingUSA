@@ -94,5 +94,21 @@
   "profile": "Profile",
   "home": "Home",
   "results_for": "Results for",
-  "your_cart": "Your Cart"
+  "your_cart": "Your Cart",
+  "recipes": "Recipes",
+  "view_prices": "View Prices",
+  "no_recipes_available": "No recipes available at the moment.",
+  "loading_recipes": "Loading basic recipes...",
+  "recipe_not_found": "Recipe not found",
+  "recipe_not_found_message": "We couldn't find the recipe you're looking for.",
+  "back_to_recipes": "Back to Recipes",
+  "servings": "servings",
+  "quick_prep": "Quick prep", 
+  "local_ingredient_prices": "Local Ingredient Prices",
+  "instructions": "Instructions",
+  "total_market_average": "Total Market Average",
+  "single_cheapest_store": "Single Cheapest Store",
+  "add_ingredients_to_list": "Add Ingredients to List",
+  "nearby_store_estimates": "Nearby Store Estimates",
+  "items_found": "items found"
 }

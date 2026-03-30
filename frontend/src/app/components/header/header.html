@@ -16,6 +16,15 @@
         <span>{{ ui.translation()['my_shopping_list'] }}</span>
       </a>
 
+        <a 
+        routerLink="/recipes" 
+        routerLinkActive="active" 
+        class="nav-link"
+        >
+      <app-icon name="restaurant_menu" />
+      <span>{{ ui.translation()['recipes'] }}</span>
+    </a>
+
       <div class="profile-container">
         <button class="nav-link profile-btn" (click)="toggleMenu()" [class.active]="isMenuOpen">
           @if (ui.user()?.tier === 'pro') {
@@ -34,13 +43,22 @@
             <div class="dropdown-divider"></div>
 
             <a
-              routerLink="/saved-lists"
+            routerLink="/saved-lists"
               class="dropdown-item"
               routerLinkActive="active"
               (click)="closeMenu()"
             >
               <app-icon name="inventory_2" />
-              <span>{{ ui.translation()['saved_inventories'] }}</span>
+              <span>{{ ui.translation()['my_shopping_list'] }}</span>
+            </a>
+            <a
+              routerLink="/recipes"
+              class="dropdown-item"
+              routerLinkActive="active"
+              (click)="closeMenu()"
+            >
+              <app-icon name="restaurant_menu" />
+              <span>{{ ui.translation()['recipes'] }}</span>
             </a>
 
             <a

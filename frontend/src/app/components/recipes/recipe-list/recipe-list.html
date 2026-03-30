@@ -1,0 +1,45 @@
+<div class="recipe-grid">
+  @if (loading()) {
+    <div class="loading-container">
+      <app-icon name="sync" />
+      <p>{{ (ui.translation() || {})['loading_recipes'] || 'Loading basic recipes...' }}</p>
+    </div>
+  } @else if (recipes().length === 0) {
+    <div class="no-results">
+        <app-icon name="restaurant" />
+        <p>{{ (ui.translation() || {})['no_recipes_available'] || 'No recipes available at the moment.' }}</p>
+    </div>
+  } @else {
+    @for (recipe of recipes(); track recipe.id) {
+      <div class="recipe-card" (click)="viewRecipe(recipe.id)">
+        <div class="recipe-image-container">
+          @if (recipe.image_url) {
+            <img [src]="recipe.image_url" [alt]="recipe.name">
+          } @else {
+            <div class="no-image">
+              <app-icon name="restaurant" />
+            </div>
+          }
+          @if (recipe.category) {
+            <span class="recipe-category">{{ recipe.category }}</span>
+          }
+        </div>
+        
+        <div class="recipe-content">
+          <h3>{{ recipe.name }}</h3>
+          <p class="recipe-description">{{ recipe.description }}</p>
+          
+          <div class="recipe-footer">
+            <div class="recipe-meta">
+              <span><app-icon name="groups" /> {{ recipe.servings }}</span>
+              <span><app-icon name="list" /> {{ recipe.ingredients.length }}</span>
+            </div>
+            <div class="recipe-link">
+              {{ (ui.translation() || {})['view_prices'] || 'View Prices' }} <app-icon name="arrow_forward" />
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

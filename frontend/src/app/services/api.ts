@@ -9,6 +9,8 @@ import {
   SavedList,
   User,
   SavedListItem,
+  Recipe,
+  RecipePriceInfo,
 } from '../models/types';
 
 @Injectable({
@@ -30,6 +32,27 @@ export class ApiService {
   /** Returns all supported regions for the region selector. */
   getRegions(): Observable<Region[]> {
     return this.http.get<Region[]>(`${this.apiUrl}/regions`);
+  }
+
+  /** Returns recipes for a given region. */
+  getRecipes(region?: string, category?: string, query?: string): Observable<Recipe[]> {
+    const params: any = {};
+    if (region) params.region = region;
+    if (category) params.category = category;
+    if (query) params.q = query;
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes`, { params });
+  }
+
+  /** Returns details for a specific recipe. */
+  getRecipeById(id: string): Observable<Recipe> {
+    return this.http.get<Recipe>(`${this.apiUrl}/recipes/${id}`);
+  }
+
+  /** Returns price estimation for a recipe in a specific region. */
+  getRecipePriceInfo(id: string, region = 'us', stores?: string[]): Observable<RecipePriceInfo> {
+    const params: any = { region };
+    if (stores && stores.length > 0) params.stores = stores.join(',');
+    return this.http.get<RecipePriceInfo>(`${this.apiUrl}/recipes/${id}/price-estimate`, { params });
   }
 
   /** Calculates the cheapest basket, scoped to the user’s current region. */

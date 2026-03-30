@@ -50,9 +50,24 @@ const validate = (schema) => (req, res, next) => {
   }
 };
 
+// Schema for GET /recipes
+const RecipeListSchema = z.object({
+  q: z.string().max(100).optional(),
+  category: z.string().max(50).optional(),
+  region: z.string().regex(/^[a-z]{2}$/).optional()
+});
+
+// Schema for GET /recipes/:id/price-estimate
+const RecipePriceEstimateSchema = z.object({
+  region: z.string().regex(/^[a-z]{2}$/).optional().default('us'),
+  stores: z.string().max(500).optional()
+});
+
 module.exports = {
   ProductFilterSchema,
   BasketItemSchema,
   BasketRequestSchema,
+  RecipeListSchema,
+  RecipePriceEstimateSchema,
   validate
 };

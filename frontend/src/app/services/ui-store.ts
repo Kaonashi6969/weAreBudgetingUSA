@@ -41,12 +41,8 @@ export class UIStore {
     return val;
   });
 
-  // Active region (defaults to USA until the API responds)
-  readonly activeRegion = signal<Region>({
-    id: 'us',
-    name: 'United States',
-    currency: { code: 'USD', symbol: '$' },
-  });
+  // Active region (restored from localStorage, defaults to USA)
+  readonly activeRegion = signal<Region>(UIStore._restoreRegion());
 
   // Dark mode — starts from OS preference, can be overridden manually
   private _darkMode = signal(
@@ -99,6 +95,30 @@ export class UIStore {
   setRegion(region: Region) {
     this.activeRegion.set(region);
     this.transloco.setActiveLang(region.id.toLowerCase());
+    UIStore._persistRegion(region);
+  }
+
+  private static _defaultRegion: Region = {
+    id: 'us',
+    name: 'United States',
+    currency: { code: 'USD', symbol: '$' },
+  };
+
+  private static _persistRegion(region: Region): void {
+    try {
+      localStorage.setItem('activeRegion', JSON.stringify(region));
+    } catch { /* quota exceeded or SSR — ignore */ }
+  }
+
+  private static _restoreRegion(): Region {
+    try {
+      const raw = localStorage.getItem('activeRegion');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.id && parsed?.currency?.code) return parsed as Region;
+      }
+    } catch { /* corrupted or SSR — ignore */ }
+    return UIStore._defaultRegion;
   }
 
   translate(key: string, params: Record<string, unknown> = {}): string {

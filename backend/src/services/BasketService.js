@@ -1,167 +1,105 @@
+'use strict';
+
 const ProductRepository = require('../models/ProductRepository');
 const PriceRepository = require('../models/PriceRepository');
-const natural = require('natural');
-const { getRegion } = require('../config/regions');
 const { getStoresByIds } = require('../config/stores');
-
-const tokenizer = new natural.WordTokenizer();
-const JaroWinklerDistance = natural.JaroWinklerDistance;
-const LevenshteinDistance = natural.LevenshteinDistance;
+const { scoreRelevance } = require('../utils/product-relevance');
 
 class BasketService {
+
+  // ── Cache staleness check ──────────────────────────────────────────────────
+
   async getStaleTerms(itemsStr, selectedStoreIds = []) {
-    const inputs = typeof itemsStr === 'string' 
+    const inputs = typeof itemsStr === 'string'
       ? itemsStr.split(/[\r\n,]+/).map(i => i.trim().toLowerCase()).filter(i => i.length > 0)
       : [];
 
-    // If every selected store is API-based (noCache:true), skip the TTL check entirely
-    // and treat all terms as stale so fresh data is always fetched from the API.
     const selectedStores = getStoresByIds(selectedStoreIds);
-    const allNoCache = selectedStores.length > 0 && selectedStores.every(s => s.noCache === true);
-    if (allNoCache) {
-      console.log(`[Cache] All selected stores are API-based. Bypassing TTL — treating all ${inputs.length} term(s) as stale.`);
-      return inputs;
-    }
+    // API stores: 1-hour TTL (rate limit protection). Browser-scraped: 24-hour TTL.
+    const allApiStores = selectedStores.length > 0 && selectedStores.every(s => s.isApiStore === true);
+    const ttlHours = allApiStores ? 1 : 24;
+    console.log(`[Cache] TTL: ${ttlHours}h (${allApiStores ? 'API stores' : 'browser scraped'})`);
 
     const staleItems = [];
 
     for (const input of inputs) {
-      const processedInput = input;
-      const normalizedInput = processedInput.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, " ");
-      
-      // Pass store IDs to only check staleness for the selected stores
-      const latestPrice = await PriceRepository.getLatestUpdateForProduct(processedInput, normalizedInput.replace(/\s+/g, "_"), selectedStoreIds);
+      const normalizedInput = input
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9 ]/g, ' ');
 
-      console.log(`[Check Stale] Term: "${processedInput}", Found in selected stores: ${latestPrice?.last_update ? 'YES ('+latestPrice.last_update+')' : 'NO'}`);
+      const latestPrice = await PriceRepository.getLatestUpdateForProduct(
+        input, normalizedInput.replace(/\s+/g, '_'), selectedStoreIds,
+      );
 
-      if (!latestPrice || !latestPrice.last_update) {
-        staleItems.push(processedInput);
+      if (!latestPrice?.last_update) {
+        console.log(`[Cache] MISS: "${input}"`);
+        staleItems.push(input);
+        continue;
+      }
+
+      const diffHours = (Date.now() - new Date(latestPrice.last_update).getTime()) / 3_600_000;
+      if (diffHours > ttlHours) {
+        console.log(`[Cache] STALE: "${input}" (${diffHours.toFixed(1)}h old)`);
+        staleItems.push(input);
       } else {
-        const lastUpdated = new Date(latestPrice.last_update);
-        const now = new Date();
-        const diffInHours = (now - lastUpdated) / (1000 * 60 * 60);
-
-        if (diffInHours > 24) {
-          staleItems.push(processedInput);
-        }
+        console.log(`[Cache] HIT: "${input}" (${diffHours.toFixed(1)}h old)`);
       }
     }
+
     return staleItems;
   }
 
-  async calculateCheapestBasket(userInput, selectedStoreIds = [], regionId = 'us') {
-    const region = getRegion(regionId);
-    const { processedWordPenalty, snackWordPenalty, brandWeights = {} } = region.nlp;
+  // ── Product search (replaces NLP scoring engine) ───────────────────────────
 
-    console.log(`Calculate: "${userInput}", Stores: ${selectedStoreIds}, Region: ${regionId}`);
-    const inputs = typeof userInput === 'string' 
-      ? userInput.split(/[\r\n,]+/).map(item => item.trim().toLowerCase()).filter(item => item.length > 0)
+  /**
+   * Search for products matching user inputs, optionally filtered by dietary tags.
+   *
+   * Uses the NLP-based scoreRelevance() engine for matching (modifier-suffix
+   * detection, processed-food penalties, non-grocery rejection, compound-word
+   * analysis). Products scoring below 0.30 are excluded.
+   *
+   * @param {string}   userInput        Newline/comma-separated search terms
+   * @param {string[]} selectedStoreIds
+   * @param {string}   regionId
+   * @param {string[]} filters          Dietary filter IDs e.g. ['gf','vegan']
+   */
+  async searchProducts(userInput, selectedStoreIds = [], regionId = 'us', filters = []) {
+    const inputs = typeof userInput === 'string'
+      ? userInput.split(/[\r\n,]+/).map(i => i.trim()).filter(i => i.length > 0)
       : [];
 
-    const productsWithPrices = await ProductRepository.getWithPrices(selectedStoreIds);
-    console.log(`Matching against ${productsWithPrices.length} total price records`);
+    if (inputs.length === 0) return [];
+
+    const products = await ProductRepository.getWithPrices(selectedStoreIds, regionId);
+    console.log(`[Search] "${inputs.join(', ')}" → ${products.length} records (filters: ${filters.join(',') || 'none'})`);
+
     const results = [];
 
     for (const input of inputs) {
-      const lowInput = input.toLowerCase().trim();
+      // Dietary filters: AND logic — product must carry ALL requested tags
+      let candidates = products;
+      if (filters.length > 0) {
+        candidates = candidates.filter(p => {
+          const tags = Array.isArray(p.dietary_tags) ? p.dietary_tags : [];
+          return filters.every(f => tags.includes(f));
+        });
+        console.log(`[Filter] ${filters.join('+')} → ${candidates.length} candidates for "${input}"`);
+      }
 
-      const normalizedInput = lowInput
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9 ]/g, " ");
+      const scored = candidates.map(p => {
+        const relevance = scoreRelevance(p.name, input, regionId);
+        return { ...p, relevance };
+      }).filter(p => p.relevance >= 0.30);
 
-      const iTokens = tokenizer.tokenize(normalizedInput).map(t => t.toLowerCase());
-      if (iTokens.length === 0) continue;
-
-      const scoredOffers = productsWithPrices.map(p => {
-        const pNameLower = p.name.toLowerCase();
-        const cleanPName = pNameLower
-          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-          .replace(/[^a-z0-9 ]/g, " ");
-
-        const pTokens = tokenizer.tokenize(cleanPName).map(t => t.toLowerCase());
-        
-        // 1. Exact Match Check (Highest Priority)
-        // If the normalized input exactly matches the product name (stripped of non-alphanumeric)
-        if (cleanPName.replace(/\s+/g, '') === normalizedInput.replace(/\s+/g, '')) {
-            return { ...p, score: 99.0 }; // Absolute winner
-        }
-
-        // 2. Exact word match check (Must contain all user words)
-        const containsAllTokens = iTokens.every(it => pTokens.includes(it));
-        
-        // 3. Substring match check (Backup for partial words)
-        const containsAsSubstring = iTokens.every(it => cleanPName.includes(it));
-
-        let score = 0;
-
-        if (containsAllTokens) {
-            score += 10.0;
-            // Short name bonus (prefer "Milk" over "Milk with Vitamin D and Omega 3")
-            const lengthPenalty = (cleanPName.length - normalizedInput.length) * 0.05;
-            score -= lengthPenalty;
-        } else if (containsAsSubstring) {
-            score += 5.0;
-        } else {
-            // Fuzzy similarity fallback (JaroWinkler is good for typos)
-            const similarity = JaroWinklerDistance(normalizedInput, cleanPName);
-            score += similarity * 2.0;
-        }
-
-        // 4. Position Bonus (Word appears at the start)
-        if (cleanPName.startsWith(normalizedInput)) {
-            score += 2.0;
-        }
-
-        // 5. NLP Penalties (Category Mismatch)
-        const isProcessed = processedWordPenalty.some(pw => pTokens.includes(pw) || cleanPName.includes(pw));
-        const userAskedForProcessed = iTokens.some(it => processedWordPenalty.includes(it));
-
-        if (isProcessed && !userAskedForProcessed) {
-            score -= 6.0; // Heavy penalty for unwanted "Juice" when asking for "Orange"
-        }
-
-        const isSnack = snackWordPenalty.some(sw => pTokens.includes(sw) || cleanPName.includes(sw));
-        const userAskedForSnack = iTokens.some(it => snackWordPenalty.includes(it));
-
-        if (isSnack && !userAskedForSnack) {
-            score -= 3.0; // Penalty for "Cookies" etc.
-        }
-
-        // 6. Brand Weight/Quality (Optional from config)
-        for (const [brand, weight] of Object.entries(brandWeights)) {
-            if (pTokens.includes(brand.toLowerCase())) {
-                score += weight;
-            }
-        }
-
-        return { ...p, score };
+      scored.sort((a, b) => {
+        if (b.relevance !== a.relevance) return b.relevance - a.relevance;
+        return (a.price || 0) - (b.price || 0);
       });
 
-      // Filter matches and sort:
-      // 1. By score (Relevance)
-      // 2. By price (Secondary, if score is very close)
-      const matches = scoredOffers
-        .filter(o => o.score > 0.5) 
-        .sort((a, b) => {
-            // If scores are significantly different, use score
-            if (Math.abs(b.score - a.score) > 0.1) {
-                return b.score - a.score;
-            }
-            // Otherwise, cheaper is better
-            return a.price - b.price;
-        });
-
-      console.log(`Input "${input}" found ${matches.length} matches. Best score: ${matches[0]?.score?.toFixed(2) || 0}`);
-      
-      const topMatches = matches.slice(0, 50); // Increased from 10 to 50 for more variety
-
-      if (topMatches.length > 0) {
-        results.push({
-          userInput: input,
-          matches: topMatches
-        });
-      }
+      // Always push so the frontend can render a "no results" row per term
+      results.push({ userInput: input, matches: scored.slice(0, 30) });
     }
+
     return results;
   }
 }

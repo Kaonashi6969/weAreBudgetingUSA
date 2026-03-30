@@ -70,3 +70,59 @@ export interface ToastMessage {
   message: string;
   type: 'info' | 'success' | 'warning' | 'error';
 }
+
+export interface RecipeIngredient {
+  name: string;
+  qty: number;
+  unit: string;
+}
+
+export interface Recipe {
+  id: string;
+  name: string;
+  description?: string;
+  image_url?: string;
+  category?: string;
+  region?: string;
+  servings?: number;
+  ingredients: RecipeIngredient[];
+  instructions?: string;
+}
+
+export interface ProportionalInfo {
+  recipeCost: number;
+  packagesNeeded: number;
+  usageRatio: number;
+  packageSize: number;
+  packageUnit: string;
+}
+
+export interface RecipeIngredientEstimate {
+  name: string;
+  searchName?: string;
+  qty?: number | null;
+  unit?: string | null;
+  avgPrice: number | null;
+  bestPrice?: number;
+  bestStore?: string;
+  url?: string | null;
+  status: 'found' | 'not_found';
+  proportional?: ProportionalInfo | null;
+}
+
+export interface StoreTotal {
+  id: string;
+  name: string;
+  total: number;
+  itemsFound: number;
+}
+
+export interface RecipePriceInfo {
+  recipeId: string;
+  name: string;
+  ingredientCount: number;
+  averageTotal: number;
+  cheapestStore: StoreTotal | null;
+  ingredients: RecipeIngredientEstimate[];
+  allStoreTotals: StoreTotal[];
+}

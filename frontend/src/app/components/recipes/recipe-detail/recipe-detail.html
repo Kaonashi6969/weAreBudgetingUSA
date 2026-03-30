@@ -1,0 +1,115 @@
+@if (loading()) {
+  <div class="loading-full">
+    <app-icon name="sync" />
+    <p>{{ (ui.translation() || {})['loading_recipes'] || 'Loading basic recipes...' }}</p>
+  </div>
+} @else if (error()) {
+  <div class="no-results">
+    <app-icon name="error_outline" />
+    <h2>{{ (ui.translation() || {})['recipe_not_found'] || 'Recipe not found' }}</h2>
+    <p>{{ (ui.translation() || {})['recipe_not_found_message'] || "We couldn't find the recipe you're looking for." }}</p>
+    <a routerLink="/recipes" class="back-btn">{{ (ui.translation() || {})['back_to_recipes'] || 'Back to Recipes' }}</a>
+  </div>
+} @else {
+  <div class="recipe-detail-container">
+    <!-- Main Content -->
+    <main>
+      <header class="recipe-header">
+        <a routerLink="/recipes" class="back-btn">
+          <app-icon name="arrow_back" /> {{ (ui.translation() || {})['back_to_recipes'] || 'Back to Recipes' }}
+        </a>
+        <h1>{{ recipe()?.name }}</h1>
+        <div class="recipe-stats">
+          <div class="stat-item">
+            <app-icon name="groups" /> {{ recipe()?.servings }} {{ (ui.translation() || {})['servings'] || 'servings' }}
+          </div>
+          <div class="stat-item">
+            <app-icon name="timer" /> {{ (ui.translation() || {})['quick_prep'] || 'Quick prep' }}
+          </div>
+          <div class="stat-item">
+            <app-icon name="restaurant" /> {{ recipe()?.category }} 
+          </div>
+        </div>
+      </header>
+
+      <div class="section-card">
+        <h3><app-icon name="shopping_basket" /> {{ (ui.translation() || {})['local_ingredient_prices'] || 'Local Ingredient Prices' }}</h3>
+        <div class="ingredients-list">
+          @for (ing of priceInfo()?.ingredients; track ing.name) {
+            <div class="ingredient-row">
+              <div class="ingredient-left">
+                @if (ing.url) {
+                  <a class="ingredient-name ingredient-link" [href]="ing.url" target="_blank" rel="noopener noreferrer">
+                    {{ ing.name }} <app-icon name="open_in_new" />
+                  </a>
+                } @else {
+                  <span class="ingredient-name">{{ ing.name }}</span>
+                }
+                @if (ing.proportional) {
+                  <span class="usage-note">
+                    {{ (ing.proportional.usageRatio * 100).toFixed(0) }}% of package
+                  </span>
+                }
+              </div>
+              <div class="ingredient-price-info">
+                @if (ing.status === 'found') {
+                  <span class="best-price">{{ ing.bestPrice | currency:ui.activeRegion().currency.code }}</span>
+                  <span class="store-name">at {{ ing.bestStore }}</span>
+                  @if (ing.proportional) {
+                    <span class="proportional-note">recipe cost</span>
+                  } @else {
+                    <span class="avg-price">Avg: {{ ing.avgPrice | currency:ui.activeRegion().currency.code }}</span>
+                  }
+                } @else {
+                  <span class="status-missing">Item not in stock</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h3><app-icon name="menu_book" /> {{ (ui.translation() || {})['instructions'] || 'Instructions' }}</h3>
+        <div class="instructions-content">{{ recipe()?.instructions }}</div>    
+      </div>
+    </main>
+
+    <!-- Sidebar Summary -->
+    <aside class="price-summary-sidebar">
+      <div class="estimate-header">
+        <span class="label">{{ (ui.translation() || {})['total_market_average'] || 'Total Market Average' }}</span>
+        <span class="total-price">{{ priceInfo()?.averageTotal | currency:ui.activeRegion().currency.code }}</span>
+
+        @if (priceInfo()?.cheapestStore) {
+          <div class="cheapest-store">
+            <span class="store-label">{{ (ui.translation() || {})['single_cheapest_store'] || 'Single Cheapest Store' }}</span>
+            <div class="store-flex">
+              <span class="name">{{ priceInfo()?.cheapestStore?.name }}</span>  
+              <span class="price">{{ priceInfo()?.cheapestStore?.total | currency:ui.activeRegion().currency.code }}</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <button class="action-btn" (click)="addToBasket()">
+        <app-icon name="shopping_cart" /> {{ (ui.translation() || {})['add_ingredients_to_list'] || 'Add Ingredients to List' }}
+      </button>
+
+      @if (priceInfo()?.allStoreTotals?.length) {
+        <div class="comparison-list">
+          <h4>{{ (ui.translation() || {})['nearby_store_estimates'] || 'Nearby Store Estimates' }}</h4>
+          @for (store of priceInfo()?.allStoreTotals; track store.id) {
+            <div class="comp-item">
+              <div class="store-info">
+                <span class="name">{{ store.name }}</span>
+                <span class="items">{{ store.itemsFound }} {{ (ui.translation() || {})['items_found'] || 'items found' }}</span>
+              </div>
+              <span class="price">{{ store.total | currency:ui.activeRegion().currency.code }}</span>
+            </div>
+          }
+        </div>
+      }
+    </aside>
+  </div>
+}

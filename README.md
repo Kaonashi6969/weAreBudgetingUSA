@@ -13,7 +13,8 @@ A professional grocery search engine and price comparison tool for global retail
 - **Google OAuth 2.0**: Secure authentication for saving shopping lists and profiles.
 - **Saved Inventories**: Dedicated page for users to save, name, and retrieve their favorite shopping baskets. Items in saved lists link directly to the retailer's product page.
 - **Modern Frontend**: Built with **Angular 21** (2026 Edition) using **Signals** for reactive state management and **Modern Control Flow** (`@if`, `@for`).
-- **Basket State Persistence**: Shopping list inputs, selected stores, and search results are stored in the global `UIStore` — navigating to Profile and back preserves your basket exactly as you left it.
+- **Regional Recipes**: Browse region-specific recipes (US, UK, DE, HU) with full ingredient lists, instructions, and real-time price estimates powered by the basket engine. Recipes automatically adapt to the user's active region and currency.
+- **Basket State Persistence**: Shopping list inputs, selected stores, and search results are stored in the global `UIStore` — navigating to Profile and back preserves your basket exactly as you left it. Region selection is persisted to `localStorage` so the correct currency survives page refreshes.
 - **Dark Mode**: Fully automatic dark/light theming synchronized with the OS `prefers-color-scheme` setting. Can be overridden manually. All colors are driven by a CSS custom-property token system defined in `styles.scss`.
 - **Native Mobile Ready**: Capacitor integration exposes native device APIs (e.g. camera). `NativeService` wraps Capacitor calls with graceful web fallbacks.
 
@@ -26,9 +27,9 @@ For specific project conventions and coding standards, refer to [.github/copilot
 ### Backend (Node.js + Express + SQLite)
 The backend follows a **Layered/Clean Architecture** with a **Plugin-Based Config**:
 - **Region Plugins** (backend/src/config/regions/): Modular `.js` files that define how each market behaves and looks.
-- **Controllers** (backend/src/controllers/): Handle API requests.
-- **Services** (backend/src/services/): Core business logic (basket calculation, stale data detection).
-- **Repositories** (backend/src/models/): Abstracted database access using the Repository Pattern.
+- **Controllers** (backend/src/controllers/): Handle API requests (Basket, Product, List, Recipe).
+- **Services** (backend/src/services/): Core business logic (basket calculation, recipe price estimation, stale data detection).
+- **Repositories** (backend/src/models/): Abstracted database access using the Repository Pattern (Product, Price, List, Recipe).
 - **Scrapers** (backend/src/scrapers/): Playwright-based bots and API fetchers.
 
 ### Frontend (Angular 21)
@@ -37,8 +38,9 @@ The backend follows a **Layered/Clean Architecture** with a **Plugin-Based Confi
   - `StoreSelector` / `RegionSelector`: Modularized selection and branding logic.
   - `ProductResultCard`: Encapsulated matching and selection UI.
   - `SavedListCard`: Reusable list preview.
+  - `RecipeListComponent` / `RecipeDetailComponent`: Regional recipe browsing with real-time price estimates.
 - **Internationalization**: Managed via `Transloco` with support for dynamic language switching.
-- **Route Guards & Lazy Loading**: `/profile` and `/saved-lists` are lazy-loaded and protected by `AuthGuard`.
+- **Route Guards & Lazy Loading**: `/profile`, `/saved-lists`, and `/recipes` are lazy-loaded. `/profile` and `/saved-lists` are protected by `AuthGuard`.
 - **RxJS & Signals**: Efficient state management and change detection.
 - **Strict Typing**: Full TypeScript coverage with a central [types.ts](frontend/src/app/models/types.ts) library.
 
@@ -151,8 +153,56 @@ Calculate the cheapest basket for a list of items in a region.
 ]
 ```
 
+### GET /api/recipes?region=us&category=Mexican&q=taco
+Returns recipes filtered by region, category, and/or search query. All parameters are optional.
+
+**Response:**
+```json
+[
+  {
+    "id": "us-beef-tacos",
+    "name": "Classic Beef Tacos",
+    "description": "Ground beef tacos with all the essential toppings.",
+    "image_url": "/assets/recipes/taco-night.jpg",
+    "category": "Mexican",
+    "region": "us",
+    "servings": 4,
+    "ingredients": ["ground beef", "taco shells", "shredded lettuce", "cheddar cheese", "salsa", "sour cream", "avocado"],
+    "instructions": "1. Brown the beef. 2. Add taco seasoning. ..."
+  }
+]
+```
+
+### GET /api/recipes/:id/price-estimate?region=us&stores=walmart,kroger
+Returns real-time price estimates for a recipe's ingredients across selected stores.
+
+**Response:**
+```json
+{
+  "recipeId": "us-beef-tacos",
+  "name": "Classic Beef Tacos",
+  "ingredientCount": 7,
+  "averageTotal": 18.42,
+  "cheapestStore": { "id": "walmart", "name": "Walmart", "total": 15.87, "itemsFound": 7 },
+  "ingredients": [...],
+  "allStoreTotals": [...]
+}
+```
+
 ### GET /api/products
 Returns all items currently in the local database.
+
+---
+
+## 🌱 Seeding
+
+### Seed Recipes
+Pre-populate the database with 13 regional recipes (US, UK, DE, HU):
+```powershell
+cd backend
+npm run seed-recipes
+```
+The seed script skips existing recipes, so it's safe to re-run.
 
 ---
 

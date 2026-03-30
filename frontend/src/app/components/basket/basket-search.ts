@@ -34,7 +34,9 @@ export class BasketSearchComponent {
 
   get dietaryFilters(): { id: string; label: string; icon: string }[] {
     return [
-      { id: 'vegan', label: this.translations['filter_vegan'] || 'Vegan', icon: 'eco' },
+      { id: 'vegan', 
+        label: this.translations['filter_vegan'] || 'Vegan', 
+        icon: 'eco' },
       {
         id: 'gluten-free',
         label: this.translations['filter_gluten_free'] || 'Gluten Free',

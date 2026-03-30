@@ -42,7 +42,7 @@ const stores = [
     regions: ['us'],
     currency: 'USD',
     scraperType: 'walmart-api',
-    noCache: true,
+    isApiStore: true,
     url: 'https://www.walmart.com',
   },
   {
@@ -51,7 +51,7 @@ const stores = [
     regions: ['us'],
     currency: 'USD',
     scraperType: 'kroger-api',
-    noCache: true,
+    isApiStore: true,
     url: 'KROGER_API',
     zipCode: process.env.KROGER_DEFAULT_ZIP || '45202',
   },
@@ -61,7 +61,7 @@ const stores = [
     regions: ['us'],
     currency: 'USD',
     scraperType: 'instacart-api',
-    noCache: true,
+    isApiStore: true,
     url: 'https://www.instacart.com',
   },
 ];

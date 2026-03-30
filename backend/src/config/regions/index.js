@@ -54,7 +54,7 @@ const DISABLED_SHOPS = (process.env.SCRAPER_DISABLED_SHOPS || '')
 
 // ── Public API (drop-in replacement for regions.js + stores.js) ───────────────
 
-const DEFAULT_REGION_ID = 'us';
+const DEFAULT_REGION_ID = 'hu';
 
 /** Returns full region config (including NLP). Falls back to 'us'. */
 function getRegion(regionId) {

@@ -8,9 +8,13 @@
     <app-icon name="home" />
     <span>{{ (ui.translation() || {})['home'] || 'Home' }}</span>
   </a>
+  <a routerLink="/recipes" routerLinkActive="active" class="tab-item">
+    <app-icon name="restaurant_menu" />
+    <span>{{ (ui.translation() || {})['recipes'] || 'Recipes' }}</span>
+  </a>
   <a routerLink="/saved-lists" routerLinkActive="active" class="tab-item">
     <app-icon name="shopping_basket" />
-    <span>{{ (ui.translation() || {})['my_shopping_list'] }}</span>
+    <span>{{ (ui.translation() || {})['my_shopping_list'] || 'My Shopping List' }}</span>
   </a>
   <a routerLink="/profile" routerLinkActive="active" class="tab-item">
     <app-icon name="account_circle" />
